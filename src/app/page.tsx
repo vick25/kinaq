@@ -1,17 +1,22 @@
 import { Header } from "@/components/header"
 import { LocationDetails } from "@/components/location-details"
 import MapComponent from "@/components/map"
+import { fetchAllAirGradientData } from "@/api/airGradientData"
+import { NextResponse } from "next/server";
 
-export default function Home() {
+export default async function Home() {
+  const gradientData = await fetchAllAirGradientData();
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <div className="flex flex-1">
-        <div className="flex-1 bg-[#d9d9d9] p-4">
-          <MapComponent />
-          {/* <p className="text-center text-muted-foreground">Map view with Air Quality device points</p> */}
+      <div className="flex flex-col md:flex-row flex-1" >
+        <div className="w-full h-screen md:h-auto md:flex-1 bg-[#d9d9d9]">
+          <MapComponent gradientData={gradientData} />
         </div>
-        <LocationDetails />
+        <div className="w-full md:w-96">
+          <LocationDetails />
+        </div>
       </div>
     </div>
   )
