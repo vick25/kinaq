@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import maplibregl, { GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { time } from 'console';
 
 interface AirGradientPointData {
     locationId: number;
@@ -99,6 +100,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ gradientData }) => {
                         properties: {
                             locationName: item.locationName,
                             pm2_5: item.pm02,
+                            timestamp: item.timestamp,
                         },
                     })),
                 };
@@ -121,7 +123,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ gradientData }) => {
 
                     map.on("click", "location-points", (e) => {
                         const coordinates = e.features?.[0].geometry.coordinates.slice();
-                        const { locationName, pm2_5 } = e.features?.[0].properties || {};
+                        const { locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
 
                         while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
@@ -130,7 +132,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ gradientData }) => {
                         new maplibregl.Popup()
                             .setLngLat(coordinates as [number, number])
                             .setHTML(
-                                `<strong>${locationName}</strong><br />PM2.5: ${pm2_5}`
+                                `<strong>${locationName}</strong><br />PM2.5: ${pm2_5}<br>
+                                Time: ${new Date(timestamp).toLocaleString()}`
                             )
                             .addTo(map);
                     });
