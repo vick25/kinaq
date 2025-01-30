@@ -4,8 +4,9 @@ import React, { useEffect, useRef } from 'react';
 import maplibregl, { GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { time } from 'console';
+import useLocationStore from '../../stores/location-store';
 
-interface AirGradientPointData {
+interface IAirGradientPointData {
     locationId: number;
     locationName: string;
     publicLocationName: string;
@@ -37,13 +38,15 @@ interface AirGradientPointData {
     publicContributorName: null;
     timezone: string;
 }
-type GradientData = AirGradientPointData[];
+type GradientData = IAirGradientPointData[];
 
-interface MapComponentProps {
+interface IMapComponentProps {
     gradientData: GradientData; // Use the correct type
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ gradientData }) => {
+const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
+    const { retrieveLocation } = useLocationStore();
+
     const mapContainer = useRef<HTMLDivElement>(null);
     const mapRef = useRef<maplibregl.Map | null>(null);
 
@@ -98,6 +101,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ gradientData }) => {
                             coordinates: [item.longitude, item.latitude],
                         },
                         properties: {
+                            locationId: item.locationId,
                             locationName: item.locationName,
                             pm2_5: item.pm02,
                             timestamp: item.timestamp,
@@ -123,11 +127,13 @@ const MapComponent: React.FC<MapComponentProps> = ({ gradientData }) => {
 
                     map.on("click", "location-points", (e) => {
                         const coordinates = e.features?.[0].geometry.coordinates.slice();
-                        const { locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
+                        const { locationId, locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
 
                         while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
                         }
+
+                        retrieveLocation(locationId); // Store the locationId
 
                         new maplibregl.Popup()
                             .setLngLat(coordinates as [number, number])

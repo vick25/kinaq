@@ -1,9 +1,16 @@
+'use client'
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Droplets, Thermometer } from "lucide-react"
 import Image from "next/image"
+import useLocationStore from "../../stores/location-store"
 
 export function LocationDetails() {
+  const { locationId } = useLocationStore(); // Get locationId from store
+
+  // const agLocationData = await fetchLocationData(`${locationId}`); // Fetch location data
+  // console.log(agLocationData)
+
   return (
     <div className="w-96 border-l bg-background p-6">
       <div className="space-y-6">
@@ -74,16 +81,25 @@ export function LocationDetails() {
 
         <div className="space-y-4">
           <h3 className="font-semibold">Our Partners</h3>
-          <div className="flex justify-center space-x-4">
+          <div className="flex flex-col justify-center space-y-2">
+            <div className="flex justify-center items-center space-x-4">
+              <Image
+                src="/logo-wasaru.jpg"
+                alt="Partner Logo 1"
+                width={100}
+                height={50}
+                className="h-32 w-auto object-contain"
+              />
+              <Image
+                src="/logo-epic.png"
+                alt="Partner Logo 2"
+                width={500}
+                height={500}
+                className="h-40 w-auto object-cover"
+              />
+            </div>
             <Image
-              src="/placeholder.svg"
-              alt="Partner Logo 1"
-              width={100}
-              height={50}
-              className="h-12 w-auto object-contain"
-            />
-            <Image
-              src="/placeholder.svg"
+              src="/logo-westerveltgroup.png"
               alt="Partner Logo 2"
               width={100}
               height={50}
