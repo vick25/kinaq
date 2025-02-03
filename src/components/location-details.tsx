@@ -4,113 +4,159 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Droplets, Thermometer } from "lucide-react"
 import Image from "next/image"
 import useLocationStore from "../../stores/location-store"
+import { useEffect, useState } from "react"
+import { fetchLocationData } from "@/actions/airGradientData"
+
+interface ILocationData {
+  locationName: string;
+  publicLocationName: string;
+  latitude: number;
+  longitude: number;
+  offline?: boolean;
+  pm01: number;
+  pm02: number;
+  pm10: number;
+  pm003Count: number;
+  atmp: number;
+  rhum: number
+  rco2: number;
+  tvoc: number;
+  wifi: number;
+  timestamp: string;
+  tvocIndex: number;
+  noxIndex: number;
+  heatindex: number;
+  publicPlaceName?: null;
+  publicPlaceUrl?: null;
+  publicContributorName?: null;
+  timezone: string;
+  model?: string;
+  firmwareVersion?: string
+  locationId: number;
+}
 
 export function LocationDetails() {
   const { locationId } = useLocationStore(); // Get locationId from store
+  const [Loading, setLoading] = useState<boolean>(false)
+  const [locationData, setLocationData] = useState<ILocationData>()
 
-  // const agLocationData = await fetchLocationData(`${locationId}`); // Fetch location data
-  // console.log(agLocationData)
+  // Fetch location data
+  const agLocationData = async () => {
+    setLoading(true)
+    const response = await fetchLocationData(`${locationId}`)
+    setLocationData(response)
+    setLoading(false)
+  };
+
+  useEffect(() => {
+    agLocationData()
+  }, [locationId])
 
   return (
     <div className="w-96 border-l bg-background p-6">
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold">Location Details</h2>
-          <p className="text-sm text-muted-foreground">Lorem ipsum</p>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <span className="font-medium">Air Quality Index</span>
-            <span className="font-bold">42</span>
-          </div>
-          <Progress value={42} className="h-2" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="p-4">
-              <CardTitle className="flex items-center text-sm font-medium">
-                <Thermometer className="mr-2 h-4 w-4" />
-                Temperature
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl font-bold">24 °C</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="p-4">
-              <CardTitle className="flex items-center text-sm font-medium">
-                <Droplets className="mr-2 h-4 w-4" />
-                Humidity
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl font-bold">65 %</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="font-semibold">Pollutants</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>PM2.5</span>
-              <span>15 μg/m³</span>
+      {Loading ? <div>Loading...</div> :
+        locationData ?
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold">Location Details</h2>
+              <div className="flex justify-between gap-3 text-sm text-muted-foreground">
+                <p>{locationData?.locationName}</p>
+                <p>{new Date(locationData?.timestamp).toLocaleString()}</p>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span>PM10</span>
-              <span>25 μg/m³</span>
-            </div>
-            <div className="flex justify-between">
-              <span>NO2</span>
-              <span>18 ppb</span>
-            </div>
-          </div>
-        </div>
 
-        <div className="space-y-4">
-          <h3 className="font-semibold">Weekly Forecast</h3>
-          <div className="grid grid-cols-7 gap-2 text-center text-sm">
-            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-              <div key={day}>{day}</div>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="font-semibold">Our Partners</h3>
-          <div className="flex flex-col justify-center space-y-2">
-            <div className="flex justify-center items-center space-x-4">
-              <Image
-                src="/logo-wasaru.jpg"
-                alt="Partner Logo 1"
-                width={100}
-                height={50}
-                className="h-32 w-auto object-contain"
-              />
-              <Image
-                src="/logo-epic.png"
-                alt="Partner Logo 2"
-                width={500}
-                height={500}
-                className="h-40 w-auto object-cover"
-              />
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="font-medium">Air Quality Index</span>
+                <span className="font-bold">{locationData?.pm02}</span>
+              </div>
+              <Progress value={locationData?.pm02} className="h-2" />
             </div>
-            <Image
-              src="/logo-westerveltgroup.png"
-              alt="Partner Logo 2"
-              width={100}
-              height={50}
-              className="h-12 w-auto object-contain"
-            />
-          </div>
-        </div>
 
-        <div className="text-center text-sm text-muted-foreground">© Copyright WASARU 2024</div>
-      </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Card>
+                <CardHeader className="p-4">
+                  <CardTitle className="flex items-center text-sm font-medium">
+                    <Thermometer className="mr-2 h-4 w-4" />
+                    Temperature
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <div className="text-2xl font-bold">{locationData?.atmp} °C</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="p-4">
+                  <CardTitle className="flex items-center text-sm font-medium">
+                    <Droplets className="mr-2 h-4 w-4" />
+                    Humidity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <div className="text-2xl font-bold">{locationData?.rhum} %</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">Pollutants</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>PM2.5</span>
+                  <span>{locationData?.pm02} μg/m³</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>PM10</span>
+                  <span>{locationData?.pm10} μg/m³</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>NO2</span>
+                  <span>{locationData?.noxIndex} ppb</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">Weekly Forecast</h3>
+              <div className="grid grid-cols-7 gap-2 text-center text-sm">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                  <div key={day}>{day}</div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">Our Partners</h3>
+              <div className="flex flex-col justify-center space-y-2">
+                <div className="flex justify-center items-center space-x-4">
+                  <Image
+                    src="/logo-wasaru.jpg"
+                    alt="Partner Logo 1"
+                    width={100}
+                    height={50}
+                    className="h-32 w-auto object-contain"
+                  />
+                  <Image
+                    src="/logo-epic.png"
+                    alt="Partner Logo 2"
+                    width={500}
+                    height={500}
+                    className="h-40 w-auto object-cover"
+                  />
+                </div>
+                <Image
+                  src="/logo-westerveltgroup.png"
+                  alt="Partner Logo 2"
+                  width={100}
+                  height={50}
+                  className="h-12 w-auto object-contain"
+                />
+              </div>
+            </div>
+
+            <div className="text-center text-sm text-muted-foreground">© Copyright WASARU 2024</div>
+          </div> :
+          <div>No data found!</div>}
     </div>
   )
 }
-

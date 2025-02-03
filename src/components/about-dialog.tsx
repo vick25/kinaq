@@ -1,7 +1,7 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { X, Users, Database, Building2 } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Users, Database, Building2 } from "lucide-react"
 import Image from "next/image"
 
 interface AboutDialogProps {

@@ -3,7 +3,6 @@
 import React, { useEffect, useRef } from 'react';
 import maplibregl, { GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { time } from 'console';
 import useLocationStore from '../../stores/location-store';
 
 interface IAirGradientPointData {
@@ -60,7 +59,9 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
 
         const map = new maplibregl.Map({
             container: mapContainer.current as HTMLDivElement,
-            style: "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+            style:
+                // 'https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/openStreetMap.json',
+                "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
             center: [initialLongitude, initialLatitude],
             zoom: initialZoom,
             // maxBounds: initialBounds,
@@ -92,7 +93,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                 // );
                 const data = gradientData;
 
-                const pointsGeoJSON = {
+                const pointsGeoJSON: any = {
                     type: "FeatureCollection",
                     features: data.map((item: any) => ({
                         type: "Feature",
@@ -158,7 +159,6 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         };
 
         fetchData();
-
 
         return () => {
             map.remove();
