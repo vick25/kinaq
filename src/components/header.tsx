@@ -4,15 +4,25 @@ import Link from "next/link"
 import { Search, Menu, User, Settings, LogIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
 import AboutDialog from "./about-dialog";
+import { useTheme } from "next-themes";
 
 export function Header() {
+  const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const handleThemeToggle = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      setTheme(theme === "dark" ? "light" : "dark")
+    },
+    [theme, setTheme],
+  )
 
   return (
     <header className="border-b">
@@ -66,10 +76,10 @@ export function Header() {
                   <User className="mr-2 h-4 w-4" />
                   <span>My Data</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                   <span className="flex items-center justify-between w-full">
                     Dark mode
-                    <Switch />
+                    <Switch checked={theme === "dark"} onClick={handleThemeToggle} />
                   </span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
@@ -125,7 +135,7 @@ export function Header() {
                 </Link>
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Dark mode</span>
-                  <Switch />
+                  <Switch onClick={handleThemeToggle} />
                 </div>
                 <Link href="/settings" className="block text-sm">
                   Settings
