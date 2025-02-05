@@ -1,4 +1,4 @@
-import { LocationDetails } from "@/components/location-details"
+import LocationDetails from "@/components/location-details"
 import MapComponent from "@/components/map"
 import { fetchAllAirGradientData } from "@/actions/airGradientData"
 
@@ -16,4 +16,3 @@ export default async function Home() {
     </div>
   )
 }
-

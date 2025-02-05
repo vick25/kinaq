@@ -10,7 +10,7 @@ const useLocationStore = create<LocationStore>()(
     persist(
         (set) => ({
             locationId: 0,
-            retrieveLocation: (locationId) => set({ locationId: locationId }),
+            retrieveLocation: (locationId) => set({ locationId }),
         }),
         {
             name: 'locationStorage',

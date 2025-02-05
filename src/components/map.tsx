@@ -68,12 +68,9 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         });
 
         map.addControl(new NavigationControl(), 'top-left');
-        map.addControl(
-            new GeolocateControl({
-                positionOptions: { enableHighAccuracy: true },
-            })
-        );
-        ;
+        map.addControl(new GeolocateControl({
+            positionOptions: { enableHighAccuracy: true },
+        }));
         map.addControl(new ScaleControl({
             maxWidth: 80,
             unit: 'metric'
@@ -121,7 +118,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                         type: "circle",
                         source: "locations",
                         paint: {
-                            "circle-radius": 6,
+                            "circle-radius": 8,
                             "circle-color": "#FF5722",
                         },
                     });
