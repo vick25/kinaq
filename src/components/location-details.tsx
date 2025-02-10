@@ -1,6 +1,7 @@
 'use client'
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 import { Droplets, Thermometer } from "lucide-react"
 import Image from "next/image"
 import useLocationStore from "../../stores/location-store"
@@ -153,7 +154,9 @@ export default function LocationDetails() {
           <div>No data found!</div>
       }
 
-      <footer className="space-y-12 mt-8 border-t-2">
+      <Separator className="mt-4" />
+
+      <footer className="space-y-12">
         <div className="space-y-4">
           <h3 className="font-semibold mt-2">Our Partners</h3>
           <div className="flex flex-col justify-center space-y-2">

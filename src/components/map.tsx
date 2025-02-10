@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import maplibregl, { GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import useLocationStore from '../../stores/location-store';
+import { getPM25Color } from './location-gauge'
 
 interface IAirGradientPointData {
     locationId: number;
@@ -44,10 +45,34 @@ interface IMapComponentProps {
 }
 
 const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
+    const [message, setMessage] = useState('')
+    const timeoutRef = useRef<NodeJS.Timeout>(null)
     const { retrieveLocation } = useLocationStore();
 
     const mapContainer = useRef<HTMLDivElement>(null);
     const mapRef = useRef<maplibregl.Map | null>(null);
+
+    const handleWheel = (e: MouseEvent) => {
+        if (!e.ctrlKey || !e.metaKey) {
+            setMessage('Scroll with Ctrl/Cmd to zoom.')
+            if (e.target.className === 'maplibregl-canvas') {
+                e.preventDefault();
+                e.stopPropagation();
+                if (timeoutRef.current) clearTimeout(timeoutRef.current)
+                timeoutRef.current = setTimeout(() => {
+                    setMessage('')
+                }, 2000)
+            }
+        } else {
+            setMessage('')
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current)
+                timeoutRef.current = null
+            }
+        }
+    }
+
+    mapContainer.current?.addEventListener('wheel', handleWheel)
 
     useEffect(() => {
         if (mapRef.current) return; // Prevent reinitialization
@@ -65,6 +90,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
             center: [initialLongitude, initialLatitude],
             zoom: initialZoom,
             // maxBounds: initialBounds,
+            attributionControl: false
         });
 
         map.addControl(new NavigationControl(), 'top-left');
@@ -77,7 +103,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         }));
         map.addControl(new AttributionControl({
             customAttribution: '<a href="https://www.airgradient.com/" target="_blank">&copy; AirGradient</a> | <a href="https://www.wasaru.org/" target="_blank">&copy; WASARU </a>',
-            compact: false,
+            compact: true,
         }));
 
         mapRef.current = map;
@@ -85,14 +111,9 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         // Fetch and add points to the map
         const fetchData = async () => {
             try {
-                // const response = await fetch(
-                //     "https://api.airgradient.com//public/api/v1/world/locations/measures/current"
-                // );
-                const data = gradientData;
-
                 const pointsGeoJSON: any = {
                     type: "FeatureCollection",
-                    features: data.map((item: any) => ({
+                    features: gradientData?.map((item: any) => ({
                         type: "Feature",
                         geometry: {
                             type: "Point",
@@ -119,7 +140,21 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                         source: "locations",
                         paint: {
                             "circle-radius": 8,
-                            "circle-color": "#FF5722",
+                            // "circle-color": "#FF5722",
+                            'circle-color': ['step',
+                                ['get', 'pm2_5'],
+                                getPM25Color(10),
+                                12,
+                                getPM25Color(35),
+                                35.4,
+                                getPM25Color(50),
+                                55.4,
+                                getPM25Color(100),
+                                150.4,
+                                getPM25Color(180),
+                                250.4,
+                                getPM25Color(300)
+                            ]
                         },
                     });
 
@@ -160,11 +195,36 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         return () => {
             map.remove();
             mapRef.current = null;
+            if (mapContainer.current) {
+                mapContainer.current.removeEventListener('wheel', handleWheel)
+            }
         };
     }, []);
 
     return (
-        <div style={{ height: '100%', width: '100%' }}>
+        <div className='relative h-full w-full' style={{ position: 'relative', height: '100%', width: '100%' }}>
+            {message && (
+                <div className='absolute top-0 w-full h-full flex justify-center items-center bg-white opacity-70 text-gray-400 z-[2]'
+                // style={{
+                //     position: 'absolute',
+                //     top: '0',
+                //     // left: '0',
+                //     width: '100%',
+                //     height: '100%',
+                //     aspectRatio: '1/1',
+                //     display: 'flex',
+                //     justifyContent: 'center',
+                //     alignItems: 'center',
+                //     background: 'white',
+                //     fontWeight: '700',
+                //     opacity: '0.7',
+                //     color: 'gray',
+                //     zIndex: 2
+                // }}
+                >
+                    {message}
+                </div>
+            )}
             <div ref={mapContainer} style={{ height: '100%', width: '100%' }} />
         </div>
     );
