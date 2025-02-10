@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import maplibregl, { GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import useLocationStore from '../../stores/location-store';
@@ -46,33 +46,11 @@ interface IMapComponentProps {
 
 const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     const [message, setMessage] = useState('')
-    const timeoutRef = useRef<NodeJS.Timeout>(null)
+    const [locationId, setLocationId] = useState<number | null>(-1)
     const { retrieveLocation } = useLocationStore();
 
     const mapContainer = useRef<HTMLDivElement>(null);
     const mapRef = useRef<maplibregl.Map | null>(null);
-
-    const handleWheel = (e: MouseEvent) => {
-        if (!e.ctrlKey || !e.metaKey) {
-            setMessage('Scroll with Ctrl/Cmd to zoom.')
-            if (e.target.className === 'maplibregl-canvas') {
-                e.preventDefault();
-                e.stopPropagation();
-                if (timeoutRef.current) clearTimeout(timeoutRef.current)
-                timeoutRef.current = setTimeout(() => {
-                    setMessage('')
-                }, 2000)
-            }
-        } else {
-            setMessage('')
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current)
-                timeoutRef.current = null
-            }
-        }
-    }
-
-    mapContainer.current?.addEventListener('wheel', handleWheel)
 
     useEffect(() => {
         if (mapRef.current) return; // Prevent reinitialization
@@ -105,6 +83,20 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
             customAttribution: '<a href="https://www.airgradient.com/" target="_blank">&copy; AirGradient</a> | <a href="https://www.wasaru.org/" target="_blank">&copy; WASARU </a>',
             compact: true,
         }));
+
+        map.on('wheel', (e) => {
+            if (!e.originalEvent.ctrlKey) {
+                map.scrollZoom.disable();
+                setMessage('Hold Ctrl to zoom');
+                // Remove the overlay after a short delay
+                setTimeout(() => {
+                    setMessage('');
+                }, 2000);
+            } else {
+                setMessage('');
+                map.scrollZoom.enable();
+            }
+        });
 
         mapRef.current = map;
 
@@ -167,11 +159,13 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                         }
 
                         retrieveLocation(locationId); // Store the locationId
+                        setLocationId(locationId);
 
                         new maplibregl.Popup()
                             .setLngLat(coordinates as [number, number])
                             .setHTML(
-                                `<strong>${locationName}</strong><br />PM2.5: ${pm2_5}<br>
+                                `<strong>${locationName}</strong><br>
+                                PM2.5: ${pm2_5}<br>
                                 Time: ${new Date(timestamp).toLocaleString()}`
                             )
                             .addTo(map);
@@ -194,34 +188,28 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
 
         return () => {
             map.remove();
-            mapRef.current = null;
-            if (mapContainer.current) {
-                mapContainer.current.removeEventListener('wheel', handleWheel)
-            }
         };
     }, []);
+
+    useEffect(() => {
+        // Fly to a random location by offsetting the point -74.50, 40
+        // by up to 5 degrees.
+        locationId &&
+            setTimeout(() => {
+                mapRef.current?.flyTo({
+                    center: [
+                        -74.5 + (Math.random() - 0.5) * 10,
+                        40 + (Math.random() - 0.5) * 10
+                    ],
+                    essential: true // this animation is considered essential with respect to prefers-reduced-motion
+                })
+            }, 5000);
+    }, [locationId])
 
     return (
         <div className='relative h-full w-full' style={{ position: 'relative', height: '100%', width: '100%' }}>
             {message && (
-                <div className='absolute top-0 w-full h-full flex justify-center items-center bg-white opacity-70 text-gray-400 z-[2]'
-                // style={{
-                //     position: 'absolute',
-                //     top: '0',
-                //     // left: '0',
-                //     width: '100%',
-                //     height: '100%',
-                //     aspectRatio: '1/1',
-                //     display: 'flex',
-                //     justifyContent: 'center',
-                //     alignItems: 'center',
-                //     background: 'white',
-                //     fontWeight: '700',
-                //     opacity: '0.7',
-                //     color: 'gray',
-                //     zIndex: 2
-                // }}
-                >
+                <div className='absolute top-0 w-full h-full flex justify-center items-center bg-white opacity-70 text-gray-600 z-[2]'>
                     {message}
                 </div>
             )}
