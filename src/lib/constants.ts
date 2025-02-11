@@ -1,0 +1,1 @@
+export const API_URL = 'https://api.airgradient.com//public/api/'

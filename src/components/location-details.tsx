@@ -7,40 +7,13 @@ import Image from "next/image"
 import useLocationStore from "../../stores/location-store"
 import { useEffect, useState } from "react"
 import { fetchLocationData } from "@/actions/airGradientData"
-import LocationGauge, { COLORS } from "./location-gauge"
+import LocationGauge from "./location-gauge"
 import { toast } from "react-fox-toast"
-
-interface ILocationData {
-  locationName: string;
-  publicLocationName: string;
-  latitude: number;
-  longitude: number;
-  offline?: boolean;
-  pm01: number;
-  pm02: number;
-  pm10: number;
-  pm003Count: number;
-  atmp: number;
-  rhum: number
-  rco2: number;
-  tvoc: number;
-  wifi: number;
-  timestamp: string;
-  tvocIndex: number;
-  noxIndex: number;
-  heatindex: number;
-  publicPlaceName?: null;
-  publicPlaceUrl?: null;
-  publicContributorName?: null;
-  timezone: string;
-  model?: string;
-  firmwareVersion?: string
-  locationId: number;
-}
+import { COLORS, ILocationData } from "@/lib/definitions"
 
 export default function LocationDetails() {
   const { locationId } = useLocationStore(); // Get locationId from store
-  const [Loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const [locationData, setLocationData] = useState<ILocationData>()
 
   // Fetch location data
@@ -68,7 +41,7 @@ export default function LocationDetails() {
 
   return (
     <div className="w-96 border-l bg-background p-4">
-      {Loading ? <div>Loading ...</div> :
+      {loading ? <div>Loading ...</div> :
         locationData ?
           <div className="space-y-6">
             <div>

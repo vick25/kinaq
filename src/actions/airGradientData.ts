@@ -1,9 +1,9 @@
 'use server'
-
+import { API_URL } from './../lib/constants';
 import { NextResponse } from "next/server";
 
 export async function fetchAllAirGradientData() {
-    const APIURL = "https://api.airgradient.com//public/api/v1/world/locations/measures/current";
+    const APIURL = `${API_URL}v1/world/locations/measures/current`;
 
     try {
         const response = await fetch(APIURL);
@@ -15,7 +15,7 @@ export async function fetchAllAirGradientData() {
 }
 
 export async function fetchLocationData(locationId: string) {
-    const APIURL = `https://api.airgradient.com//public/api/v1/world/locations/${locationId}/measures/current`;
+    const APIURL = `${API_URL}v1/world/locations/${locationId}/measures/current`;
 
     try {
         const response = await fetch(APIURL);

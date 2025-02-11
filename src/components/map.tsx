@@ -1,48 +1,11 @@
 'use client'
 
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import maplibregl, { GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import useLocationStore from '../../stores/location-store';
-import { getPM25Color } from './location-gauge'
-
-interface IAirGradientPointData {
-    locationId: number;
-    locationName: string;
-    publicLocationName: string;
-    latitude: number;
-    longitude: number;
-    pm01: number;
-    pm02: number;
-    pm10: number;
-    pm003Count: number;
-    atmp: number;
-    rhum: number;
-    rco2: number;
-    tvoc: number;
-    wifi: number;
-    timestamp: string;
-    ledMode: string;
-    ledCo2Threshold1: number;
-    ledCo2Threshold2: number;
-    ledCo2ThresholdEnd: number;
-    serialno: string | number;
-    model: string | number;
-    firmwareVersion: string | null;
-    tvocIndex: number;
-    noxIndex: number;
-    offline: boolean;
-    heatindex: number;
-    publicPlaceName: null;
-    publicPlaceUrl: null;
-    publicContributorName: null;
-    timezone: string;
-}
-type GradientData = IAirGradientPointData[];
-
-interface IMapComponentProps {
-    gradientData: GradientData; // Use the correct type
-}
+import { IMapComponentProps } from '@/lib/definitions';
+import { getPM25Color } from '@/lib/utils';
 
 const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     const [message, setMessage] = useState('')
