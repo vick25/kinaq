@@ -3,14 +3,16 @@ import { persist } from 'zustand/middleware';
 
 type LocationStore = {
     locationId: number;
-    retrieveLocation: (locationId: number) => void;
+    coordinates: number[];
+    retrieveLocation: (locationId: number, coordinates: number[]) => void;
 }
 
 const useLocationStore = create<LocationStore>()(
     persist(
         (set) => ({
             locationId: 0,
-            retrieveLocation: (locationId) => set({ locationId }),
+            coordinates: [],
+            retrieveLocation: (locationId, coordinates) => set({ locationId, coordinates }),
         }),
         {
             name: 'locationStorage',

@@ -61,13 +61,14 @@ export default function LocationDetails() {
                 value={Math.round(locationData?.pm02)}
                 limits={[
                   { value: 12, color: COLORS.green },
-                  { value: 35.4, color: COLORS.lightBlue },
+                  { value: 35.4, color: COLORS.yellow },
                   { value: 55.4, color: COLORS.orange },
                   { value: 150.4, color: COLORS.red },
-                  { value: 200, color: COLORS.purple },
+                  { value: 250.4, color: COLORS.purple },
+                  { value: 1000, color: COLORS.brown },
                 ]}
                 min={0}
-                max={200}
+                max={1000}
               />
               {/* <Progress value={Math.round(locationData?.pm02)} className="h-2" /> */}
             </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import maplibregl, { Map, GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import useLocationStore from '../../stores/location-store';
@@ -11,10 +11,10 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     const [map, setMap] = useState<Map | null>(null);
     const [message, setMessage] = useState('')
     const [locationId, setLocationId] = useState<number | null>(-1)
-    const { retrieveLocation } = useLocationStore();
+    const { retrieveLocation, coordinates } = useLocationStore();
 
     // To Load the Map
-    useEffect(() => {
+    useEffect(function createMap() {
         if (map) return;
 
         const initialLongitude = 20.0; // Longitude for the center of Central Africa
@@ -98,7 +98,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                         paint: {
                             "circle-radius": 8,
                             "circle-stroke-width": 1,
-                            "circle-stroke-color": "#fff",
+                            "circle-stroke-color": "#FFF",
                             // "circle-color": "#FF5722",
                             'circle-color': ['step',
                                 ['get', 'pm2_5'],
@@ -134,7 +134,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                             )
                             .addTo(map);
 
-                        retrieveLocation(locationId); // Store the locationId
+                        retrieveLocation(locationId, coordinates); // Store the locationId
                         setLocationId(locationId);
                     });
 
@@ -163,12 +163,12 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
             setTimeout(() => {
                 map.flyTo({
                     center: [
-                        -74.5 + (Math.random() - 0.5) * 10,
-                        40 + (Math.random() - 0.5) * 10
+                        coordinates[0], // -74.5 + (Math.random() - 0.5) * 10,
+                        coordinates[1] // 40 + (Math.random() - 0.5) * 10
                     ],
                     essential: true // this animation is considered essential with respect to prefers-reduced-motion
                 })
-            }, 5000);
+            }, 2000);
     }, [map, locationId])
 
     return (

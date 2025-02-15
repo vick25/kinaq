@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Search, Menu, User, Settings, LogIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useCallback, useState } from "react"
+import React, { useCallback, useState } from "react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
@@ -12,7 +12,7 @@ import AboutDialog from "./about-dialog";
 import { useTheme } from "next-themes";
 import { ToastContainer } from "react-fox-toast"
 
-export function Header() {
+function Header() {
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -24,6 +24,8 @@ export function Header() {
     },
     [theme, setTheme],
   )
+
+  console.log(console.log('Header rendered'))
 
   return (
     <header className="border-b">
@@ -154,3 +156,4 @@ export function Header() {
   )
 }
 
+export default React.memo(Header);

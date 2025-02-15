@@ -77,13 +77,15 @@ export interface ICustomGradientGaugeProps {
 }
 
 export const COLORS = {
-    green: '#7BDA72',
-    orange: '#F0C42D',
-    red: '#EC2C45',
+    green: '#1de208',
+    yellow: '#e2e020',
+    orange: '#e26a05',
+    red: '#e20410',
+    purple: '#7f01e2',
+    brown: '#903305',
     grey: '#464A4F',
     white: '#FFFFFF',
     lightBlue: '#7CDDED',
     darkRed: '#960232',
-    purple: '#512871',
     background: '#F5F5F5',
 };

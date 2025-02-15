@@ -34,17 +34,23 @@ const LocationGauge = ({
                     type='semicircle'
                     minValue={min}
                     maxValue={max}
+                    value={value}
                     arc={{
+                        width: 0.2,
+                        padding: 0.005,
+                        cornerRadius: 1,
                         gradient: true,
                         subArcs: limits.map((limit, index) => ({
                             limit: limit.value,
                             color: limit.color,
+                            showTick: true,
                         })),
                     }}
                     pointer={{
                         color: COLORS.grey,
                         length: 0.8,
                         width: 10,
+                        elastic: true,
                     }}
                     labels={{
                         valueLabel: {
@@ -56,12 +62,13 @@ const LocationGauge = ({
                             },
                         },
                         tickLabels: {
+                            type: 'outer',
                             defaultTickValueConfig: {
                                 formatTextValue: (value: any) => `${value}${tickSuffix}`,
+                                style: { fontSize: 10 }
                             },
                         },
                     }}
-                    value={value}
                 />
             </div>
         </div>
@@ -69,4 +76,3 @@ const LocationGauge = ({
 }
 
 export default LocationGauge
-
