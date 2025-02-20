@@ -12,7 +12,7 @@ const LocationGauge = ({
     valueSuffix = '',
     tickSuffix = '',
     min = 0,
-    max = 100,
+    max = 500
 }: ICustomGradientGaugeProps) => {
     // Good
     // Moderate
@@ -25,8 +25,8 @@ const LocationGauge = ({
         <div className="space-y-2">
             <div>
                 <p style={{
-                    color: "white",
-                    fontSize: "20px",
+                    color: "black",
+                    fontSize: "14px",
                     margin: "auto",
                     textAlign: "center"
                 }}>{label}</p>
@@ -38,12 +38,15 @@ const LocationGauge = ({
                     arc={{
                         width: 0.2,
                         padding: 0.005,
-                        cornerRadius: 1,
-                        gradient: true,
+                        cornerRadius: 2,
+                        //gradient: true,
                         subArcs: limits.map((limit, index) => ({
                             limit: limit.value,
                             color: limit.color,
                             showTick: true,
+                            // tooltip: {
+                            //     text: {label}
+                            // },
                         })),
                     }}
                     pointer={{
@@ -67,6 +70,12 @@ const LocationGauge = ({
                                 formatTextValue: (value: any) => `${value}${tickSuffix}`,
                                 style: { fontSize: 10 }
                             },
+                            ticks: [
+                                { value: 250 },
+                                { value: 350 },
+                                { value: 400 },
+                                { value: 450 }
+                            ],
                         },
                     }}
                 />

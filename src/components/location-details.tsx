@@ -1,5 +1,5 @@
 'use client'
-import { Progress } from "@/components/ui/progress"
+// import { Progress } from "@/components/ui/progress"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Droplets, Thermometer } from "lucide-react"
@@ -10,11 +10,19 @@ import { fetchLocationData } from "@/actions/airGradientData"
 import LocationGauge from "./location-gauge"
 import { toast } from "react-fox-toast"
 import { COLORS, ILocationData } from "@/lib/definitions"
+import { calculateOverallAqi, formatDateToLocaleString, formatTo2Places, getAqiDescription } from "@/lib/utils"
+
+interface AQI {
+  AQI_PM25: number | null;
+  AQI_PM10: number | null;
+  Overall_AQI: number | null;
+}
 
 export default function LocationDetails() {
   const { locationId } = useLocationStore(); // Get locationId from store
   const [loading, setLoading] = useState<boolean>(false)
   const [locationData, setLocationData] = useState<ILocationData>()
+  const [AQI, setAQI] = useState<AQI>()
 
   // Fetch location data
   const agLocationData = async () => {
@@ -39,36 +47,43 @@ export default function LocationDetails() {
     agLocationData()
   }, [locationId])
 
+  useEffect(() => {
+    if (locationData) {
+      setAQI(calculateOverallAqi(locationData))
+    }
+  }, [locationData]);
+
   return (
-    <div className="w-96 border-l bg-background p-4">
+    <div className="w-96 border-l bg-background p-4 flex flex-col h-full">
       {loading ? <div>Loading ...</div> :
         locationData ?
           <div className="space-y-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">Location Details</h2>
-              <div className="flex justify-between gap-3 text-sm text-muted-foreground">
+              <div className="flex justify-between items-center gap-3 text-sm text-muted-foreground">
                 <p>{locationData?.locationName}</p>
-                <p>{new Date(locationData?.timestamp).toLocaleString()}</p>
+                <p className="text-xs">{formatDateToLocaleString(locationData?.timestamp)}</p>
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="font-medium">Air Quality Index</span>
-                <span className="font-bold">{locationData?.pm02} μg/m³</span>
+                <span className="font-bold">{AQI?.Overall_AQI}</span>
               </div>
               <LocationGauge
-                value={Math.round(locationData?.pm02)}
+                value={Math.round(AQI?.Overall_AQI || 0)}
+                label={getAqiDescription(AQI?.Overall_AQI || 0).category}
                 limits={[
-                  { value: 12, color: COLORS.green },
-                  { value: 35.4, color: COLORS.yellow },
-                  { value: 55.4, color: COLORS.orange },
-                  { value: 150.4, color: COLORS.red },
-                  { value: 250.4, color: COLORS.purple },
-                  { value: 1000, color: COLORS.brown },
+                  { value: 50, color: COLORS.green },
+                  { value: 100, color: COLORS.yellow },
+                  { value: 150, color: COLORS.orange },
+                  { value: 200, color: COLORS.red },
+                  { value: 300, color: COLORS.purple },
+                  { value: 301, color: COLORS.maroon },
                 ]}
                 min={0}
-                max={1000}
+                max={500}
               />
               {/* <Progress value={Math.round(locationData?.pm02)} className="h-2" /> */}
             </div>
@@ -82,7 +97,7 @@ export default function LocationDetails() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
-                  <div className="text-2xl font-bold">{locationData?.atmp} °C</div>
+                  <div className="text-2xl font-bold">{formatTo2Places(locationData?.atmp)} °C</div>
                 </CardContent>
               </Card>
               <Card>
@@ -93,7 +108,7 @@ export default function LocationDetails() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
-                  <div className="text-2xl font-bold">{locationData?.rhum} %</div>
+                  <div className="text-2xl font-bold">{formatTo2Places(locationData?.rhum)} %</div>
                 </CardContent>
               </Card>
             </div>
@@ -102,16 +117,20 @@ export default function LocationDetails() {
               <h3 className="font-semibold">Pollutants</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
+                  <span>PM01</span>
+                  <span>{formatTo2Places(locationData?.pm01)} μg/m³</span>
+                </div>
+                <div className="flex justify-between">
                   <span>PM2.5</span>
-                  <span>{locationData?.pm02} μg/m³</span>
+                  <span>{formatTo2Places(locationData?.pm02)} μg/m³</span>
                 </div>
                 <div className="flex justify-between">
                   <span>PM10</span>
-                  <span>{locationData?.pm10} μg/m³</span>
+                  <span>{formatTo2Places(locationData?.pm10)} μg/m³</span>
                 </div>
                 <div className="flex justify-between">
                   <span>NO2</span>
-                  <span>{locationData?.noxIndex} ppb</span>
+                  <span>{formatTo2Places(locationData?.noxIndex)} ppb</span>
                 </div>
               </div>
             </div>
@@ -127,10 +146,8 @@ export default function LocationDetails() {
           </div> :
           <div>No data found!</div>
       }
-
-      <Separator className="mt-4" />
-
-      <footer className="space-y-12">
+      <footer className="mt-auto pt-6">
+        <Separator className="mt-4" />
         <div className="space-y-4">
           <h3 className="font-semibold mt-2">Our Partners</h3>
           <div className="flex flex-col justify-center space-y-2">

@@ -25,8 +25,6 @@ function Header() {
     [theme, setTheme],
   )
 
-  console.log(console.log('Header rendered'))
-
   return (
     <header className="border-b">
       <ToastContainer />

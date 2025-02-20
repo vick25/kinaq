@@ -5,13 +5,14 @@ import maplibregl, { Map, GeolocateControl, NavigationControl, AttributionContro
 import "maplibre-gl/dist/maplibre-gl.css";
 import useLocationStore from '../../stores/location-store';
 import { IMapComponentProps } from '@/lib/definitions';
-import { getPM25Color } from '@/lib/utils';
+import { formatDateToLocaleString, getPM25Color } from '@/lib/utils';
 
 const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     const [map, setMap] = useState<Map | null>(null);
-    const [message, setMessage] = useState('')
+    const [message, setMessage] = useState<string | null>('')
     const [locationId, setLocationId] = useState<number | null>(-1)
     const { retrieveLocation, coordinates } = useLocationStore();
+    let popup: maplibregl.Popup | null = null; // Store the popup instance
 
     // To Load the Map
     useEffect(function createMap() {
@@ -125,17 +126,40 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
                         }
 
-                        new maplibregl.Popup()
-                            .setLngLat(coordinates as [number, number])
-                            .setHTML(
-                                `<strong>${locationName}</strong><br>
-                            PM2.5: ${pm2_5}<br>
-                            Time: ${new Date(timestamp).toLocaleString()}`
-                            )
-                            .addTo(map);
+                        // new maplibregl.Popup()
+                        //     .setLngLat(coordinates as [number, number])
+                        //     .setHTML(
+                        //         `<strong>${locationName}</strong><br>
+                        //     PM2.5: ${pm2_5}<br>
+                        //     Time: ${new Date(timestamp).toLocaleString()}`
+                        //     )
+                        //     .addTo(map);
 
                         retrieveLocation(locationId, coordinates); // Store the locationId
                         setLocationId(locationId);
+                    });
+
+                    map.on("mousemove", "location-points", async (e: any) => {
+                        const coordinates = e.features?.[0].geometry.coordinates.slice();
+                        const { locationId, locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
+
+                        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                        }
+
+                        // Close the previous popup if it exists
+                        if (popup) {
+                            popup.remove();
+                            popup = null; // Reset the popup variable
+                        }
+
+                        popup = new maplibregl.Popup({ closeButton: false })
+                            .setLngLat(coordinates as [number, number])
+                            .setHTML(
+                                `<strong>${locationName}</strong><br>
+                                PM2.5: ${pm2_5} μg/m³<br>
+                                Last updated: ${formatDateToLocaleString(timestamp)}`)
+                            .addTo(map);
                     });
 
                     map.on("mouseenter", "location-points", () => {
@@ -144,6 +168,10 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
 
                     map.on("mouseleave", "location-points", () => {
                         map.getCanvas().style.cursor = "";
+                        if (popup) {
+                            popup.remove();
+                            popup = null;
+                        }
                     });
                 });
             } catch (error) {
