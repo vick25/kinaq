@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Search, Menu, User, Settings, LogIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useRef, useState } from "react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
@@ -16,6 +16,7 @@ function Header() {
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const handleThemeToggle = useCallback(
     (e: React.MouseEvent) => {
@@ -24,6 +25,11 @@ function Header() {
     },
     [theme, setTheme],
   )
+
+  const handleInputChange = () => {
+    if (searchRef.current)
+      console.log(searchRef.current.value)
+  };
 
   return (
     <header className="border-b">
@@ -41,7 +47,7 @@ function Header() {
         </Link>
         <div className="ml-auto flex items-center space-x-4">
           <div className="relative w-64 shadow-sm hidden md:block">
-            <Input placeholder="Search districts" className="pl-8" />
+            <Input placeholder="Search districts" className="pl-8" ref={searchRef} onChange={handleInputChange} />
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           </div>
           <nav className="hidden md:flex items-center space-x-4">
@@ -59,14 +65,14 @@ function Header() {
               About
             </Link>
             <Link href="/districts" className="text-sm font-medium hover:text-primary transition-colors">
-              Beneficiary Districts
+              Beneficiary districts
             </Link>
             <Link href="/historical" className="text-sm font-medium hover:text-primary transition-colors">
-              Historical Data
+              Historical data
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Avatar className="h-8 w-8 cursor-pointer">
+                <Avatar className="h-8 w-8 cursor-pointer hover:text-primary transition-colors">
                   <AvatarImage src="/placeholder-avatar.jpg" alt="User avatar" />
                   <AvatarFallback>
                     <User className="h-4 w-4" />
@@ -76,7 +82,7 @@ function Header() {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
-                  <span>My Data</span>
+                  <span>My data</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                   <span className="flex items-center justify-between w-full">
@@ -110,16 +116,16 @@ function Header() {
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             </div>
             <nav className="flex flex-col space-y-4">
-              <Link href="/" className="text-sm font-medium">
+              <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
                 Home
               </Link>
-              <Link href="/about" className="text-sm font-medium">
+              <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
                 About
               </Link>
-              <Link href="/districts" className="text-sm font-medium">
+              <Link href="/districts" className="text-sm font-medium hover:text-primary transition-colors">
                 Beneficiary Districts
               </Link>
-              <Link href="/historical" className="text-sm font-medium">
+              <Link href="/historical" className="text-sm font-medium hover:text-primary transition-colors">
                 Historical Data
               </Link>
               <div className="flex items-center space-x-2">
@@ -129,7 +135,7 @@ function Header() {
                     <User className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium">User Menu</span>
+                <span className="text-sm font-medium hover:text-primary transition-colors">User Menu</span>
               </div>
               <div className="pl-10 space-y-2">
                 <Link href="/my-data" className="block text-sm">

@@ -5,7 +5,7 @@ const GaugeComponent = dynamic(() => import('react-gauge-component'), {
     ssr: false,
 });
 
-const LocationGauge = ({
+const LocationGauge: React.FC<ICustomGradientGaugeProps> = ({
     value,
     limits,
     label,
@@ -13,23 +13,11 @@ const LocationGauge = ({
     tickSuffix = '',
     min = 0,
     max = 500
-}: ICustomGradientGaugeProps) => {
-    // Good
-    // Moderate
-    // Unhealthy Sensitive Groups
-    // Unhealthy
-    // Very Unhealthy
-    // Hazardous
-
+}) => {
     return (
         <div className="space-y-2">
-            <div>
-                <p style={{
-                    color: "black",
-                    fontSize: "14px",
-                    margin: "auto",
-                    textAlign: "center"
-                }}>{label}</p>
+            <>
+                <p className='text-black text-sm m-auto text-center'>{label}</p>
                 <GaugeComponent
                     type='semicircle'
                     minValue={min}
@@ -79,7 +67,7 @@ const LocationGauge = ({
                         },
                     }}
                 />
-            </div>
+            </>
         </div>
     )
 }

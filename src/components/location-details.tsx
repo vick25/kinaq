@@ -5,24 +5,17 @@ import { Separator } from "@/components/ui/separator"
 import { Droplets, Thermometer } from "lucide-react"
 import Image from "next/image"
 import useLocationStore from "../../stores/location-store"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { fetchLocationData } from "@/actions/airGradientData"
 import LocationGauge from "./location-gauge"
 import { toast } from "react-fox-toast"
-import { COLORS, ILocationData } from "@/lib/definitions"
+import { AQI, COLORS, ILocationData } from "@/lib/definitions"
 import { calculateOverallAqi, formatDateToLocaleString, formatTo2Places, getAqiDescription } from "@/lib/utils"
-
-interface AQI {
-  AQI_PM25: number | null;
-  AQI_PM10: number | null;
-  Overall_AQI: number | null;
-}
 
 export default function LocationDetails() {
   const { locationId } = useLocationStore(); // Get locationId from store
   const [loading, setLoading] = useState<boolean>(false)
   const [locationData, setLocationData] = useState<ILocationData>()
-  const [AQI, setAQI] = useState<AQI>()
 
   // Fetch location data
   const agLocationData = async () => {
@@ -47,11 +40,11 @@ export default function LocationDetails() {
     agLocationData()
   }, [locationId])
 
-  useEffect(() => {
+  const AQIData = useMemo(() => {
     if (locationData) {
-      setAQI(calculateOverallAqi(locationData))
+      return calculateOverallAqi(locationData);
     }
-  }, [locationData]);
+  }, [locationData])
 
   return (
     <div className="w-96 border-l bg-background p-4 flex flex-col h-full">
@@ -59,7 +52,7 @@ export default function LocationDetails() {
         locationData ?
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Location Details</h2>
+              <h2 className="text-2xl font-bold mb-2">Location details</h2>
               <div className="flex justify-between items-center gap-3 text-sm text-muted-foreground">
                 <p>{locationData?.locationName}</p>
                 <p className="text-xs">{formatDateToLocaleString(locationData?.timestamp)}</p>
@@ -67,13 +60,13 @@ export default function LocationDetails() {
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="font-medium">Air Quality Index</span>
-                <span className="font-bold">{AQI?.Overall_AQI}</span>
+                <span className="font-bold">{AQIData?.Overall_AQI}</span>
               </div>
               <LocationGauge
-                value={Math.round(AQI?.Overall_AQI || 0)}
-                label={getAqiDescription(AQI?.Overall_AQI || 0).category}
+                value={Math.round(AQIData?.Overall_AQI || 0)}
+                label={getAqiDescription(AQIData?.Overall_AQI || 0).category}
                 limits={[
                   { value: 50, color: COLORS.green },
                   { value: 100, color: COLORS.yellow },
@@ -167,16 +160,18 @@ export default function LocationDetails() {
                 className="h-16 w-auto object-contain"
               />
             </div>
-            <Image
-              src="/logo-westerveltgroup.png"
-              alt="Partner Logo 2"
-              width={100}
-              height={50}
-              className="h-12 w-auto p-1 object-contain"
-            />
+            <div className="flex justify-center items-center space-x-2">
+              <Image
+                src="/logo-westerveltgroup.png"
+                alt="Partner Logo 2"
+                width={100}
+                height={50}
+                className="h-12 w-auto p-1 object-contain"
+              />
+            </div>
           </div>
         </div>
-        <div className="text-center text-sm text-muted-foreground">© Copyright WASARU {new Date().getFullYear()}</div>
+        <div className="text-center text-xs text-muted-foreground">© Copyright WASARU {new Date().getFullYear()}</div>
       </footer>
     </div>
   )

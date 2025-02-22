@@ -90,6 +90,12 @@ export const COLORS = {
     background: '#F5F5F5',
 };
 
+export interface AQI {
+    AQI_PM25: number | null;
+    AQI_PM10: number | null;
+    Overall_AQI: number | null;
+}
+
 export interface Breakpoint {
     low: number;
     high: number;

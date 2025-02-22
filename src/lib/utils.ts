@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Breakpoint, ILocationData, pm10_breakpoints, pm25_breakpoints } from "./definitions";
+import { AQI, Breakpoint, ILocationData, pm10_breakpoints, pm25_breakpoints } from "./definitions";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -118,7 +118,7 @@ function calculateAqi(concentration: number, breakpoints: Breakpoint[]): number 
 /**
  * Calculate the AQI for PM2.5 and PM10 and return the overall AQI.
  */
-export function calculateOverallAqi(data: ILocationData): { AQI_PM25: number | null; AQI_PM10: number | null; Overall_AQI: number | null } {
+export function calculateOverallAqi(data: ILocationData): AQI {
   const pm25 = data.pm02;
   const pm10 = data.pm10;
   const aqi_pm25 = pm25 !== undefined ? calculateAqi(pm25, pm25_breakpoints) : null;

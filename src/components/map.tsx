@@ -47,6 +47,10 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                     compact: true,
                 }))
         );
+
+        () => {
+            setMap(null)
+        }
     }, [map]);
 
     useEffect(() => {
@@ -157,7 +161,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                             .setLngLat(coordinates as [number, number])
                             .setHTML(
                                 `<strong>${locationName}</strong><br>
-                                PM2.5: ${pm2_5} μg/m³<br>
+                                PM2.5: ${pm2_5 ?? "-"} μg/m³<br>
                                 Last updated: ${formatDateToLocaleString(timestamp)}`)
                             .addTo(map);
                     });
@@ -180,6 +184,10 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         };
 
         populateMarkers();
+
+        () => {
+            setMap(null)
+        }
     }, [map]);
 
     // Use the user last location as the default air quality information when the application loads
