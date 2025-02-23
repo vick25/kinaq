@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import maplibregl, { Map, GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import useLocationStore from '../../stores/location-store';
+import useLocationStore from '../stores/location-store';
 import { IMapComponentProps } from '@/lib/definitions';
 import { formatDateToLocaleString, getPM25Color } from '@/lib/utils';
 

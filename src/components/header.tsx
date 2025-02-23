@@ -11,8 +11,11 @@ import { Switch } from "@/components/ui/switch"
 import AboutDialog from "./about-dialog";
 import { useTheme } from "next-themes";
 import { ToastContainer } from "react-fox-toast"
+import LocaleSwitcher from "./locale-switcher";
+import { useTranslations } from "next-intl";
 
 function Header() {
+  const t = useTranslations('HomePage')
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -34,7 +37,7 @@ function Header() {
   return (
     <header className="border-b">
       <ToastContainer />
-      <div className="container flex h-16 items-center px-4">
+      <div className="w-full flex h-16 items-center px-4">
         <Link href="/" className="flex items-center space-x-2">
           <Image
             src="/logo-kinaq.jpg"
@@ -45,14 +48,14 @@ function Header() {
           />
           <span className="text-lg font-bold text-[#05b15d]">KINSHASA AIR QUALITY</span>
         </Link>
-        <div className="ml-auto flex items-center space-x-4">
+        <div className="ml-auto flex items-center space-x-4 md:gap-5">
           <div className="relative w-64 shadow-sm hidden md:block">
             <Input placeholder="Search districts" className="pl-8" ref={searchRef} onChange={handleInputChange} />
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           </div>
-          <nav className="hidden md:flex items-center space-x-4">
+          <nav className="hidden md:flex md:gap-5 items-center space-x-4">
             <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
-              Home
+              {t('menu1')}
             </Link>
             <Link
               href="#"
@@ -62,13 +65,13 @@ function Header() {
               }}
               className="text-sm font-medium hover:text-primary transition-colors"
             >
-              About
+              {t('menu2')}
             </Link>
             <Link href="/districts" className="text-sm font-medium hover:text-primary transition-colors">
-              Beneficiary districts
+              {t('menu3')}
             </Link>
             <Link href="/historical" className="text-sm font-medium hover:text-primary transition-colors">
-              Historical data
+              {t('menu4')}
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -100,6 +103,8 @@ function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            {/* <!-- Local switcher --> */}
+            <LocaleSwitcher />
           </nav>
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             <Menu className="h-6 w-6" />

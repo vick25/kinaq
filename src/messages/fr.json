@@ -1,0 +1,13 @@
+{
+    "TabTitle": {
+        "home": "Accueil",
+        "about": "A propos",
+        "contact": "Contact"
+    },
+    "HomePage": {
+        "menu1": "Accueil",
+        "menu2": "A propos",
+        "menu3": "Communes bénéficiaires",
+        "menu4": "Données historiques"
+    }
+}

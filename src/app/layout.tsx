@@ -3,6 +3,8 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import Header from "@/components/header"
 import { ThemeProvider } from "@/components/theme-provider"
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -11,13 +13,17 @@ export const metadata: Metadata = {
   description: "Air quality monitoring dashboard for Kinshasa",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+
+  const messages = await getMessages();
+  const locale = await getLocale();
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
@@ -25,10 +31,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="flex flex-col min-h-screen">
-            <Header />
-            {children}
-          </main>
+          <NextIntlClientProvider messages={messages}>
+            <main className="flex flex-col min-h-screen">
+              <Header />
+              {children}
+            </main>
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>
