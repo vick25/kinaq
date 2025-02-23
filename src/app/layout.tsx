@@ -5,6 +5,8 @@ import Header from "@/components/header"
 import { ThemeProvider } from "@/components/theme-provider"
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
+import { Toast } from "@/components/toast-component"
+import NextProgress from "@/components/next-progress"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,6 +27,8 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
+        <Toast />
+        <NextProgress />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
