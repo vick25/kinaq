@@ -1,1 +1,1 @@
-export const API_URL = 'https://api.airgradient.com//public/api/'
+export const API_URL = 'https://api.airgradient.com/public/api/'
