@@ -10,7 +10,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
 import AboutDialog from "./about-dialog";
 import { useTheme } from "next-themes";
-import { ToastContainer } from "react-fox-toast"
 import LocaleSwitcher from "./locale-switcher";
 import { useTranslations } from "next-intl";
 
@@ -36,7 +35,6 @@ function Header() {
 
   return (
     <header className="border-b">
-      <ToastContainer />
       <div className="w-full flex h-16 items-center px-4">
         <Link href="/" className="flex items-center space-x-2">
           <Image

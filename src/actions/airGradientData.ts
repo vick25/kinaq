@@ -1,5 +1,5 @@
 'use server'
-import { API_URL } from './../lib/constants';
+import { API_URL } from '../lib/constants';
 import { NextResponse } from "next/server";
 
 export async function fetchAllAirGradientData() {

@@ -14,30 +14,37 @@ import { calculateOverallAqi, formatDateToLocaleString, formatTo2Places, getAqiD
 
 export default function LocationDetails() {
   const { locationId } = useLocationStore(); // Get locationId from store
-  const [loading, setLoading] = useState<boolean>(false)
+  // const [loading, setLoading] = useState<boolean>(false)
   const [locationData, setLocationData] = useState<ILocationData>()
 
   // Fetch location data
   const agLocationData = async () => {
-    setLoading(true)
-    const response = await fetchLocationData(`${locationId}`)
-    // toast.promise(response, {
-    //   loading: 'Loading data...',
-    //   success: 'Data loaded successfully!',
-    //   error: 'Failed to load data!',
-    //   position: 'top-center'
-    // })
-    if (response.error) {
-      toast.error(response.error)
-      setLoading(false)
-      return
+    // setLoading(true);
+    try {
+      const response = await fetchLocationData(`${locationId}`);
+
+      toast.promise(
+        Promise.resolve(response), // Wrap the data in a resolved promise
+        {
+          loading: "Loading data...",
+          success: "Data loaded successfully!",
+          error: "Failed to load data!",
+          position: "top-right",
+        }
+      );
+      setLocationData(response);
+      // setLoading(false);
+
+    } catch (error) {
+      console.error("Error in agLocationData:", error);
+      toast.error("Failed to load data!"); // Display an error toast
+      // setLoading(false);
     }
-    setLocationData(response)
-    setLoading(false)
   };
 
   useEffect(() => {
-    agLocationData()
+    if (locationId)
+      agLocationData()
   }, [locationId])
 
   const AQIData = useMemo(() => {
@@ -48,7 +55,8 @@ export default function LocationDetails() {
 
   return (
     <div className="w-96 border-l bg-background p-4 flex flex-col h-full">
-      {loading ? <div>Loading ...</div> :
+      {
+        // loading ? <div>Loading ...</div> :
         locationData ?
           <div className="space-y-6">
             <div>
