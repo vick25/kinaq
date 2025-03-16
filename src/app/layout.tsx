@@ -28,7 +28,6 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
         <Toast />
-        <NextProgress />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -42,6 +41,7 @@ export default async function RootLayout({
             </main>
           </NextIntlClientProvider>
         </ThemeProvider>
+        <NextProgress />
       </body>
     </html>
   )

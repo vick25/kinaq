@@ -5,7 +5,7 @@ import { IAirGradientPointData } from "@/lib/definitions";
 import React from "react";
 
 export default async function Home() {
-  const { gradientData } = await fetchAllAirGradientData() || [];
+  const [...gradientData] = await fetchAllAirGradientData() || [];
 
   return (
     <div className="flex flex-col md:flex-row flex-1">
