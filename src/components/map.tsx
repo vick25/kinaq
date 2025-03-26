@@ -20,8 +20,8 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
 
         const initialLongitude = 20.0; // Longitude for the center of Central Africa
         const initialLatitude = 0.0;   // Latitude for the center of Central Africa
-        const initialZoom = 2;         // Adjust zoom level as needed
-        // const initialBounds: [number, number, number, number] = [-10, -15, 45, 15];
+        const initialZoom = 1;         // Adjust zoom level as needed
+        const initialBounds: [number, number, number, number] = [14.66241, -5.501214, 17.093503, -3.307021];
         // This is used to initialize the map. The library used here is Maplibre GL JS (https://maplibre.org).
         setMap(
             new maplibregl.Map({
@@ -31,7 +31,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                     "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
                 center: [initialLongitude, initialLatitude],
                 zoom: initialZoom,
-                // maxBounds: initialBounds,
+                maxBounds: initialBounds,
                 attributionControl: false
             })
                 .addControl(new NavigationControl(), 'top-left')
