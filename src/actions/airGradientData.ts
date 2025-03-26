@@ -9,10 +9,14 @@ export async function fetchAllAirGradientData() {
         const response = await fetch(APIURL, {
             next: { revalidate: 60 }
         });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
         const data = await response.json();
         return data;
     } catch (error) {
-        return NextResponse.json({ error: `Failed to fetch Air Gradient data. ${error}` }, { status: 500 });
+        console.error("Failed to fetch Air Gradient data:", error);
+        return null;
     }
 }
 
@@ -24,6 +28,7 @@ export async function fetchLocationData(locationId: string) {
         const data = await response.json();
         return data;
     } catch (error) {
-        return NextResponse.json({ error: `Failed to fetch Air Gradient data. ${error}` }, { status: 500 });
+        console.error("Failed to fetch Air Gradient data:", error);
+        return null;
     }
 }
