@@ -85,12 +85,12 @@ function Header() {
                   <User className="mr-2 h-4 w-4" />
                   <span>My data</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+                {/* <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                   <span className="flex items-center justify-between w-full">
                     Dark mode
                     <Switch checked={theme === "dark"} onClick={handleThemeToggle} />
                   </span>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
