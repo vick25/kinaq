@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from "react"
 import { fetchLocationData } from "@/actions/airGradientData"
 import LocationGauge from "./location-gauge"
 import { toast } from "react-fox-toast"
-import { AQI, COLORS, ILocationData } from "@/lib/definitions"
+import { COLORS, ILocationData } from "@/lib/definitions"
 import { calculateOverallAqi, formatDateToLocaleString, formatTo2Places, getAqiDescription } from "@/lib/utils"
 
 export default function LocationDetails() {

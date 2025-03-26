@@ -21,7 +21,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         const initialLongitude = 20.0; // Longitude for the center of Central Africa
         const initialLatitude = 0.0;   // Latitude for the center of Central Africa
         const initialZoom = 2;         // Adjust zoom level as needed
-        const initialBounds: [number, number, number, number] = [-10, -15, 45, 15];
+        // const initialBounds: [number, number, number, number] = [-10, -15, 45, 15];
         // This is used to initialize the map. The library used here is Maplibre GL JS (https://maplibre.org).
         setMap(
             new maplibregl.Map({
@@ -73,9 +73,9 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         // Fetch and add points to the map
         const populateMarkers = async () => {
             try {
-                const pointsGeoJSON: any = {
+                const pointsGeoJSON: string | GeoJSON.FeatureCollection = {
                     type: "FeatureCollection",
-                    features: gradientData?.map((item: any) => ({
+                    features: gradientData?.map((item) => ({
                         type: "Feature",
                         geometry: {
                             type: "Point",
@@ -122,9 +122,9 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                         },
                     });
 
-                    map.on("click", "location-points", async (e: any) => {
-                        const coordinates = e.features?.[0].geometry.coordinates.slice();
-                        const { locationId, locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
+                    map.on("click", "location-points", async (e) => {
+                        const coordinates = (e.features?.[0].geometry as GeoJSON.Point).coordinates.slice();
+                        const { locationId } = e.features?.[0].properties || {};
 
                         while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
@@ -143,9 +143,9 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                         setLocationId(locationId);
                     });
 
-                    map.on("mousemove", "location-points", async (e: any) => {
-                        const coordinates = e.features?.[0].geometry.coordinates.slice();
-                        const { locationId, locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
+                    map.on("mousemove", "location-points", async (e) => {
+                        const coordinates = (e.features?.[0].geometry as GeoJSON.Point).coordinates.slice();
+                        const { locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
 
                         while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
@@ -185,7 +185,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
 
         populateMarkers();
 
-        () => {
+        return () => {
             setMap(null)
         }
     }, [map]);
@@ -195,7 +195,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         if (!map) return;
         // Fly to a random location by offsetting the point -74.50, 40
         // by up to 5 degrees.
-        locationId &&
+        if (locationId)
             setTimeout(() => {
                 map.flyTo({
                     center: [
@@ -205,7 +205,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                     essential: true // this animation is considered essential with respect to prefers-reduced-motion
                 })
             }, 2000);
-    }, [map, locationId])
+    }, [map, locationId, coordinates])
 
     return (
         <div className='relative h-full w-full'>

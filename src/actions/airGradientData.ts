@@ -6,7 +6,9 @@ export async function fetchAllAirGradientData() {
     const APIURL = `${API_URL}v1/world/locations/measures/current`;
 
     try {
-        const response = await fetch(APIURL);
+        const response = await fetch(APIURL, {
+            next: { revalidate: 60 }
+        });
         const data = await response.json();
         return data;
     } catch (error) {

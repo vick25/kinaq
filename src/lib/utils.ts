@@ -107,7 +107,7 @@ export function getPM25Color(pmValue: number): string {
  * Calculate the AQI for a given concentration based on breakpoints.
  */
 function calculateAqi(concentration: number, breakpoints: Breakpoint[]): number | null {
-  for (let bp of breakpoints) {
+  for (const bp of breakpoints) {
     if (concentration >= bp.low && concentration <= bp.high) {
       return Math.round((bp.aqi_high - bp.aqi_low) / (bp.high - bp.low) * (concentration - bp.low) + bp.aqi_low);
     }
