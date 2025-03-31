@@ -73,8 +73,8 @@ function Header() {
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Avatar className="h-8 w-8 cursor-pointer hover:text-primary transition-colors">
-                  <AvatarImage src="/placeholder-avatar.jpg" alt="User avatar" />
+                <Avatar className="h-5 w-5 cursor-pointer hover:text-primary transition-colors">
+                  <AvatarImage src="/placeholder-avatar.svg" alt="User avatar" />
                   <AvatarFallback>
                     <User className="h-4 w-4" />
                   </AvatarFallback>
@@ -85,12 +85,12 @@ function Header() {
                   <User className="mr-2 h-4 w-4" />
                   <span>My data</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+                {/* <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                   <span className="flex items-center justify-between w-full">
                     Dark mode
                     <Switch checked={theme === "dark"} onClick={handleThemeToggle} />
                   </span>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
@@ -132,8 +132,8 @@ function Header() {
                 Historical Data
               </Link>
               <div className="flex items-center space-x-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder-avatar.jpg" alt="User avatar" />
+                <Avatar className="h-5 w-5">
+                  <AvatarImage src="/placeholder-avatar.svg" alt="User avatar" />
                   <AvatarFallback>
                     <User className="h-4 w-4" />
                   </AvatarFallback>

@@ -28,7 +28,7 @@ const LocationGauge: React.FC<ICustomGradientGaugeProps> = ({
                         padding: 0.005,
                         cornerRadius: 2,
                         //gradient: true,
-                        subArcs: limits.map((limit, index) => ({
+                        subArcs: limits.map((limit) => ({
                             limit: limit.value,
                             color: limit.color,
                             showTick: true,
@@ -45,7 +45,7 @@ const LocationGauge: React.FC<ICustomGradientGaugeProps> = ({
                     }}
                     labels={{
                         valueLabel: {
-                            formatTextValue: (value: any) => `${value}${valueSuffix}`,
+                            formatTextValue: (value: number) => `${value}${valueSuffix}`,
                             style: {
                                 fontSize: '32px',
                                 textShadow:
@@ -55,7 +55,7 @@ const LocationGauge: React.FC<ICustomGradientGaugeProps> = ({
                         tickLabels: {
                             type: 'outer',
                             defaultTickValueConfig: {
-                                formatTextValue: (value: any) => `${value}${tickSuffix}`,
+                                formatTextValue: (value: number) => `${value}${tickSuffix}`,
                                 style: { fontSize: 10 }
                             },
                             ticks: [
