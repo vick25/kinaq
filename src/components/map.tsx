@@ -28,7 +28,8 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                 container: 'map',
                 style:
                     // 'https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/openStreetMap.json',
-                    "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+                    // "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+                    'https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/openStreetMap.json',
                 center: [initialLongitude, initialLatitude],
                 zoom: initialZoom,
                 maxBounds: initialBounds,
