@@ -31,12 +31,6 @@ const Historical = (props: Props) => {
                             <h3 className="text-lg font-semibold text-gray-800 text-center">
                                 Authentication through Email:
                             </h3>
-                            {/* Earthdata Login Button */}
-                            {/* <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md text-lg font-medium hover:bg-blue-700">
-                                Earthdata Login
-                            </button>
-                            <hr className="my-4 border-gray-300" /> */}
-                            {/* Email Input */}
                             <input
                                 type="email"
                                 placeholder="Enter email address"

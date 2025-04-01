@@ -230,10 +230,18 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     return (
         <div className='relative h-full w-full'>
             {message && (
-                <div className='absolute top-0 w-full h-full flex justify-center items-center bg-white opacity-70 text-gray-600 z-[2]'>
+                <div className='absolute top-0 w-full h-full flex justify-center items-center bg-white opacity-70 text-gray-600 z-10'>
                     {message}
                 </div>
             )}
+            <div className="absolute left-0 top-0 z-20 m-2 flex">
+                <button className="rounded-l-md bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Map
+                </button>
+                <button className="rounded-r-md bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Satellite
+                </button>
+            </div>
             <div id='map' className='h-full w-full' />
         </div>
     );
