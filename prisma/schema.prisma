@@ -14,6 +14,7 @@ datasource db {
 }
 
 // Define the enum based on the SQL CREATE TYPE
+
 enum Usages {
   academic_research
   professional
@@ -21,39 +22,48 @@ enum Usages {
 }
 
 // Define the User model based on the users table
+
 model User {
-  id          Int       @id @default(autoincrement())
-  firstName   String? // Mapped from varchar, nullable
-  lastName    String? // Mapped from varchar, nullable
-  email       String    @unique // Mapped from varchar UNIQUE NOT NULL
-  password    String // Mapped from varchar NOT NULL
-  profession  String? // Mapped from text, nullable
-  institution String? // Mapped from text, nullable
-  created_at  DateTime  @default(now()) // Mapped from datetime NOT NULL
-  updated_at  DateTime? @updatedAt // Mapped from datetime, nullable. @updatedAt handles auto-updates.
+  id            Int       @id @default(autoincrement())
+  firstName     String? // Mapped from varchar, nullable
+  lastName      String? // Mapped from varchar, nullable
+  email         String    @unique // Mapped from varchar UNIQUE NOT NULL
+  emailVerified Boolean   @default(false)
+  image         String?
+  password      String // Mapped from varchar NOT NULL
+  profession    String? // Mapped from text, nullable
+  institution   String? // Mapped from text, nullable
+  createdAt     DateTime  @default(now()) // Mapped from datetime NOT NULL
+  updatedAt     DateTime? @updatedAt // Mapped from datetime, nullable. @updatedAt handles auto-updates.
 
   // Relations based on foreign keys pointing to users.id
+  // Optional: Explicitly map to the SQL table name "users"
   logins   Login[]
   requests Request[]
+  sessions Session[]
+  accounts Account[]
 
-  @@map("users") // Optional: Explicitly map to the SQL table name "users"
+  @@map("users")
 }
 
 // Define the Login model based on the logins table
+
 model Login {
   id               Int       @id @default(autoincrement())
-  user_id          Int // Scalar field for the foreign key
+  userId           Int // Scalar field for the foreign key
   login_timestamp  DateTime  @default(now()) // Mapped from timestamp DEFAULT now()
   logout_timestamp DateTime? // Mapped from timestamp DEFAULT now(). Made nullable as default now() might not be suitable for logout on creation. If it MUST be non-null with default now(), remove the '?'.
   ip_address       String? // Mapped from varchar, nullable
 
-  // Relation based on the foreign key logins.user_id -> users.id
-  user User @relation(fields: [user_id], references: [id])
+  // Relation based on the foreign key logins.userId -> users.id
+  user User @relation(fields: [userId], references: [id])
 
-  @@map("logins") // Optional: Explicitly map to the SQL table name "logins"
+  // Optional: Explicitly map to the SQL table name "logins"
+  @@map("logins")
 }
 
 // Define the Location model based on the locations table
+
 model Location {
   id           Int     @id @default(autoincrement())
   locationName String // Mapped from varchar NOT NULL
@@ -65,13 +75,15 @@ model Location {
   // Relation based on foreign keys pointing to locations.id
   requests Request[]
 
-  @@map("locations") // Optional: Explicitly map to the SQL table name "locations"
+  // Optional: Explicitly map to the SQL table name "locations"
+  @@map("locations")
 }
 
 // Define the Request model based on the requests table
+
 model Request {
   id           Int       @id @default(autoincrement())
-  user_id      Int // Scalar field for the foreign key
+  userId       Int // Scalar field for the foreign key
   location_id  Int // Scalar field for the foreign key
   startDate    String? // Mapped from varchar, nullable
   endDate      String? // Mapped from varchar, nullable
@@ -81,8 +93,54 @@ model Request {
   updated_at   DateTime? @updatedAt // Mapped from datetime, nullable. @updatedAt handles auto-updates.
 
   // Relations based on foreign keys
-  user     User     @relation(fields: [user_id], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
   location Location @relation(fields: [location_id], references: [id])
 
-  @@map("requests") // Optional: Explicitly map to the SQL table name "requests"
+  // Optional: Explicitly map to the SQL table name "requests"
+  @@map("requests")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                Int
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
 }
