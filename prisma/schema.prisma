@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Define the enum based on the SQL CREATE TYPE
+enum Usages {
+  academic_research
+  professional
+  other
+}
+
+// Define the User model based on the users table
+model User {
+  id          Int       @id @default(autoincrement())
+  firstName   String? // Mapped from varchar, nullable
+  lastName    String? // Mapped from varchar, nullable
+  email       String    @unique // Mapped from varchar UNIQUE NOT NULL
+  password    String // Mapped from varchar NOT NULL
+  profession  String? // Mapped from text, nullable
+  institution String? // Mapped from text, nullable
+  created_at  DateTime  @default(now()) // Mapped from datetime NOT NULL
+  updated_at  DateTime? @updatedAt // Mapped from datetime, nullable. @updatedAt handles auto-updates.
+
+  // Relations based on foreign keys pointing to users.id
+  logins   Login[]
+  requests Request[]
+
+  @@map("users") // Optional: Explicitly map to the SQL table name "users"
+}
+
+// Define the Login model based on the logins table
+model Login {
+  id               Int       @id @default(autoincrement())
+  user_id          Int // Scalar field for the foreign key
+  login_timestamp  DateTime  @default(now()) // Mapped from timestamp DEFAULT now()
+  logout_timestamp DateTime? // Mapped from timestamp DEFAULT now(). Made nullable as default now() might not be suitable for logout on creation. If it MUST be non-null with default now(), remove the '?'.
+  ip_address       String? // Mapped from varchar, nullable
+
+  // Relation based on the foreign key logins.user_id -> users.id
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("logins") // Optional: Explicitly map to the SQL table name "logins"
+}
+
+// Define the Location model based on the locations table
+model Location {
+  id           Int     @id @default(autoincrement())
+  locationName String // Mapped from varchar NOT NULL
+  locationID   String // Mapped from varchar NOT NULL
+  latitude     String? // Mapped from varchar, nullable
+  longitude    String? // Mapped from varchar, nullable
+  serial       String? // Mapped from text, nullable
+
+  // Relation based on foreign keys pointing to locations.id
+  requests Request[]
+
+  @@map("locations") // Optional: Explicitly map to the SQL table name "locations"
+}
+
+// Define the Request model based on the requests table
+model Request {
+  id           Int       @id @default(autoincrement())
+  user_id      Int // Scalar field for the foreign key
+  location_id  Int // Scalar field for the foreign key
+  startDate    String? // Mapped from varchar, nullable
+  endDate      String? // Mapped from varchar, nullable
+  usage        Usages? // Mapped from the usages enum, nullable
+  is_delivered Boolean   @default(false) // Mapped from boolean DEFAULT false
+  created_at   DateTime  @default(now()) // Mapped from datetime NOT NULL
+  updated_at   DateTime? @updatedAt // Mapped from datetime, nullable. @updatedAt handles auto-updates.
+
+  // Relations based on foreign keys
+  user     User     @relation(fields: [user_id], references: [id])
+  location Location @relation(fields: [location_id], references: [id])
+
+  @@map("requests") // Optional: Explicitly map to the SQL table name "requests"
+}
