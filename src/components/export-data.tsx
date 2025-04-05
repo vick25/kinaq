@@ -20,7 +20,7 @@ export default function ExportData() {
         <section className="">
             {/* Main Content */}
             <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-                <h2 className="text-2xl font-semibold text-blue-700">Export Data as CSV</h2>
+                <h2 className="text-2xl font-semibold text-[#05b15d]">Export Data as CSV</h2>
 
                 {/* Warning Box */}
                 <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mt-4 flex gap-2">

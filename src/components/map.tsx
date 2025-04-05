@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import maplibregl, { Map, GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import useLocationStore from '../stores/location-store';
@@ -14,6 +15,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     const [locationId, setLocationId] = useState<number | null>(-1)
     const { retrieveLocation, coordinates } = useLocationStore();
     let popup: maplibregl.Popup | null = null; // Store the popup instance
+    const router = useRouter();
 
     //Fetch and add points to the map
     const populateMarkers = async () => {
@@ -225,6 +227,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                     essential: true // this animation is considered essential with respect to prefers-reduced-motion
                 })
             }, 2000);
+        router.refresh();
     }, [map, locationId, coordinates])
 
     return (
