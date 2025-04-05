@@ -1,5 +1,7 @@
 import ExportData from '@/components/export-data'
 import React from 'react'
+import SignUpForm from './signUp-form'
+import SignInForm from './signIn-form'
 
 type Props = {}
 
@@ -28,31 +30,11 @@ const Historical = (props: Props) => {
 
                     <div className="my-6 bg-white border shadow-md rounded-md p-6 max-w-3xl mx-auto">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-800 text-center">
-                                Authentication through Email:
-                            </h3>
-                            <input
-                                type="email"
-                                placeholder="Enter email address"
-                                className="w-full border p-2 rounded-md text-gray-700"
-                            />
-                            {/* Email Code Button */}
-                            <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md text-lg font-medium hover:bg-blue-700">
-                                Email Code
-                            </button>
+                            <SignUpForm />
                         </div>
 
                         <div id="email_code_block">
-                            <h3 className="text-lg font-semibold text-gray-800 text-center">Enter CODE emailed to:</h3>
-                            <div className="lbCode">
-                                <input type="text" name="code" id="ecode" value="" placeholder="123456"
-                                    className="w-full border p-2 rounded-md text-gray-700" />
-                            </div>
-                            <p id="codeError" className='text-xs text-red-600'></p>
-                            <div className='flex space-x-4 items-center'>
-                                <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md text-lg font-medium hover:bg-blue-700" id="btn_proceed_email">Login with code</button>
-                                <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md text-lg font-medium hover:bg-blue-700" id="btn_proceed_ed">Cancel</button>
-                            </div>
+                            <SignInForm />
                         </div>
                     </div>
                 </div>
