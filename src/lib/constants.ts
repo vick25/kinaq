@@ -1,5 +1,33 @@
 export const API_URL = 'https://api.airgradient.com/public/api/v1/'
 
+export const CURRENT_DATA_REFRESH_INTERVAL = 60000;
+export const MINUTELY_HISTORICAL_DATA_REFRESH_INTERVAL = 180000;
+export const HOURLY_HISTORICAL_DATA_REFRESH_INTERVAL = 3600000;
+
+export const COLORS = {
+    green: '#1de208',
+    yellow: '#e2e020',
+    orange: '#e26a05',
+    red: '#e20410',
+    purple: '#7f01e2',
+    brown: '#903305',
+    blue: '#166de2',
+    grey: '#c4c5c5',
+    lightslategray: '#778899'
+}
+
+export const CHART_COLORS_DARKENED = {
+    green: '#2b9b20',
+    yellow: '#c7ac1d',
+    orange: '#b94f04',
+    red: '#881218',
+    purple: '#521681',
+    brown: '#54230b',
+    blue: '#134f7e',
+    grey: '#4c5660',
+    lightGray: '#989696',
+}
+
 export const kinAQPoints: { locationName: string, locationId: number, coordinates: [number, number] }[] = [
     { locationName: "KINAQ BelAir", locationId: 155791, coordinates: [15.275384, -4.435699] },
     { locationName: "KINAQ Cité Verte", locationId: 155431, coordinates: [15.25749, -4.44431] },
@@ -125,3 +153,23 @@ export const kinAQfeatureCollection = {
         }
     ]
 };
+
+export function getOtpHtmlTemplate(otp: string): string {
+    return `
+      <div style="font-family: Arial, sans-serif; border: 1px solid #ccc; max-width: 876px; background: #fff;">
+        <div style="background: #05b15d; color: white; padding: 12px 24px; font-size: 18px; font-weight: bold;">
+          KINAQ EMAIL LOGIN CODE
+        </div>
+        <div style="padding: 24px; font-size: 16px; color: #000;">
+          <p><strong>KINAQ LOGIN CODE: <span style="font-size: 24px;">${otp}</span></strong><p>This code is valid for 10 minutes.</p></p>
+          <p>If you have not initiated this process, please disregard or contact us at 
+            <a href="mailto:contact@wasaruwash.org">contact@wasaruwash.org</a>.
+          </p>
+          <p>Thank you,<br>KINAQ Team</p>
+        </div>
+        <div style="background: #05b15d; color: white; padding: 8px 16px; font-size: 12px;">
+          More information on KINAQ can be found on the <a style="color: white; text-decoration: underline;" href="https://wasaruwash.org/">KINAQ WASARU</a> home page.
+        </div>
+      </div>
+    `
+}

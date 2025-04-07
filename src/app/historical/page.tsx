@@ -2,18 +2,31 @@ import ExportData from '@/components/export-data'
 import React from 'react'
 import SignUpForm from './signUp-form'
 import SignInForm from './signIn-form'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
-type Props = {}
+interface PageProps {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
 
-const Historical = (props: Props) => {
+const Historical = async ({ searchParams }: PageProps) => {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    })
+    const { signup, email } = await searchParams
+    const showSignIn = signup === 'login'
+    const showExport = signup === 'success'
+    const loggedInEmail = typeof email === 'string' ? email : ''
+
     return (
         <div className='container mx-auto'>
             <section className='my-5 space-y-4'>
                 <div className="text-[#f0f0f0] bg-[#222] text-2xl font-semibold leading-5 relative pl-[2.3rem] pr-0 py-4 rounded-[3rem_0_0_3rem]">
-                    KINSHASA | Data Export
+                    KINAQ | Data Export
                 </div>
 
                 <div className='mt-8 w-full'>
+                    <p>Download Requests for {!session ? "Not authenticated" : session.user.email}</p>
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800">
                             Download active air quality information older than the last 7 days:
@@ -28,19 +41,23 @@ const Historical = (props: Props) => {
                         </ul>
                     </div>
 
-                    <div className="my-6 bg-white border shadow-md rounded-md p-6 max-w-3xl mx-auto">
-                        <div>
-                            <SignUpForm />
-                        </div>
+                    {!showExport && <div className="my-6 bg-white border shadow-md rounded-md p-6 max-w-3xl mx-auto">
+                        {!showSignIn && !showExport && (
+                            <div>
+                                <SignUpForm />
+                            </div>
+                        )}
 
-                        <div id="email_code_block">
-                            <SignInForm />
-                        </div>
-                    </div>
+                        {showSignIn && (
+                            <div id="email_code_block">
+                                <SignInForm loggedInEmail={loggedInEmail} />
+                            </div>
+                        )}
+                    </div>}
                 </div>
             </section>
 
-            <ExportData />
+            {showExport && <ExportData />}
         </div>
     )
 }

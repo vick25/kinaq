@@ -11,6 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import Link from "next/link";
 
 export default function ExportData() {
     const [startDate, setStartDate] = useState("2025-03-14");
@@ -30,10 +31,9 @@ export default function ExportData() {
                         <br />
                         All air quality parameters exported are raw values. We recommend applying
                         correction algorithms. See more at{" "}
-                        <a href="#" className="text-blue-600 underline">
+                        <Link href="https://www.airgradient.com/documentation/correction-algorithms/" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">
                             Correction Algorithms
-                        </a>
-                        .
+                        </Link>.
                     </p>
                 </div>
 
