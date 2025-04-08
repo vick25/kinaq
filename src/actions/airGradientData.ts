@@ -66,8 +66,18 @@ export async function fetchUniqueLocation(locationID: string) {
 }
 
 // Get current measures
-export async function fetchLocationMeasures(downloadUrl: string, from: string, end: string) {
-    const endPoint = `${API_URL}${downloadUrl}?token=${AIRGRADIENT_TOKEN}${from}${end}`
+export async function fetchLocationMeasures(downloadUrl: string, from?: string, end?: string) {
+    let endPoint = `${API_URL}${downloadUrl}?token=${AIRGRADIENT_TOKEN}`;
+
+    if (from) {
+        endPoint += `&from=${from}`;
+    }
+
+    if (end) {
+        endPoint += `&to=${end}`;
+    }
+
+    console.log(endPoint);
     try {
         const response = await fetch(endPoint);
         const data = await response.json();

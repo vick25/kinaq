@@ -7,6 +7,8 @@ import { getLocale, getMessages } from 'next-intl/server';
 import { Toast } from "@/components/toast-component"
 import NextProgress from "@/components/next-progress"
 import { Analytics } from "@vercel/analytics/react"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,13 +26,17 @@ export default async function RootLayout({
   const messages = await getMessages();
   const locale = await getLocale();
 
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
         <Toast />
         <NextIntlClientProvider messages={messages}>
           <main className="flex flex-col min-h-screen">
-            <Header />
+            <Header session={session} />
             {children}
             <Analytics />
           </main>

@@ -12,19 +12,27 @@ import AboutDialog from "./about-dialog";
 import { useTheme } from "next-themes";
 import LocaleSwitcher from "./locale-switcher";
 import { useTranslations } from "next-intl";
-import { getUser } from "@/lib/auth-session";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { Session } from "@/lib/auth";
 
-async function Header() {
-  const user = await getUser();
-
+function Header({ session }: { session: Session | null }) {
+  const router = useRouter()
   const t = useTranslations('HomePage')
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null);
+
+  const handleSignOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push('/')
+        }
+      }
+    });
+  }
 
   const handleThemeToggle = useCallback(
     (e: React.MouseEvent) => {
@@ -87,8 +95,8 @@ async function Header() {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {user && <DropdownMenuItem>
-                  <Link href="/settings" className="block text-sm">
+                {session?.user && <DropdownMenuItem>
+                  <Link href="/settings" className="text-sm">
                     <User className="mr-2 h-4 w-4" />
                     My data
                   </Link>
@@ -101,34 +109,22 @@ async function Header() {
                   </span>
                 </DropdownMenuItem> */}
                 <DropdownMenuItem>
-                  <Link href="/settings" className="block text-sm">
+                  <Link href="/settings" className="flex items-center w-full text-sm">
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  {!user ? <Link href="/settings" className="block text-sm">
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Login
-                  </Link> :
-                    <form>
-                      <button formAction={
-                        async () => {
-                          "use server"
-                          await auth.api.signOut({
-                            headers: await headers(),
-                          });
-                          redirect('/');
-                        }}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        logout
-                      </button>
-                    </form>
-                    // <Link href="/logout" className="block text-sm">
-                    //   <LogOut className="mr-2 h-4 w-4" />
-                    //   Logout
-                    // </Link>
+                  {!session?.user ?
+                    <Link href="/historical?signup=#" className="flex items-center w-full text-sm">
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Login
+                    </Link> :
+                    <button onClick={handleSignOut} className="flex items-center w-full">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </button>
                   }
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -173,7 +169,7 @@ async function Header() {
                 <span className="text-sm font-medium hover:text-primary transition-colors">User Menu</span>
               </div>
               <div className="pl-10 space-y-2">
-                {user && <Link href="/my-data" className="block text-sm">
+                {session?.user && <Link href="/my-data" className="block text-sm">
                   My Data
                 </Link>}
                 <div className="flex items-center justify-between">
