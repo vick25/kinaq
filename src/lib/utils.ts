@@ -10,6 +10,11 @@ export const formatTo2Places = (amount: number) => {
   return amount && amount?.toFixed(2);
 };
 
+// Format YYYY-MM-DD to YYYYMMDD
+export const formatToYYYYMMDD = (dateString: string): string => {
+  return dateString.replace(/-/g, ''); // Remove hyphens
+};
+
 export function formatDateToLocaleString(date: string): string {
   return new Date(date).toLocaleString('en-US', {
     month: 'numeric',
@@ -145,3 +150,48 @@ export function getAqiDescription(aqi: number): { category: string; color: strin
     return { category: "Hazardous", color: "Maroon" };
   }
 }
+
+/**
+ * Converts an array of objects into a CSV string.
+ * Handles basic escaping for commas and quotes within values.
+ */
+export const convertToCSV = (data: any[]): string => {
+  if (!data || data.length === 0) {
+    return "";
+  }
+
+  const headers = Object.keys(data[0]);
+  const csvRows = [];
+
+  // Add header row
+  csvRows.push(headers.join(','));
+
+  // Add data rows
+  for (const row of data) {
+    const values = headers.map(header => {
+      let value = row[header];
+
+      // Handle null/undefined
+      if (value === null || value === undefined) {
+        return '';
+      }
+
+      // Convert value to string
+      let stringValue = String(value);
+
+      // Escape double quotes by doubling them
+      stringValue = stringValue.replace(/"/g, '""');
+
+      // If value contains comma, newline, or double quote, wrap in double quotes
+      if (stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('"')) {
+        stringValue = `"${stringValue}"`;
+      }
+
+      return stringValue;
+    });
+    csvRows.push(values.join(','));
+  }
+
+  return csvRows.join('\n');
+};
+

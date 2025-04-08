@@ -64,3 +64,16 @@ export async function fetchUniqueLocation(locationID: string) {
         return null;
     }
 }
+
+// Get current measures
+export async function fetchLocationMeasures(downloadUrl: string, from: string, end: string) {
+    const endPoint = `${API_URL}${downloadUrl}?token=${AIRGRADIENT_TOKEN}${from}${end}`
+    try {
+        const response = await fetch(endPoint);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch Location measures data:", error);
+        return null;
+    }
+}
