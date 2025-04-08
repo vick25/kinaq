@@ -72,11 +72,14 @@ export default function LocationDetails() {
             <div>
               <h2 className="text-2xl font-bold mb-2">Location details</h2>
               <div className="flex justify-between items-center gap-3 text-sm text-muted-foreground">
-                <p className="relative">{locationData?.locationName}
-                  {offline && <span className="absolute -top-1 -right-3 flex size-3 cursor-pointer" title="The sensor seems to be offline.">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
-                  </span>}
+                <p className="relative flex items-center">{locationData?.locationName}
+                  {offline &&
+                    <><span className="absolute -top-1 -right-3 flex size-3 cursor-pointer" title="The sensor seems to be offline.">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
+                    </span>
+                      <span className="absolute -top-[0.37rem] -right-[1.9rem] text-red-600 text-xs font-semibold">off</span>
+                    </>}
                 </p>
                 <p className="text-xs">{formatDateToLocaleString(locationData?.timestamp)}</p>
               </div>

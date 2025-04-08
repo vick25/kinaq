@@ -9,6 +9,9 @@ const SignUpForm = async (props: Props) => {
         <form action={async (formdata) => {
             'use server'
             const email = formdata.get('email')
+            if (!email) {
+                return
+            }
             // Send the email OTP
             const { data, error } = await authClient.emailOtp.sendVerificationOtp({
                 email: email as string,

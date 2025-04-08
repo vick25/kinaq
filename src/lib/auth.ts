@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
-import { emailOTP } from "better-auth/plugins"
+import { emailOTP } from "better-auth/plugins";
+import { openAPI } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "@prisma/client";
@@ -13,10 +14,16 @@ export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
-    // emailAndPassword: {
-    //     enabled: true,
-    //     requireEmailVerification: true
-    // },
+    session: {
+        cookieCache: {
+            enabled: true,
+            maxAge: 5 * 60 // Cache duration in seconds
+        }
+    },
+    emailAndPassword: {
+        enabled: false,
+        // requireEmailVerification: true
+    },
     plugins: [
         emailOTP({
             expiresIn: 600,
@@ -53,7 +60,7 @@ export const auth = betterAuth({
                 try {
                     // Send the email using the pre-configured transporter
                     const info = await transporter.sendMail(mailOptions);
-                    console.log(`OTP Email sent successfully to ${email}: ${info.messageId}`);
+                    // console.log(`OTP Email sent successfully to ${email}: ${info.messageId}`);
                     // better-auth expects this function to resolve successfully if email is sent
                     // If you want to return any data, you can do so here.
                     // return { success: true, messageId: info.messageId };
@@ -66,6 +73,9 @@ export const auth = betterAuth({
                 }
             }
         }),
-        nextCookies()
+        openAPI(),
+        nextCookies(),
     ],
 });
+
+export type Session = typeof auth.$Infer.Session
