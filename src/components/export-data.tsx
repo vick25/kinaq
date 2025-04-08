@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from "react";
-import { Info } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Info, Loader2 } from "lucide-react";
 import {
     Select,
     SelectContent,
@@ -12,13 +12,141 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import Link from "next/link";
+import { fetchKinAQData } from "@/actions/airGradientData";
+import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
+
+type LocationData = {
+    locationName: string;
+    locationId: string;
+}
+
+enum Usages {
+    academic_research = "Academic Research", // Assign user-friendly values if needed for display
+    professional = "Professional",
+    other = "Other"
+}
+
 
 export default function ExportData() {
-    const [startDate, setStartDate] = useState("2025-03-14");
-    const [endDate, setEndDate] = useState("2025-03-17");
+    const [startDate, setStartDate] = useState<string | undefined>();
+    const [endDate, setEndDate] = useState<string | undefined>();
+    const [locationData, setLocationData] = useState<LocationData[]>([]);
+    const [selectedLocation, setSelectedLocation] = useState<string | undefined>();
+    const [selectedBucket, setSelectedBucket] = useState<string | undefined>();
+    const [institution, setInstitution] = useState<string>('');
+    const [selectedUsage, setSelectedUsage] = useState<Usages | undefined>(Usages.academic_research);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isDownloadDisabled, setIsDownloadDisabled] = useState(true);
+
+    const handleDownload = async (format: 'csv' | 'json') => {
+        if (!selectedLocation || !selectedBucket) {
+            console.error("Missing required parameters for download.");
+            alert("Please select location, bucket.");
+            return;
+        }
+
+        if (endDate! < startDate!) {
+            alert("End date cannot be earlier than the start date.");
+            return; // Already handled partially by input onChange, but good to double-check
+        }
+
+        setIsLoading(true);
+
+        let downloadUrl = `locations/${selectedLocation}/measures/bucket=${selectedBucket}`;
+
+        if (startDate) {
+            downloadUrl += `&from=${formatToYYYYMMDD(startDate as string)}`;
+        }
+
+        if (endDate) {
+            downloadUrl += `&to=${formatToYYYYMMDD(endDate as string)}`;
+        }
+
+        window.location.href = downloadUrl;
+
+        try {
+            //Generate Filename
+            const datePart = `${formatToYYYYMMDD(startDate as string)}-${formatToYYYYMMDD(endDate as string)}`;
+            const locationNamePart = locationData.find(loc => loc.locationId === selectedLocation)?.locationName.replace(/\s+/g, '_') || selectedLocation; // Use name or ID
+            const baseFilename = `Export_${locationNamePart}_${selectedBucket}_${datePart}`;
+
+            // Fetch data from the API
+            const data = await fetchKinAQData();
+            if (data)
+                if (format === 'csv') {
+                    const csvData = convertToCSV(data);
+                    triggerFileDownload(csvData, `${baseFilename}.csv`, 'text/csv;charset=utf-8;');
+                } else if (format === 'json') {
+                    const jsonData = JSON.stringify(data, null, 2); // Pretty print JSON
+                    triggerFileDownload(jsonData, `${baseFilename}.json`, 'application/json;charset=utf-8;');
+                }
+        } finally {
+            setIsLoading(false); // Stop loading indicator regardless of success or failure
+        }
+    }
+
+    // Handle End Date Change - includes validation against start date
+    const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newEndDate = e.target.value;
+
+        // Prevent setting end date if it's earlier than the start date
+        if (startDate && newEndDate < startDate) {
+            alert("End date cannot be earlier than the start date.");
+            // Optionally reset the input visually if needed: 
+            e.target.value = endDate || '';
+        } else {
+            setEndDate(newEndDate);
+        }
+    };
+
+    /**
+ * Triggers a browser file download.
+ */
+    const triggerFileDownload = (content: string, filename: string, mimeType: string) => {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a); // Append link to body
+        a.click(); // Programmatically click the link
+        document.body.removeChild(a); // Remove link from body
+        URL.revokeObjectURL(url); // Release the object URL
+    };
+
+    const getLocationData = async () => {
+        try {
+            const data = await fetchKinAQData();
+            if (data) {
+                const locations: LocationData[] = data.map((location: any) => ({
+                    locationName: location.locationName,
+                    locationId: location.locationId,
+                }));
+                setLocationData(locations);
+            } else {
+                console.error("Failed to fetch data");
+            }
+        } catch (error) {
+            console.error("Failed to fetch location data:", error);
+        }
+    };
+
+    useEffect(() => {
+        getLocationData();
+    }, []);
+
+    // Effect to update download button disable state
+    useEffect(() => {
+        // Enable button only if both location and bucket are selected
+        if (selectedLocation && selectedBucket) {
+            setIsDownloadDisabled(false);
+        } else {
+            setIsDownloadDisabled(true);
+        }
+    }, [selectedLocation, selectedBucket]);
 
     return (
-        <section className="">
+        <section className="pb-8">
             {/* Main Content */}
             <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h2 className="text-2xl font-semibold text-[#05b15d]">Export Data as CSV</h2>
@@ -26,7 +154,7 @@ export default function ExportData() {
                 {/* Warning Box */}
                 <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mt-4 flex gap-2">
                     <Info className="text-xl" />
-                    <p>
+                    <p className="text-sm">
                         <strong>All data are uncorrected values</strong>
                         <br />
                         All air quality parameters exported are raw values. We recommend applying
@@ -38,44 +166,53 @@ export default function ExportData() {
                 </div>
 
                 {/* Filters */}
-                <div className="mt-6 flex flex-wrap gap-4">
-                    <Select>
+                <div className="mt-6 flex items-center flex-wrap gap-4">
+                    <Select onValueChange={(value) => setSelectedLocation(value)}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select a location" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
                                 <SelectLabel>Locations</SelectLabel>
-                                <SelectItem value="apple">KINAQ Kimwenza</SelectItem>
-                                <SelectItem value="banana">Banana</SelectItem>
-                                <SelectItem value="blueberry">Blueberry</SelectItem>
-                                <SelectItem value="grapes">Grapes</SelectItem>
-                                <SelectItem value="pineapple">Pineapple</SelectItem>
+                                {locationData.length > 0 ? (
+                                    locationData.map((location) => (
+                                        <SelectItem value={location.locationId} key={location.locationId}>{location.locationName}</SelectItem>
+                                    ))
+                                ) : (
+                                    <SelectItem value="loading" disabled>Loading locations...</SelectItem>
+                                )}
                             </SelectGroup>
                         </SelectContent>
                     </Select>
 
-                    <Select>
+                    <Select onValueChange={(value) => setSelectedBucket(value)}>
                         <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Select data" />
+                            <SelectValue placeholder="Select bucket" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="apple">Raw Data</SelectItem>
+                                <SelectItem value="raw">Raw Data</SelectItem>
+                                <SelectItem value="past">Past Data</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
+
+                    {selectedBucket &&
+                        <p className="text-xs text-red-600 ml-4">
+                            {selectedBucket === 'raw' ? 'The from .. to interval is limited to 2 days.' : 'The from .. to interval is limited to 10 days.'}
+                        </p>}
                 </div>
 
                 {/* Date Inputs */}
-                <div className="mt-4 flex flex-wrap gap-4">
+                <div className="mt-4 flex items-center flex-wrap gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Start date</label>
                         <input
                             type="date"
-                            value={startDate}
+                            max={endDate}
+                            value={startDate || ''}
                             onChange={(e) => setStartDate(e.target.value)}
-                            className="border p-2 rounded-md w-full focus:border-blue-500 focus:ring-blue-500"
+                            className="mt-1 border p-2 rounded-md w-full focus:border-blue-500 focus:ring-blue-500"
                         />
                     </div>
 
@@ -83,16 +220,74 @@ export default function ExportData() {
                         <label className="block text-sm font-medium text-gray-700">End date</label>
                         <input
                             type="date"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            className="border p-2 rounded-md w-full"
+                            min={startDate}
+                            value={endDate || ''}
+                            onChange={handleEndDateChange}
+                            className="mt-1 border p-2 rounded-md w-full focus:border-blue-500 focus:ring-blue-500"
                         />
                     </div>
                 </div>
 
-                {/* Download Button */}
-                <button className="mt-6 bg-orange-500 text-white py-2 px-6 rounded-md text-lg font-semibold hover:bg-orange-600">
-                    Download
+                <fieldset className="mt-6 border border-gray-300 p-4 rounded-md">
+                    <legend className="text-base font-semibold text-gray-600 px-2">
+                        Usage Information (Optional)
+                    </legend>
+
+                    {/* Institution Input */}
+                    <div className="mt-3">
+                        <label htmlFor="institution" className="block text-sm font-medium text-gray-700">
+                            Institution / Company Name
+                        </label>
+                        <input
+                            type="text"
+                            id="institution"
+                            name="institution"
+                            value={institution}
+                            onChange={(e) => setInstitution(e.target.value)}
+                            className="mt-1 border p-2 rounded-md w-full focus:border-blue-500 focus:ring-blue-500"
+                            placeholder="e.g., University of Example, Example Corp"
+                        />
+                    </div>
+
+                    {/* Usage Radio Buttons */}
+                    <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Primary Usage
+                        </label>
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-x-6 gap-y-2"> {/* Layout radios */}
+                            {Object.keys(Usages)
+                                .filter(key => isNaN(Number(key)))
+                                .map((usageKey) => (
+                                    <div key={usageKey} className="flex items-center gap-2">
+                                        <input
+                                            required
+                                            type="radio"
+                                            id={`usage-${usageKey}`}
+                                            name="usage"
+                                            value={usageKey}
+                                            checked={selectedUsage === Usages[usageKey as keyof typeof Usages]}
+                                            onChange={() => setSelectedUsage(Usages[usageKey as keyof typeof Usages])}
+                                            className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
+                                        />
+                                        <label htmlFor={`usage-${usageKey}`} className="text-sm text-gray-700">
+                                            {Usages[usageKey as keyof typeof Usages]}
+                                        </label>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                </fieldset>
+
+                <button className={`mt-6 bg-orange-500 text-white py-2 px-6 rounded-md text-lg font-semibold hover:bg-orange-600
+                                ${isDownloadDisabled ? 'opacity-50 cursor-not-allowed' : ''} `}
+                    onClick={() => handleDownload('csv')}>
+                    {isLoading ? (
+                        <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Downloading...
+                        </>
+                    ) : (
+                        'Download'
+                    )}
                 </button>
             </div>
         </section>
