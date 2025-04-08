@@ -4,15 +4,20 @@ import SignUpForm from './signUp-form'
 import SignInForm from './signIn-form'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
+import { getUser } from '@/lib/auth-session'
 
 interface PageProps {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
+const metadata = {
+    title: 'KINAQ | Data Export',
+    description: 'Download air quality data from KINAQ',
+}
+
 const Historical = async ({ searchParams }: PageProps) => {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    })
+    const user = await getUser();
+
     const { signup, email } = await searchParams
     const showSignIn = signup === 'login'
     const showExport = signup === 'success'
@@ -26,7 +31,7 @@ const Historical = async ({ searchParams }: PageProps) => {
                 </div>
 
                 <div className='mt-8 w-full'>
-                    <p>Download Requests for {!session ? "Not authenticated" : session.user.email}</p>
+                    <p>Download Requests for {!user ? "Not authenticated" : user.email}</p>
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800">
                             Download active air quality information older than the last 7 days:

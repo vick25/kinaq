@@ -1,19 +1,25 @@
 'use client';
 import Image from "next/image"
 import Link from "next/link"
-import { Search, Menu, User, Settings, LogIn } from "lucide-react"
+import { Search, Menu, User, Settings, LogIn, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import React, { useCallback, useRef, useState } from "react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
 import AboutDialog from "./about-dialog";
 import { useTheme } from "next-themes";
 import LocaleSwitcher from "./locale-switcher";
 import { useTranslations } from "next-intl";
+import { getUser } from "@/lib/auth-session";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-function Header() {
+async function Header() {
+  const user = await getUser();
+
   const t = useTranslations('HomePage')
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
@@ -81,10 +87,13 @@ function Header() {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>My data</span>
+                {user && <DropdownMenuItem>
+                  <Link href="/settings" className="block text-sm">
+                    <User className="mr-2 h-4 w-4" />
+                    My data
+                  </Link>
                 </DropdownMenuItem>
+                }
                 {/* <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                   <span className="flex items-center justify-between w-full">
                     Dark mode
@@ -92,12 +101,35 @@ function Header() {
                   </span>
                 </DropdownMenuItem> */}
                 <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                  <Link href="/settings" className="block text-sm">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </Link>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <LogIn className="mr-2 h-4 w-4" />
-                  <span>Login</span>
+                  {!user ? <Link href="/settings" className="block text-sm">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Login
+                  </Link> :
+                    <form>
+                      <button formAction={
+                        async () => {
+                          "use server"
+                          await auth.api.signOut({
+                            headers: await headers(),
+                          });
+                          redirect('/');
+                        }}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        logout
+                      </button>
+                    </form>
+                    // <Link href="/logout" className="block text-sm">
+                    //   <LogOut className="mr-2 h-4 w-4" />
+                    //   Logout
+                    // </Link>
+                  }
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -141,9 +173,9 @@ function Header() {
                 <span className="text-sm font-medium hover:text-primary transition-colors">User Menu</span>
               </div>
               <div className="pl-10 space-y-2">
-                <Link href="/my-data" className="block text-sm">
+                {user && <Link href="/my-data" className="block text-sm">
                   My Data
-                </Link>
+                </Link>}
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Dark mode</span>
                   <Switch onClick={handleThemeToggle} />
@@ -151,9 +183,9 @@ function Header() {
                 <Link href="/settings" className="block text-sm">
                   Settings
                 </Link>
-                <Link href="/login" className="block text-sm">
+                {<Link href="/login" className="block text-sm">
                   Login
-                </Link>
+                </Link>}
               </div>
             </nav>
           </div>
