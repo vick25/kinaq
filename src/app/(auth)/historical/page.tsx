@@ -1,7 +1,7 @@
 import ExportData from '@/components/export-data'
 import React from 'react'
-import SignUpForm from './signUp-form'
-import SignInForm from './signIn-form'
+import SignUpForm from '../signUp-form'
+import SignInForm from '../signIn-form'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 

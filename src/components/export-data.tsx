@@ -14,6 +14,8 @@ import {
 import Link from "next/link";
 import { fetchKinAQData, fetchLocationMeasures } from "@/actions/airGradientData";
 import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 type LocationData = {
     locationName: string;
@@ -36,6 +38,29 @@ export default function ExportData() {
     const [selectedUsage, setSelectedUsage] = useState<Usages | undefined>(Usages.academic_research);
     const [isLoading, setIsLoading] = useState(false);
     const [isDownloadDisabled, setIsDownloadDisabled] = useState(true);
+
+    // async function createPost(formData: FormData) {
+    //     "use server";
+
+    //     const title = formData.get("title") as string;
+    //     const content = formData.get("content") as string;
+
+    //     await prisma.request.create({
+    //         data: {
+    //             title,
+    //             content,
+    //             locationId: selectedLocation as string,
+    //             bucket: selectedBucket as string,
+    //             isDelivered:true,
+    //             usage: selectedUsage as Usages,
+    //             startDate: startDate as string,
+    //             endDate: endDate as string,
+    //         },
+    //     });
+
+    //     revalidatePath("/posts");
+    //     // redirect("/posts");
+    // }
 
     const handleDownload = async (format: 'csv' | 'json') => {
         if (!selectedLocation || !selectedBucket) {
