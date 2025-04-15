@@ -1,4 +1,5 @@
 'use server'
+import { revalidatePath } from 'next/cache';
 import { API_URL } from '../lib/constants';
 
 const AIRGRADIENT_TOKEN = process.env.AIRGRADIENT_TOKEN;
@@ -27,9 +28,11 @@ export async function fetchLocationData(locationId: string) {
     try {
         const response = await fetch(endPoint);
         const data = await response.json();
+        revalidatePath('/')
         return data;
     } catch (error) {
         console.error("Failed to fetch Air Gradient data:", error);
+        revalidatePath('/')
         return null;
     }
 }

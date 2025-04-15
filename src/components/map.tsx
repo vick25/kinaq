@@ -1,21 +1,44 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import maplibregl, { Map, GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import useLocationStore from '../stores/location-store';
 import { IMapComponentProps } from '@/lib/definitions';
 import { formatDateToLocaleString, getPM25Color } from '@/lib/utils';
-import { kinAQPoints } from '@/lib/constants';
+import { kinAQPoints, styles } from '@/lib/constants';
 
 const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     const [map, setMap] = useState<Map | null>(null);
     const [message, setMessage] = useState<string | null>('')
     const [locationId, setLocationId] = useState<number | null>(-1)
     const { retrieveLocation, coordinates } = useLocationStore();
-    let popup: maplibregl.Popup | null = null; // Store the popup instance
+    const [currentStyleSource, setCurrentStyleSource] = useState<string>(styles[0].source);
+    const popupRef = useRef<maplibregl.Popup | null>(null);
     const router = useRouter();
+
+    // --- Handle Map Style Change ---
+    const handleMapChange = useCallback((mapType: string) => {
+        if (!map) return;
+
+        const selectedStyle = styles.find(style => style.label === mapType);
+        if (!selectedStyle || selectedStyle.source === currentStyleSource) {
+            console.log("Style change skipped: No style found or already active.");
+            return; // Don't reload if style is the same
+        }
+
+        console.log(`Changing style to: ${selectedStyle.label}`);
+        setCurrentStyleSource(selectedStyle.source); // Update state for next potential init
+
+        const currentCenter = map.getCenter();
+        const currentZoom = map.getZoom();
+
+        // Set the new style (this triggers the loading process)
+        // map.setStyle(selectedStyle.source);
+
+    }, [currentStyleSource, gradientData]);
+
 
     //Fetch and add points to the map
     const populateMarkers = async () => {
@@ -109,12 +132,9 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                         }
 
                         // Close the previous popup if it exists
-                        if (popup) {
-                            popup.remove();
-                            popup = null; // Reset the popup variable
-                        }
+                        popupRef.current?.remove();
 
-                        popup = new maplibregl.Popup({ closeButton: false })
+                        popupRef.current = new maplibregl.Popup({ closeButton: false })
                             .setLngLat(coordinates as [number, number])
                             .setHTML(
                                 `<strong>${locationName}</strong><br>
@@ -129,10 +149,8 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
 
                     map.on("mouseleave", "location-points", () => {
                         map.getCanvas().style.cursor = "";
-                        if (popup) {
-                            popup.remove();
-                            popup = null;
-                        }
+                        popupRef.current?.remove();
+                        popupRef.current = null;
                     });
                 });
             }
@@ -162,7 +180,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                 maxBounds: initialBounds,
                 attributionControl: false
             })
-                .addControl(new NavigationControl(), 'top-left')
+                .addControl(new NavigationControl(), 'top-right')
                 .addControl(new GeolocateControl({
                     positionOptions: { enableHighAccuracy: true },
                 }))
@@ -188,10 +206,8 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
             if (!e.originalEvent.ctrlKey) {
                 map.scrollZoom.disable();
                 setMessage('Hold Ctrl to zoom');
-                // Remove the overlay after a short delay
-                setTimeout(() => {
-                    setMessage('');
-                }, 2000);
+                const timer = setTimeout(() => setMessage(''), 1500);
+                return () => clearTimeout(timer);
             } else {
                 setMessage('');
                 map.scrollZoom.enable();
@@ -233,17 +249,25 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     return (
         <div className='relative h-full w-full'>
             {message && (
-                <div className='absolute top-0 w-full h-full flex justify-center items-center bg-white opacity-70 text-gray-600 z-10'>
+                <div className='absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 text-white text-lg font-semibold z-10 pointer-events-none'>
                     {message}
                 </div>
             )}
-            <div className="absolute left-0 top-0 z-20 m-2 flex">
-                <button className="rounded-l-md bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    Map
-                </button>
-                <button className="rounded-r-md bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    Satellite
-                </button>
+            <div className="absolute left-2 top-2 z-20 flex rounded-md shadow-sm">
+                {styles.map((style, index) => (
+                    <button
+                        key={style.label}
+                        onClick={() => handleMapChange(style.label)}
+                        className={`
+                             px-4 py-2 text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                             ${index === 0 ? 'rounded-l-md' : ''}
+                             ${index === styles.length - 1 ? 'rounded-r-md' : '-ml-px'}
+                             ${currentStyleSource === style.source ? 'bg-gray-200 font-bold' : ''} // Indicate active style
+                         `}
+                    >
+                        {style.label}
+                    </button>
+                ))}
             </div>
             <div id='map' className='h-full w-full' />
         </div>
