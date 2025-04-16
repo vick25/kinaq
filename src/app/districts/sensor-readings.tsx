@@ -17,6 +17,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { getLocations } from "@/actions/populateTables";
+import { fetchUniqueLocation } from "@/actions/airGradientData";
 
 type Props = {}
 
@@ -30,11 +32,18 @@ interface SensorData {
     aqi: number;
     aqiStatus: string;
     lastUpdated: string;
+    offline?: boolean
 }
 
+interface Location {
+    id: number;
+    locationName: string;
+    locationID: string;
+}
 
 const SensorReadings = (props: Props) => {
     const searchParams = useSearchParams();
+    const [locations, setLocations] = useState<Location[]>([]);
     const [locationName, setLocationName] = useState("Kinshasa");
     const [sensorData, setSensorData] = useState<SensorData>({
         pm1: 30,
@@ -48,21 +57,77 @@ const SensorReadings = (props: Props) => {
         lastUpdated: new Date().toLocaleString()
     });
 
+    // {
+    //     "locationId": 155647,
+    //     "locationName": "KINAQ Kalembelembe",
+    //     "pm01": 21.5,
+    //     "pm02": 29,
+    //     "pm10": 32,
+    //     "pm01_corrected": 21.5,
+    //     "pm02_corrected": 29,
+    //     "pm10_corrected": 32,
+    //     "pm003Count": 1201.83,
+    //     "atmp": 27.4,
+    //     "rhum": 61.15,
+    //     "rco2": 406,
+    //     "atmp_corrected": 27.2,
+    //     "rhum_corrected": 84,
+    //     "rco2_corrected": 406,
+    //     "tvoc": 20.546692,
+    //     "wifi": -53,
+    //     "timestamp": "2025-04-16T22:25:46.000Z",
+    //     "serialno": "d83bda1b500c",
+    //     "model": "O-1PST",
+    //     "firmwareVersion": "3.2.0",
+    //     "tvocIndex": 15,
+    //     "noxIndex": 1
+    // }
+
+    useEffect(() => {
+        const fetchLocationNames = async () => {
+            const data = await getLocations();
+            // console.log({ data })
+            setLocations(data);
+        };
+
+        fetchLocationNames();
+    }, []);
+
+    useEffect(() => {
+        const selectedLocation = locations.find(loc => loc.locationName === locationName);
+        const fetchLocationData = async () => {
+            const data = await fetchUniqueLocation(selectedLocation?.locationID as string)
+            console.log(data)
+        };
+
+        fetchLocationData();
+    }, [locationName])
+
+    const handleLocationChange = (locationId: string) => {
+        const selectedLocation = locations.find(loc => loc.locationID === locationId);
+        if (selectedLocation) {
+            setLocationName(selectedLocation.locationName);
+        }
+    };
+
     return (
         <div className="container mx-auto px-4 py-8">
             <div>
-                <Select>
+                <Select onValueChange={handleLocationChange}>
                     <SelectTrigger className="w-[280px]">
                         <SelectValue placeholder="Select a location" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
                             <SelectLabel>Locations</SelectLabel>
-                            <SelectItem value="apple">Apple</SelectItem>
-                            <SelectItem value="banana">Banana</SelectItem>
-                            <SelectItem value="blueberry">Blueberry</SelectItem>
-                            <SelectItem value="grapes">Grapes</SelectItem>
-                            <SelectItem value="pineapple">Pineapple</SelectItem>
+                            {locations.map((location) => (
+                                <SelectItem
+                                    key={location.id}
+                                    value={location.locationID}
+                                >
+                                    {location.locationName}
+                                </SelectItem>
+                            ))}
                         </SelectGroup>
                     </SelectContent>
                 </Select>
@@ -107,7 +172,7 @@ const SensorReadings = (props: Props) => {
             <Card className="mb-12 overflow-hidden border border-gray-200">
                 <CardContent className="p-6 flex flex-col md:flex-row items-center">
                     {/* Air Quality Index Gauge */}
-                    <div className="mb-8 flex-1">
+                    <div className="mb-8 flex-1 w-full">
                         <LocationGauge
                             value={sensorData?.aqi || 0}
                             label={sensorData?.aqiStatus}

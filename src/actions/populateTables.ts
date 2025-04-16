@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+'use server'
 
+import prisma from '@/lib/prisma';
 import { fetchAllAirGradientData } from './airGradientData';
-
-const prisma = new PrismaClient();
 
 // Filter locations with "KINAQ" in their name
 interface AirGradientLocation {
@@ -52,7 +51,24 @@ export async function populateLocationsTable() {
     } catch (error) {
         console.error('Error populating locations:', error);
         throw error;
-    } finally {
-        await prisma.$disconnect();
+    }
+}
+
+export async function getLocations() {
+    try {
+        const locations = await prisma.location.findMany({
+            select: {
+                id: true,
+                locationName: true,
+                locationID: true
+            },
+            orderBy: {
+                locationName: 'asc'
+            }
+        })
+        return locations
+    } catch (error) {
+        console.error('Error fetching locations:', error)
+        return []
     }
 }
