@@ -68,7 +68,7 @@ model Login {
 model Location {
   id           Int     @id @default(autoincrement())
   locationName String // Mapped from varchar NOT NULL
-  locationID   String // Mapped from varchar NOT NULL
+  locationID   String  @unique // Mapped from varchar NOT NULL
   latitude     String? // Mapped from varchar, nullable
   longitude    String? // Mapped from varchar, nullable
   serial       String? // Mapped from text, nullable

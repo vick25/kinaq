@@ -9,6 +9,7 @@ import NextProgress from "@/components/next-progress"
 import { Analytics } from "@vercel/analytics/react"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers";
+import { populateLocationsTable } from "@/actions/populateTables";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,9 +27,13 @@ export default async function RootLayout({
   const messages = await getMessages();
   const locale = await getLocale();
 
-  const session = await auth.api.getSession({
+  const session = await auth?.api.getSession({
     headers: await headers(),
   });
+
+  console.log({session})
+
+  await populateLocationsTable();
 
   return (
     <html lang={locale} suppressHydrationWarning>
