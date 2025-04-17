@@ -26,7 +26,7 @@ const SignInForm = async ({ loggedInEmail }: Props) => {
             return
         }
         if (data.token) {
-            console.log("OTP verified successfully")
+            // console.log("OTP verified successfully")
             redirect(`/historical?signup=success`)
         }
         redirect(`/historical`)

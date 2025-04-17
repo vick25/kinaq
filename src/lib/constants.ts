@@ -4,6 +4,20 @@ export const CURRENT_DATA_REFRESH_INTERVAL = 60000;
 export const MINUTELY_HISTORICAL_DATA_REFRESH_INTERVAL = 180000;
 export const HOURLY_HISTORICAL_DATA_REFRESH_INTERVAL = 3600000;
 
+// Define types for better clarity
+type MapStyle = {
+    label: string;
+    source: string;
+};
+
+const arcgis_hybrid = "https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/arcgis_hybrid.json";
+const openStreetMap = "https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/openStreetMap.json";
+
+export const styles: MapStyle[] = [
+    { label: 'Map', source: openStreetMap },
+    { label: 'Satellite', source: arcgis_hybrid }
+];
+
 export const COLORS = {
     green: '#1de208',
     yellow: '#e2e020',

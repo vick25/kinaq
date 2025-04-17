@@ -12,8 +12,10 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import Link from "next/link";
-import { fetchKinAQData } from "@/actions/airGradientData";
+import { fetchKinAQData, fetchLocationMeasures } from "@/actions/airGradientData";
 import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 type LocationData = {
     locationName: string;
@@ -26,7 +28,6 @@ enum Usages {
     other = "Other"
 }
 
-
 export default function ExportData() {
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
@@ -38,6 +39,29 @@ export default function ExportData() {
     const [isLoading, setIsLoading] = useState(false);
     const [isDownloadDisabled, setIsDownloadDisabled] = useState(true);
 
+    // async function createPost(formData: FormData) {
+    //     "use server";
+
+    //     const title = formData.get("title") as string;
+    //     const content = formData.get("content") as string;
+
+    //     await prisma.request.create({
+    //         data: {
+    //             title,
+    //             content,
+    //             locationId: selectedLocation as string,
+    //             bucket: selectedBucket as string,
+    //             isDelivered:true,
+    //             usage: selectedUsage as Usages,
+    //             startDate: startDate as string,
+    //             endDate: endDate as string,
+    //         },
+    //     });
+
+    //     revalidatePath("/posts");
+    //     // redirect("/posts");
+    // }
+
     const handleDownload = async (format: 'csv' | 'json') => {
         if (!selectedLocation || !selectedBucket) {
             console.error("Missing required parameters for download.");
@@ -45,34 +69,31 @@ export default function ExportData() {
             return;
         }
 
+        if (selectedBucket === 'past' && (!startDate || !endDate)) {
+            alert("Please select a start and end date.");
+            return;
+        }
+
         if (endDate! < startDate!) {
             alert("End date cannot be earlier than the start date.");
-            return; // Already handled partially by input onChange, but good to double-check
+            return;
         }
 
         setIsLoading(true);
 
-        let downloadUrl = `locations/${selectedLocation}/measures/bucket=${selectedBucket}`;
-
-        if (startDate) {
-            downloadUrl += `&from=${formatToYYYYMMDD(startDate as string)}`;
-        }
-
-        if (endDate) {
-            downloadUrl += `&to=${formatToYYYYMMDD(endDate as string)}`;
-        }
-
-        window.location.href = downloadUrl;
-
         try {
             //Generate Filename
-            const datePart = `${formatToYYYYMMDD(startDate as string)}-${formatToYYYYMMDD(endDate as string)}`;
-            const locationNamePart = locationData.find(loc => loc.locationId === selectedLocation)?.locationName.replace(/\s+/g, '_') || selectedLocation; // Use name or ID
-            const baseFilename = `Export_${locationNamePart}_${selectedBucket}_${datePart}`;
+            const datePart = (startDate && endDate) ?
+                `${formatToYYYYMMDD(startDate as string)}-${formatToYYYYMMDD(endDate as string)}` :
+                new Date().toISOString().split('T')[0];
+            const locationNamePart = locationData.find(loc => loc.locationId === selectedLocation)?.locationName.replace(/\s+/g, '_') || selectedLocation;  // Use name or ID
+            const baseFilename = `Export_${locationNamePart}_${selectedBucket}_${datePart.replace(/-/g, '_')}`;
 
             // Fetch data from the API
-            const data = await fetchKinAQData();
-            if (data)
+            const data: any = await fetchLocationMeasures(`locations/${selectedLocation}/measures/${selectedBucket}`,
+                startDate as string, endDate as string);
+
+            if (data) {
                 if (format === 'csv') {
                     const csvData = convertToCSV(data);
                     triggerFileDownload(csvData, `${baseFilename}.csv`, 'text/csv;charset=utf-8;');
@@ -80,6 +101,14 @@ export default function ExportData() {
                     const jsonData = JSON.stringify(data, null, 2); // Pretty print JSON
                     triggerFileDownload(jsonData, `${baseFilename}.json`, 'application/json;charset=utf-8;');
                 }
+            } else {
+                console.error("No data returned from the API.");
+            }
+        } catch (error) {
+            // Error already logged and message set in fetchExportData
+            console.error(`Download failed for ${format.toUpperCase()}:`, error);
+            // Error message state is already set by fetchExportData, no need to alert again unless desired
+            // alert(`Failed to download data: ${errorMessage || 'Unknown error'}`);
         } finally {
             setIsLoading(false); // Stop loading indicator regardless of success or failure
         }
@@ -100,8 +129,8 @@ export default function ExportData() {
     };
 
     /**
- * Triggers a browser file download.
- */
+       * Triggers a browser file download.
+    */
     const triggerFileDownload = (content: string, filename: string, mimeType: string) => {
         const blob = new Blob([content], { type: mimeType });
         const url = URL.createObjectURL(blob);
@@ -146,7 +175,7 @@ export default function ExportData() {
     }, [selectedLocation, selectedBucket]);
 
     return (
-        <section className="pb-8">
+        <section className="pb-10">
             {/* Main Content */}
             <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h2 className="text-2xl font-semibold text-[#05b15d]">Export Data as CSV</h2>
@@ -282,9 +311,9 @@ export default function ExportData() {
                                 ${isDownloadDisabled ? 'opacity-50 cursor-not-allowed' : ''} `}
                     onClick={() => handleDownload('csv')}>
                     {isLoading ? (
-                        <>
+                        <div className="flex items-center justify-between">
                             <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Downloading...
-                        </>
+                        </div>
                     ) : (
                         'Download'
                     )}

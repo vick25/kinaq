@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import LocationGauge from "@/components/location-gauge";
-import { COLORS } from "@/lib/definitions";
+import { COLORS, ILocationData } from "@/lib/definitions";
 
 import {
     Select,
@@ -17,52 +17,89 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { getLocations } from "@/actions/populateTables";
+import { fetchUniqueLocation } from "@/actions/airGradientData";
+import { calculateOverallAqi, formatDateToLocaleString, getAqiDescription } from "@/lib/utils";
+import useLocationStore from "@/stores/location-store";
 
 type Props = {}
 
-interface SensorData {
-    pm1: number;
-    pm25: number;
-    pm10: number;
-    no2: number;
-    temperature: number;
-    humidity: number;
-    aqi: number;
-    aqiStatus: string;
-    lastUpdated: string;
+interface Location {
+    id: number;
+    locationName: string;
+    locationID: string;
 }
-
 
 const SensorReadings = (props: Props) => {
     const searchParams = useSearchParams();
-    const [locationName, setLocationName] = useState("Kinshasa");
-    const [sensorData, setSensorData] = useState<SensorData>({
-        pm1: 30,
-        pm25: 31,
-        pm10: 31,
-        no2: 11,
-        temperature: 32,
-        humidity: 71,
-        aqi: 91,
-        aqiStatus: "Moderate",
-        lastUpdated: new Date().toLocaleString()
-    });
+    const { locationId } = useLocationStore();
+    const [locations, setLocations] = useState<Location[]>([]);
+    const [locationName, setLocationName] = useState("");
+    const [sensorData, setSensorData] = useState<ILocationData>();
+
+    useEffect(() => {
+        const fetchLocationNames = async () => {
+            const data = await getLocations();
+            setLocations(data);
+        };
+
+        fetchLocationNames();
+    }, []);
+
+    // Handle setting location name whenever locations or locationId changes
+    useEffect(() => {
+        if (locationId && locations.length > 0) {
+            const selectedLocation = locations.find(loc => loc.locationID === locationId.toString());
+            if (selectedLocation) {
+                setLocationName(selectedLocation.locationName);
+            }
+        }
+    }, [locations, locationId]);
+
+    useEffect(() => {
+        const selectedLocation = locations.find(loc => loc.locationName === locationName);
+        const fetchLocationData = async () => {
+            const data = await (locationId ? fetchUniqueLocation(locationId.toString()) :
+                fetchUniqueLocation(selectedLocation?.locationID as string));
+            setSensorData(data);
+        };
+
+        fetchLocationData();
+    }, [locationId, locationName]);
+
+    const AQIData = useMemo(() => {
+        if (sensorData) {
+            return calculateOverallAqi(sensorData);
+        }
+    }, [sensorData]);
+
+    const handleLocationChange = (locationId: string) => {
+        const selectedLocation = locations.find(loc => loc.locationID === locationId);
+        if (selectedLocation) {
+            setLocationName(selectedLocation.locationName);
+        }
+    };
 
     return (
         <div className="container mx-auto px-4 py-8">
             <div>
-                <Select>
+                <Select onValueChange={handleLocationChange}
+                    value={locations.find(loc => loc.locationName === locationName)?.locationID}
+                    defaultValue={locations.find(loc => loc.locationName === locationName)?.locationID}>
                     <SelectTrigger className="w-[280px]">
                         <SelectValue placeholder="Select a location" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
                             <SelectLabel>Locations</SelectLabel>
-                            <SelectItem value="apple">Apple</SelectItem>
-                            <SelectItem value="banana">Banana</SelectItem>
-                            <SelectItem value="blueberry">Blueberry</SelectItem>
-                            <SelectItem value="grapes">Grapes</SelectItem>
-                            <SelectItem value="pineapple">Pineapple</SelectItem>
+                            {locations.map((location) => (
+                                <SelectItem
+                                    key={location.id}
+                                    value={location.locationID}
+                                >
+                                    {location.locationName}
+                                </SelectItem>
+                            ))}
                         </SelectGroup>
                     </SelectContent>
                 </Select>
@@ -72,16 +109,18 @@ const SensorReadings = (props: Props) => {
 
             <h1 className="mb-6 text-3xl font-bold text-gray-900">{locationName}</h1>
 
-            <div className="mb-8 flex items-center justify-between">
+            <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between">
                 <div>
                     <h2 className="mb-2 text-xl font-semibold text-gray-800">Current Readings</h2>
-                    <p className="text-gray-600">Last Updated: {sensorData.lastUpdated}</p>
+                    <p className="text-gray-600">Last Updated: {formatDateToLocaleString(sensorData?.timestamp || "")}</p>
                 </div>
 
-                <div className="mt-4 flex justify-end">
-                    <Link href={`/historical`}>
+                <div className="mt-4 flex md:justify-end">
+                    {/* session?.user &&  */}
+                    {<Link href={`/historical`}>
                         <Button className="bg-green-600 hover:bg-green-700">View Historical Data</Button>
                     </Link>
+                    }
 
                     <Button className="ml-2 bg-blue-500 hover:bg-blue-600">
                         <svg
@@ -105,12 +144,12 @@ const SensorReadings = (props: Props) => {
             </div>
 
             <Card className="mb-12 overflow-hidden border border-gray-200">
-                <CardContent className="p-6 flex flex-col md:flex-row items-center">
+                <CardContent className="p-4 sm:p-6 flex flex-col lg:flex-row gap-8">
                     {/* Air Quality Index Gauge */}
-                    <div className="mb-8 flex-1">
+                    <div className="w-full lg:w-1/3 flex justify-center items-center">
                         <LocationGauge
-                            value={sensorData?.aqi || 0}
-                            label={sensorData?.aqiStatus}
+                            value={Math.round(AQIData?.Overall_AQI || 0)}
+                            label={getAqiDescription(AQIData?.Overall_AQI || 0).category}
                             limits={[
                                 { value: 50, color: COLORS.green },
                                 { value: 100, color: COLORS.yellow },
@@ -125,41 +164,49 @@ const SensorReadings = (props: Props) => {
                     </div>
 
                     {/* Air Quality Readings Grid */}
-                    <div className="flex-1 grid grid-cols-1 gap-6 md:grid-cols-3">
-                        {/* PM1 */}
-                        <div className="rounded-lg p-4 text-center">
-                            <h4 className="mb-2 text-lg font-medium text-gray-700">PM1</h4>
-                            <p className="text-4xl font-bold text-gray-900">{sensorData?.pm1}</p>
-                        </div>
+                    <div className="w-full lg:w-2/3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                            {/* PM1 */}
+                            <div className="rounded-lg bg-gray-50 p-4 text-center">
+                                <h4 className="mb-2 text-sm sm:text-base lg:text-lg font-medium text-gray-700">PM1</h4>
+                                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">{sensorData?.pm01}&nbsp;μg/m³</p>
+                            </div>
 
-                        {/* PM2.5 */}
-                        <div className="rounded-lg p-4 text-center">
-                            <h4 className="mb-2 text-lg font-medium text-gray-700">PM2.5</h4>
-                            <p className="text-4xl font-bold text-gray-900">{sensorData?.pm25}</p>
-                        </div>
+                            {/* PM2.5 */}
+                            <div className="rounded-lg bg-gray-50 p-4 text-center">
+                                <h4 className="mb-2 text-sm sm:text-base lg:text-lg font-medium text-gray-700">PM2.5</h4>
+                                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">{sensorData?.pm02}&nbsp;μg/m³</p>
+                            </div>
 
-                        {/* PM10 */}
-                        <div className="rounded-lg p-4 text-center">
-                            <h4 className="mb-2 text-lg font-medium text-gray-700">PM10</h4>
-                            <p className="text-4xl font-bold text-gray-900">{sensorData?.pm10}</p>
-                        </div>
+                            {/* PM10 */}
+                            <div className="rounded-lg bg-gray-50 p-4 text-center">
+                                <h4 className="mb-2 text-sm sm:text-base lg:text-lg font-medium text-gray-700">PM10</h4>
+                                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">{sensorData?.pm10}&nbsp;μg/m³</p>
+                            </div>
 
-                        {/* Nitrogen Dioxide */}
-                        <div className="rounded-lg p-4 text-center">
-                            <h4 className="mb-2 text-lg font-medium text-gray-700">Nitrogen Dioxide</h4>
-                            <p className="text-4xl font-bold text-gray-900">{sensorData?.no2}</p>
-                        </div>
+                            {/* CO2 */}
+                            <div className="rounded-lg bg-gray-50 p-4 text-center">
+                                <h4 className="mb-2 text-sm sm:text-base lg:text-lg font-medium text-gray-700">CO2</h4>
+                                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">{sensorData?.rco2}</p>
+                            </div>
 
-                        {/* Temperature */}
-                        <div className="rounded-lg p-4 text-center">
-                            <h4 className="mb-2 text-lg font-medium text-gray-700">Temperature</h4>
-                            <p className="text-4xl font-bold text-gray-900">{sensorData?.temperature}°C</p>
-                        </div>
+                            {/* Nitrogen Dioxide */}
+                            <div className="rounded-lg bg-gray-50 p-4 text-center">
+                                <h4 className="mb-2 text-sm sm:text-base lg:text-lg font-medium text-gray-700">Nitrogen Dioxide</h4>
+                                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">{sensorData?.noxIndex}&nbsp;ppb</p>
+                            </div>
 
-                        {/* Humidity */}
-                        <div className="rounded-lg p-4 text-center">
-                            <h4 className="mb-2 text-lg font-medium text-gray-700">Humidity</h4>
-                            <p className="text-4xl font-bold text-gray-900">{sensorData?.humidity}%</p>
+                            {/* Temperature */}
+                            <div className="rounded-lg bg-gray-50 p-4 text-center">
+                                <h4 className="mb-2 text-sm sm:text-base lg:text-lg font-medium text-gray-700">Temperature</h4>
+                                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">{sensorData?.atmp}&nbsp;°C</p>
+                            </div>
+
+                            {/* Humidity */}
+                            <div className="rounded-lg bg-gray-50 p-4 text-center">
+                                <h4 className="mb-2 text-sm sm:text-base lg:text-lg font-medium text-gray-700">Humidity</h4>
+                                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">{sensorData?.rhum}&nbsp;%</p>
+                            </div>
                         </div>
                     </div>
                 </CardContent>
