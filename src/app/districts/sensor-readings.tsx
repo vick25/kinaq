@@ -116,9 +116,11 @@ const SensorReadings = (props: Props) => {
                 </div>
 
                 <div className="mt-4 flex md:justify-end">
-                    <Link href={`/historical`}>
+                    {/* session?.user &&  */}
+                    {<Link href={`/historical`}>
                         <Button className="bg-green-600 hover:bg-green-700">View Historical Data</Button>
                     </Link>
+                    }
 
                     <Button className="ml-2 bg-blue-500 hover:bg-blue-600">
                         <svg
