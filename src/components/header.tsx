@@ -62,7 +62,7 @@ function Header({ session }: { session: Session | null }) {
         </Link>
         <div className="ml-auto flex items-center space-x-4 md:gap-5">
           <div className="relative w-64 shadow-sm hidden md:block">
-            <Input placeholder="Search districts" className="pl-8" ref={searchRef} onChange={handleInputChange} />
+            <Input placeholder="Search zones" className="pl-8" ref={searchRef} onChange={handleInputChange} />
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           </div>
           <nav className="hidden md:flex md:gap-5 items-center space-x-4">
@@ -143,7 +143,7 @@ function Header({ session }: { session: Session | null }) {
         <div className="md:hidden border-t">
           <div className="container py-4 px-4 space-y-4">
             <div className="relative">
-              <Input placeholder="Search districts" className="pl-8 w-full" />
+              <Input placeholder="Search zones" className="pl-8 w-full" />
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             </div>
             <nav className="flex flex-col space-y-4">
@@ -154,10 +154,10 @@ function Header({ session }: { session: Session | null }) {
                 About
               </Link>
               <Link href="/districts" className="text-sm font-medium hover:text-primary transition-colors">
-                Beneficiary Districts
+                Beneficiary zones
               </Link>
               <Link href="/historical" className="text-sm font-medium hover:text-primary transition-colors">
-                Historical Data
+                Historical data
               </Link>
               <div className="flex items-center space-x-2">
                 <Avatar className="h-5 w-5">
