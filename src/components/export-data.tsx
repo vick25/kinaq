@@ -16,16 +16,11 @@ import { fetchKinAQData, fetchLocationMeasures } from "@/actions/airGradientData
 import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { Usages } from "@/lib/definitions";
 
 type LocationData = {
     locationName: string;
     locationId: string;
-}
-
-enum Usages {
-    academic_research = "Academic Research", // Assign user-friendly values if needed for display
-    professional = "Professional",
-    other = "Other"
 }
 
 export default function ExportData() {
@@ -38,29 +33,6 @@ export default function ExportData() {
     const [selectedUsage, setSelectedUsage] = useState<Usages | undefined>(Usages.academic_research);
     const [isLoading, setIsLoading] = useState(false);
     const [isDownloadDisabled, setIsDownloadDisabled] = useState(true);
-
-    // async function createPost(formData: FormData) {
-    //     "use server";
-
-    //     const title = formData.get("title") as string;
-    //     const content = formData.get("content") as string;
-
-    //     await prisma.request.create({
-    //         data: {
-    //             title,
-    //             content,
-    //             locationId: selectedLocation as string,
-    //             bucket: selectedBucket as string,
-    //             isDelivered:true,
-    //             usage: selectedUsage as Usages,
-    //             startDate: startDate as string,
-    //             endDate: endDate as string,
-    //         },
-    //     });
-
-    //     revalidatePath("/posts");
-    //     // redirect("/posts");
-    // }
 
     const handleDownload = async (format: 'csv' | 'json') => {
         if (!selectedLocation || !selectedBucket) {
@@ -100,6 +72,31 @@ export default function ExportData() {
                 } else if (format === 'json') {
                     const jsonData = JSON.stringify(data, null, 2); // Pretty print JSON
                     triggerFileDownload(jsonData, `${baseFilename}.json`, 'application/json;charset=utf-8;');
+                }
+
+                // Update database after successful download
+                try {
+                    const response = await fetch('/api/export-data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            institution,
+                            locationId: selectedLocation,
+                            bucket: selectedBucket,
+                            usage: selectedUsage,
+                            startDate,
+                            endDate,
+                            format
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to update database');
+                    }
+                } catch (error) {
+                    console.error('Error updating database:', error);
                 }
             } else {
                 console.error("No data returned from the API.");
@@ -283,7 +280,8 @@ export default function ExportData() {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Primary Usage
                         </label>
-                        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-x-6 gap-y-2"> {/* Layout radios */}
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-x-6 gap-y-2">
+                            {/* Layout radios */}
                             {Object.keys(Usages)
                                 .filter(key => isNaN(Number(key)))
                                 .map((usageKey) => (

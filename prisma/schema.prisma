@@ -21,6 +21,16 @@ enum Usages {
   other
 }
 
+enum Bucket {
+  raw
+  past
+}
+
+enum Format {
+  csv
+  json
+}
+
 // Define the User model based on the users table
 
 model User {
@@ -85,17 +95,19 @@ model Location {
 model Request {
   id           Int       @id @default(autoincrement())
   userId       String // Scalar field for the foreign key
-  location_id  Int // Scalar field for the foreign key
+  location_id  String // Scalar field for the foreign key
   startDate    String? // Mapped from varchar, nullable
   endDate      String? // Mapped from varchar, nullable
   usage        Usages? // Mapped from the usages enum, nullable
+  bucket       Bucket? // Mapped from varchar, nullable
+  format       Format? // Mapped from varchar, nullable
   is_delivered Boolean   @default(false) // Mapped from boolean DEFAULT false
   created_at   DateTime  @default(now()) // Mapped from datetime NOT NULL
   updated_at   DateTime? @updatedAt // Mapped from datetime, nullable. @updatedAt handles auto-updates.
 
   // Relations based on foreign keys
   user     User     @relation(fields: [userId], references: [id])
-  location Location @relation(fields: [location_id], references: [id])
+  location Location @relation(fields: [location_id], references: [locationID])
 
   // Optional: Explicitly map to the SQL table name "requests"
   @@map("requests")

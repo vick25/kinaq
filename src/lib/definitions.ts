@@ -1,3 +1,9 @@
+export enum Usages {
+    academic_research = "Academic Research",
+    professional = "Professional",
+    other = "Other"
+}
+
 export interface IMapComponentProps {
     gradientData: GradientData; // Use the correct type
 }

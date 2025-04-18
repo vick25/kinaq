@@ -15,6 +15,11 @@ export const formatToYYYYMMDD = (dateString: string): string => {
   return dateString.replace(/-/g, ''); // Remove hyphens
 };
 
+export function getEnumKeyByValue<T extends Record<string, string>>(enumObj: T, value: string): keyof T | undefined {
+  return (Object.keys(enumObj) as (keyof T)[])
+    .find(key => enumObj[key] === value)
+}
+
 export function formatDateToLocaleString(date: string): string {
   return new Date(date).toLocaleString('en-US', {
     month: 'numeric',
