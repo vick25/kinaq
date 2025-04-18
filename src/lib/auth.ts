@@ -3,7 +3,7 @@ import { emailOTP } from "better-auth/plugins";
 import { openAPI } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import transporter from "./transporter";
 import { getOtpHtmlTemplate } from "./constants";
 
@@ -14,6 +14,9 @@ export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
+    advanced: {
+        useSecureCookies: process.env.NODE_ENV === "production",
+    },
     session: {
         expiresIn: 60 * 60 * 24 * 7,
         updateAge: 60 * 60 * 24,

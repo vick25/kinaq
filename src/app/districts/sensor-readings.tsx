@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import LocationGauge from "@/components/location-gauge";
 import { COLORS, ILocationData } from "@/lib/definitions";
+import { authClient } from "@/lib/auth-client"
 
 import {
     Select,
@@ -32,6 +33,8 @@ interface Location {
 
 const SensorReadings = (props: Props) => {
     const searchParams = useSearchParams();
+    const { data: session } = authClient.useSession();
+
     const { locationId } = useLocationStore();
     const [locations, setLocations] = useState<Location[]>([]);
     const [locationName, setLocationName] = useState("");
@@ -116,8 +119,7 @@ const SensorReadings = (props: Props) => {
                 </div>
 
                 <div className="mt-4 flex md:justify-end">
-                    {/* session?.user &&  */}
-                    {<Link href={`/historical`}>
+                    {session?.user && <Link href={`/historical`}>
                         <Button className="bg-green-600 hover:bg-green-700">View Historical Data</Button>
                     </Link>
                     }

@@ -2,8 +2,7 @@ import { createAuthClient } from "better-auth/react" // make sure to import from
 import { emailOTPClient } from "better-auth/client/plugins"
 
 export const authClient = createAuthClient({
-    //you can pass client configuration here
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
     plugins: [
         emailOTPClient()
     ]

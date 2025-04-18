@@ -3,6 +3,8 @@
 import React from 'react';
 import { Trash, Mail } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { authClient } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
 
 const userEmail = 'vickadiata@gmail.com';
 const requests = [
@@ -80,12 +82,21 @@ const requests = [
 ];
 
 const DownloadRequestsPage = () => {
+    const { data: session } = authClient.useSession();
+    const router = useRouter();
+
     const handleCreateRequest = () => {
-        console.log('Navigate to Create Request page');
+        router.push('/historical');
     };
 
-    const handleLogout = () => {
-        console.log('Performing logout');
+    const handleLogout = async () => {
+        await authClient.signOut({
+            fetchOptions: {
+                onSuccess: () => {
+                    router.push('/')
+                }
+            }
+        });
     };
 
     const handleDeleteRequest = (id: string) => {
@@ -98,7 +109,7 @@ const DownloadRequestsPage = () => {
             <div className="max-w-7xl mx-auto">
                 <h1 className="text-3xl font-semibold text-gray-700 text-center mb-6">
                     Download Requests for{' '}
-                    <span className="font-bold">{userEmail}</span>
+                    <span className="font-bold">{session?.user?.email}</span>
                 </h1>
 
                 {/* Action Buttons */}

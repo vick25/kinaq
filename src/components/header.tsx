@@ -111,7 +111,7 @@ function Header({ session }: { session: Session | null }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 {session?.user && <DropdownMenuItem>
-                  <Link href="/requests" className="text-sm">
+                  <Link href="/requests" className="flex items-center w-full text-sm">
                     <User className="mr-2 h-4 w-4" />
                     My data
                   </Link>

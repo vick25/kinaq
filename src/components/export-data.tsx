@@ -259,7 +259,7 @@ export default function ExportData() {
 
                 <fieldset className="mt-6 border border-gray-300 p-4 rounded-md">
                     <legend className="text-base font-semibold text-gray-600 px-2">
-                        Usage Information (Optional)
+                        Usage Information
                     </legend>
 
                     {/* Institution Input */}

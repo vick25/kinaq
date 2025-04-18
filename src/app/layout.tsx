@@ -31,8 +31,6 @@ export default async function RootLayout({
     headers: await headers(),
   });
 
-  console.log({session})
-
   await populateLocationsTable();
 
   return (

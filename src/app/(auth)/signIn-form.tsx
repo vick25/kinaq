@@ -1,7 +1,7 @@
-import { authClient } from '@/lib/auth-client'
 import React from 'react'
-// import CancelSignInForm from './cancel-form'
 import { redirect } from 'next/navigation'
+import { auth } from '@/lib/auth'
+import { headers } from "next/headers";
 
 type Props = {
     loggedInEmail: string
@@ -15,17 +15,28 @@ const SignInForm = async ({ loggedInEmail }: Props) => {
         const email = loggedInEmail
 
         // Sign in with emailed OTP
-        const { data, error } = await authClient.signIn.emailOtp({
-            email: (email as string).trim(),
-            otp: (code as string).trim()
-        })
-        if (error) {
-            console.error("Error verifying OTP:", error)
+        const response = await auth.api.signInEmailOTP(
+            {
+                asResponse: true,
+                body: {
+                    email: (email as string).trim(),
+                    otp: (code as string).trim(),
+                },
+                headers: await headers(),
+            }
+        )
+        if (response !== null && response.status !== 200) {
+            const codeError = document.getElementById('codeError')
+            if (codeError) {
+                codeError.innerHTML = 'Invalid code. Please try again.'
+                codeError.classList.add('text-red-600')
+            }
+            console.error("Error verifying OTP:")
             if (code === '')
                 redirect(`/historical`)
             return
         }
-        if (data.token) {
+        if (response.status === 200) {
             // console.log("OTP verified successfully")
             redirect(`/historical?signup=success`)
         }
@@ -34,7 +45,9 @@ const SignInForm = async ({ loggedInEmail }: Props) => {
 
     return (
         <form action={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 text-center mb-2">Enter CODE emailed to:</h3>
+            <h3 className="text-lg font-semibold text-gray-800 text-center mb-2">Enter CODE emailed to:
+                <span className='text-blue-950'>{loggedInEmail}</span>
+            </h3>
             <div className="lbCode">
                 <input type="text" name="code" id="ecode" placeholder="123456"
                     className="w-full border p-2 rounded-md text-gray-700" />

@@ -32,7 +32,7 @@ const Historical = async ({ searchParams }: PageProps) => {
                 </div>
 
                 <div className='mt-8 w-full'>
-                    <p>Download Requests for {!session ? "Not authenticated" : session.user.email}</p>
+                    {session && <p className='mb-3 text-center'>Download Requests for <span className='font-bold text-blue-700'>{session.user.email}</span></p>}
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800">
                             Download active air quality information older than the last 7 days:
@@ -47,23 +47,25 @@ const Historical = async ({ searchParams }: PageProps) => {
                         </ul>
                     </div>
 
-                    {!showExport && <div className="my-6 bg-white border shadow-md rounded-md p-6 max-w-3xl mx-auto">
-                        {!showSignIn && !showExport && (
-                            <div>
-                                <SignUpForm />
-                            </div>
-                        )}
+                    {!session && (
+                        <div className="my-6 bg-white border shadow-md rounded-md p-6 max-w-3xl mx-auto">
+                            {!showSignIn && !showExport && (
+                                <div>
+                                    <SignUpForm />
+                                </div>
+                            )}
 
-                        {showSignIn && (
-                            <div id="email_code_block">
-                                <SignInForm loggedInEmail={loggedInEmail} />
-                            </div>
-                        )}
-                    </div>}
+                            {showSignIn && (
+                                <div id="email_code_block">
+                                    <SignInForm loggedInEmail={loggedInEmail} />
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </section>
 
-            {showExport && <ExportData />}
+            {(session || showExport) && <ExportData />}
         </div>
     )
 }
