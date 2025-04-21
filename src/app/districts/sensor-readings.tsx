@@ -21,6 +21,7 @@ import {
 import { fetchUniqueLocation } from "@/actions/airGradientData";
 import { calculateOverallAqi, formatDateToLocaleString, getAqiDescription } from "@/lib/utils";
 import useLocationStore from "@/stores/location-store";
+import { useLocale } from 'next-intl';
 
 interface ILocation {
     id: number;
@@ -34,6 +35,7 @@ type Props = {
 
 const SensorReadings = ({ locationsData }: Props) => {
     const searchParams = useSearchParams();
+    const locale = useLocale();
     const { data: session } = authClient.useSession();
 
     const { locationId } = useLocationStore();
@@ -108,7 +110,7 @@ const SensorReadings = ({ locationsData }: Props) => {
             <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between">
                 <div>
                     <h2 className="mb-2 text-xl font-semibold text-gray-800">Current Readings</h2>
-                    <p className="text-gray-600">Last Updated: {formatDateToLocaleString(sensorData?.timestamp || "")}</p>
+                    <p className="text-gray-600">Last Updated: {formatDateToLocaleString(locale, sensorData?.timestamp || "")}</p>
                 </div>
 
                 <div className="mt-4 flex md:justify-end">

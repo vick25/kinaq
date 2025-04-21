@@ -8,6 +8,7 @@ import useLocationStore from '../stores/location-store';
 import { IMapComponentProps } from '@/lib/definitions';
 import { formatDateToLocaleString, getPM25Color } from '@/lib/utils';
 import { kinAQPoints, styles } from '@/lib/constants';
+import { useLocale } from 'next-intl';
 
 const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     const [map, setMap] = useState<Map | null>(null);
@@ -17,6 +18,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     const [currentStyleSource, setCurrentStyleSource] = useState<string>(styles[0].source);
     const popupRef = useRef<maplibregl.Popup | null>(null);
     const router = useRouter();
+    const locale = useLocale();
 
     // --- Handle Map Style Change ---
     const handleMapChange = useCallback((mapType: string) => {
@@ -138,7 +140,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                             .setHTML(
                                 `<strong>${locationName}</strong><br>
                                     PM2.5: ${pm2_5 ?? "-"} μg/m³<br>
-                                    Last updated: ${formatDateToLocaleString(timestamp)}`)
+                                    Last updated: ${formatDateToLocaleString(locale, timestamp)}`)
                             .addTo(map);
                     });
 

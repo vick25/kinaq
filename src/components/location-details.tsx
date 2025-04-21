@@ -11,9 +11,11 @@ import LocationGauge from "./location-gauge"
 import { toast } from "react-fox-toast"
 import { COLORS, ILocationData } from "@/lib/definitions"
 import { calculateOverallAqi, formatDateToLocaleString, formatTo2Places, getAqiDescription } from "@/lib/utils"
-import Link from "next/link"
+import Link from "next/link";
+import { useLocale } from 'next-intl';
 
 export default function LocationDetails() {
+  const locale = useLocale();
   const { locationId } = useLocationStore(); // Get locationId from store
   // const [loading, setLoading] = useState<boolean>(false)
   const [locationData, setLocationData] = useState<ILocationData>()
@@ -81,7 +83,7 @@ export default function LocationDetails() {
                       <span className="absolute -top-[0.37rem] -right-[1.9rem] text-red-600 text-xs font-semibold">off</span>
                     </>}
                 </p>
-                <p className="text-xs">{formatDateToLocaleString(locationData?.timestamp)}</p>
+                <p className="text-xs">{formatDateToLocaleString(locale, locationData?.timestamp)}</p>
               </div>
             </div>
 

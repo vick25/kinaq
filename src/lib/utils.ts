@@ -20,8 +20,8 @@ export function getEnumKeyByValue<T extends Record<string, string>>(enumObj: T, 
     .find(key => enumObj[key] === value)
 }
 
-export function formatDateToLocaleString(date: string): string {
-  return new Date(date).toLocaleString('en-US', {
+export function formatDateToLocaleString(locale: string, date: string): string {
+  return new Date(date).toLocaleString(locale, {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric',
