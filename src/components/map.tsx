@@ -39,7 +39,6 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
 
     }, [currentStyleSource, gradientData]);
 
-
     //Fetch and add points to the map
     const populateMarkers = async () => {
         try {

@@ -1,88 +1,35 @@
 'use client'
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trash, Mail } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
+import { getRequestData, updateRequest } from '@/actions/populateTables';
 
-const userEmail = 'vickadiata@gmail.com';
-const requests = [
-    {
-        id: '502624',
-        source: 'CSV',
-        dateRange: '2023-08-01 : 2024-08-19',
-        coords: '[14.271, 7.778; 20.139, 11.653]',
-        requestDate: '2024-08-19 10:11:01',
-        status: 'Processed',
-        statusDate: 'on 2024-08-19 10:19:46',
-        downloadInfo: 'Download - N/A',
-    },
-    {
-        id: '498668',
-        source: 'CSV',
-        dateRange: '2023-09-01 : 2024-06-30',
-        coords: '[19.27, 10.555; 20.081, 11.09]',
-        requestDate: '2024-08-07 15:57:17',
-        status: 'Processed',
-        statusDate: 'on 2024-08-07 15:59:20',
-        downloadInfo: 'Download - N/A',
-    },
-    {
-        id: '424087',
-        source: 'CSV',
-        dateRange: '2022-12-01 : 2024-02-08',
-        coords: '[25.814, -8.555; 30.71, -4.857]',
-        requestDate: '2024-02-08 10:38:36',
-        status: 'Processed',
-        statusDate: 'on 2024-02-08 10:42:21',
-        downloadInfo: 'Download - N/A',
-    },
-    {
-        id: '424079',
-        source: 'CSV',
-        dateRange: '2023-01-01 : 2024-01-01',
-        coords: '[7.103, -14.027; 38.692, 9.83]',
-        requestDate: '2024-02-08 10:14:31',
-        status: 'Processed',
-        statusDate: 'on 2024-02-08 10:23:15',
-        downloadInfo: 'Download - N/A',
-    },
-    {
-        id: '423560',
-        source: 'CSV',
-        dateRange: '2020-01-01 : 2024-01-01',
-        coords: '[7.103, -14.027; 38.692, 9.83]', // Note: Coords reused from above for example
-        requestDate: '2024-02-07 12:09:42',
-        status: 'Processed',
-        statusDate: 'on 2024-02-07 12:16:30',
-        downloadInfo: 'Download - N/A',
-    },
-    {
-        id: '400944',
-        source: 'CSV',
-        dateRange: '2020-01-01 : 2022-12-31',
-        coords: '[11.23, -14.027; 34.03, 9.82]',
-        requestDate: '2023-11-13 10:49:40',
-        status: 'Processed',
-        statusDate: 'on 2023-11-13 10:55:10',
-        downloadInfo: 'Download - N/A',
-    },
-    {
-        id: '365705',
-        source: 'CSV',
-        dateRange: '2010-01-01 : 2020-12-31',
-        coords: '[19.171, 0.67; 23.593, 3.283]',
-        requestDate: '2023-07-14 10:57:28',
-        status: 'Processed',
-        statusDate: 'on 2023-07-14 11:12:25',
-        downloadInfo: 'Download - N/A',
-    },
-    // Add more request objects here
-];
+type location = {
+    locationID: string;
+    locationName: string;
+}
+
+interface IRequest {
+    id: number;
+    userId: string;
+    location_id: string;
+    location: location | null;
+    startDate: string | null;
+    endDate: string | null;
+    usage: string | null;
+    bucket: string | null;
+    format: string | null;
+    is_delivered: boolean;
+    created_at: Date;
+    updated_at: Date | null;
+}
 
 const DownloadRequestsPage = () => {
     const { data: session } = authClient.useSession();
+    const [requests, setRequests] = useState<IRequest[]>([]);
     const router = useRouter();
 
     const handleCreateRequest = () => {
@@ -99,17 +46,27 @@ const DownloadRequestsPage = () => {
         });
     };
 
-    const handleDeleteRequest = (id: string) => {
-        console.log(`Deleting request with ID: ${id}`);
-        alert(`Simulating delete for request ID: ${id}`);
+    const handleDeleteRequest = async (id: string) => {
+        await updateRequest(id);
+        router.refresh();
     };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (session) {
+                const data = await getRequestData(session);
+                setRequests(data);
+            }
+        };
+        fetchData();
+    }, [session]);
 
     return (
         <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 <h1 className="text-3xl font-semibold text-gray-700 text-center mb-6">
-                    Download Requests for{' '}
-                    <span className="font-bold">{session?.user?.email}</span>
+                    Download Requests for&nbsp;
+                    <span className="font-bold text-blue-700">{session?.user?.email}</span>
                 </h1>
 
                 {/* Action Buttons */}
@@ -137,6 +94,7 @@ const DownloadRequestsPage = () => {
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zone of Interest</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bucket</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Date</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Delete</th>
@@ -146,23 +104,24 @@ const DownloadRequestsPage = () => {
                                 {requests.map((request) => (
                                     <tr key={request.id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.id}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{request.source}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{request.format}</td>
                                         <td className="px-6 py-4 text-sm text-gray-600">
-                                            <div>{request.dateRange}</div>
-                                            <div className="text-xs text-gray-500">{request.coords}</div>
+                                            <div>{`${request.startDate} : ${request.endDate}`}</div>
+                                            <div className="text-xs text-gray-500">{request.location?.locationName}</div>
                                             <a href="#" className="text-blue-600 hover:text-blue-800 hover:underline text-xs font-medium">
                                                 View on Map
                                             </a>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{request.requestDate}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{request.bucket}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{request.created_at?.toLocaleDateString()}</td>
                                         <td className="px-6 py-4 text-sm text-gray-600">
-                                            <div className="font-semibold">{request.status}</div>
-                                            <div className="text-xs text-gray-500">{request.statusDate}</div>
-                                            <div className="text-xs text-gray-500">{request.downloadInfo}</div>
+                                            <div className="font-semibold">{request.is_delivered ? 'Processed' : 'Not processed'}</div>
+                                            <div className="text-xs text-gray-500">{`on ${request.updated_at?.toLocaleDateString()}`}</div>
+                                            <div className="text-xs text-gray-500">{request.is_delivered ? 'Download' : 'Download - N/A'}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                             <Button
-                                                onClick={() => handleDeleteRequest(request.id)}
+                                                onClick={() => handleDeleteRequest(request.id.toString())}
                                                 variant={'destructive'}
                                                 className="text-gray-600 hover:text-gray-800"
                                                 aria-label={`Delete request ${request.id}`}

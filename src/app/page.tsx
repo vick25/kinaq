@@ -1,9 +1,8 @@
-import LocationDetails from "@/components/location-details"
-import MapComponent from "@/components/map"
-import { fetchAllAirGradientData, fetchKinAQData } from "@/actions/airGradientData"
+import LocationDetails from "@/components/location-details";
+import MapComponent from "@/components/map";
+import { fetchKinAQData } from "@/actions/airGradientData";
 import { IAirGradientPointData } from "@/lib/definitions";
 import React from "react";
-import { kinAQPoints } from "@/lib/constants";
 
 export default async function Home() {
   // const gradientData = (await fetchAllAirGradientData()) || [];

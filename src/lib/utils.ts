@@ -174,7 +174,7 @@ export const convertToCSV = (data: any[]): string => {
   // Add data rows
   for (const row of data) {
     const values = headers.map(header => {
-      let value = row[header];
+      const value = row[header];
 
       // Handle null/undefined
       if (value === null || value === undefined) {
@@ -199,4 +199,3 @@ export const convertToCSV = (data: any[]): string => {
 
   return csvRows.join('\n');
 };
-

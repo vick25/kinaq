@@ -102,6 +102,7 @@ model Request {
   bucket       Bucket? // Mapped from varchar, nullable
   format       Format? // Mapped from varchar, nullable
   is_delivered Boolean   @default(false) // Mapped from boolean DEFAULT false
+  deleted      Boolean   @default(false) // Mapped from boolean DEFAULT false
   created_at   DateTime  @default(now()) // Mapped from datetime NOT NULL
   updated_at   DateTime? @updatedAt // Mapped from datetime, nullable. @updatedAt handles auto-updates.
 

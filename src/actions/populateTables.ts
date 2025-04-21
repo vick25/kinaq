@@ -1,7 +1,9 @@
 'use server'
+import { Session } from '@/lib/auth';
 
 import prisma from '@/lib/prisma';
 import { fetchAllAirGradientData } from './airGradientData';
+import { revalidatePath } from 'next/cache';
 
 // Filter locations with "KINAQ" in their name
 interface AirGradientLocation {
@@ -70,5 +72,49 @@ export async function getLocations() {
     } catch (error) {
         console.error('Error fetching locations:', error)
         return []
+    }
+}
+
+export async function getRequestData(session: Session) {
+    try {
+        const requests = await prisma.request.findMany({
+            where: {
+                userId: session?.user?.id,
+                deleted: false,
+            },
+            include: {
+                location: {
+                    select: {
+                        locationName: true,
+                        locationID: true,
+                    },
+                },
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        });
+        return requests;
+    } catch (error) {
+        console.error('Error fetching requests:', error);
+        return [];
+    }
+}
+
+export async function updateRequest(id: string) {
+    try {
+        const updatedRequest = await prisma.request.update({
+            where: {
+                id: parseInt(id),
+            },
+            data: {
+                deleted: true,
+            },
+        });
+        revalidatePath('/requests');
+        return updatedRequest;
+    } catch (error) {
+        console.error('Error updating request:', error);
+        throw error;
     }
 }

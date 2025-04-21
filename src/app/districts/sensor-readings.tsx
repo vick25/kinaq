@@ -31,7 +31,7 @@ interface Location {
     locationID: string;
 }
 
-const SensorReadings = (props: Props) => {
+const SensorReadings = () => {
     const searchParams = useSearchParams();
     const { data: session } = authClient.useSession();
 

@@ -44,7 +44,6 @@ export default function LocationDetails() {
       setLocationData(response);
       setOffline(false);
       // setLoading(false);
-
     } catch (error) {
       console.error("Error in agLocationData:", error);
       toast.error("Failed to load data!"); // Display an error toast
@@ -53,8 +52,9 @@ export default function LocationDetails() {
   };
 
   useEffect(() => {
-    if (locationId)
-      agLocationData()
+    if (locationId) {
+      agLocationData();
+    }
   }, [locationId])
 
   const AQIData = useMemo(() => {

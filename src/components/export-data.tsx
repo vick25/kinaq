@@ -14,8 +14,6 @@ import {
 import Link from "next/link";
 import { fetchKinAQData, fetchLocationMeasures } from "@/actions/airGradientData";
 import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
-import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 import { Usages } from "@/lib/definitions";
 
 type LocationData = {
