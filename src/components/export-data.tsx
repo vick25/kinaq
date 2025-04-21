@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useEffect, useState } from "react";
 import { Info, Loader2 } from "lucide-react";
@@ -16,15 +16,18 @@ import { fetchKinAQData, fetchLocationMeasures } from "@/actions/airGradientData
 import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
 import { Usages } from "@/lib/definitions";
 
+type Props = {
+    locationQuery: string;
+}
 type LocationData = {
     locationName: string;
     locationId: string;
 }
 
-export default function ExportData() {
+export default function ExportData({ locationQuery }: Props) {
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
-    const [locationData, setLocationData] = useState<LocationData[]>([]);
+    const [locationsData, setLocationsData] = useState<LocationData[]>([]);
     const [selectedLocation, setSelectedLocation] = useState<string | undefined>();
     const [selectedBucket, setSelectedBucket] = useState<string | undefined>();
     const [institution, setInstitution] = useState<string>('');
@@ -56,7 +59,7 @@ export default function ExportData() {
             const datePart = (startDate && endDate) ?
                 `${formatToYYYYMMDD(startDate as string)}-${formatToYYYYMMDD(endDate as string)}` :
                 new Date().toISOString().split('T')[0];
-            const locationNamePart = locationData.find(loc => loc.locationId === selectedLocation)?.locationName.replace(/\s+/g, '_') || selectedLocation;  // Use name or ID
+            const locationNamePart = locationsData.find(loc => loc.locationId === selectedLocation)?.locationName.replace(/\s+/g, '_') || selectedLocation;  // Use name or ID
             const baseFilename = `Export_${locationNamePart}_${selectedBucket}_${datePart.replace(/-/g, '_')}`;
 
             // Fetch data from the API
@@ -146,7 +149,7 @@ export default function ExportData() {
                     locationName: location.locationName,
                     locationId: location.locationId,
                 }));
-                setLocationData(locations);
+                setLocationsData(locations);
             } else {
                 console.error("Failed to fetch data");
             }
@@ -191,15 +194,18 @@ export default function ExportData() {
 
                 {/* Filters */}
                 <div className="mt-6 flex items-center flex-wrap gap-4">
-                    <Select onValueChange={(value) => setSelectedLocation(value)}>
+                    <Select
+                        value={locationsData.find(loc => loc.locationName === locationQuery)?.locationId}
+                        //   defaultValue={locationsData.find(loc => loc.locationName === locationName)?.locationID}
+                        onValueChange={(value) => setSelectedLocation(value)}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select a location" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
                                 <SelectLabel>Locations</SelectLabel>
-                                {locationData.length > 0 ? (
-                                    locationData.map((location) => (
+                                {locationsData.length > 0 ? (
+                                    locationsData.map((location) => (
                                         <SelectItem value={location.locationId} key={location.locationId}>{location.locationName}</SelectItem>
                                     ))
                                 ) : (

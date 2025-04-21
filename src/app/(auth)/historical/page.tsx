@@ -16,7 +16,7 @@ export const metadata = {
 const Historical = async ({ searchParams }: PageProps) => {
     const session = await getUser();
 
-    const { signup, email } = await searchParams
+    const { signup, email, locq } = await searchParams
     const showSignIn = signup === 'login'
     const showExport = signup === 'success'
     const loggedInEmail = typeof email === 'string' ? email : ''
@@ -62,7 +62,7 @@ const Historical = async ({ searchParams }: PageProps) => {
                 </div>
             </section>
 
-            {(session || showExport) && <ExportData />}
+            {(session || showExport) && <ExportData locationQuery={locq as string} />}
         </div>
     )
 }
