@@ -110,31 +110,33 @@ function Header({ session }: { session: IUser | null }) {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {session && <DropdownMenuItem>
-                  <Link href="/requests" className="flex items-center w-full text-sm">
-                    <User className="mr-2 h-4 w-4" />
-                    My data
-                  </Link>
-                </DropdownMenuItem>
-                }
-                <DropdownMenuItem>
-                  <Link href="/settings" className="flex items-center w-full text-sm">
+                {session && (
+                  <DropdownMenuItem onSelect={() => router.push('/requests')}>
+                    <div className="flex items-center w-full text-sm">
+                      <User className="mr-2 h-4 w-4" />
+                      My data
+                    </div>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onSelect={() => router.push('/settings')}>
+                  <div className="flex items-center w-full text-sm">
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
-                  </Link>
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  {!session ?
-                    <Link href="/historical?signup=#" className="flex items-center w-full text-sm">
+                  {!session ? (
+                    <div onClick={() => router.push('/historical?signup=#')} className="flex items-center w-full text-sm">
                       <LogIn className="mr-2 h-4 w-4" />
                       Login
-                    </Link> :
-                    <button onClick={handleSignOut} className="flex items-center w-full">
+                    </div>
+                  ) : (
+                    <div onClick={handleSignOut} className="flex items-center w-full text-sm">
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
-                    </button>
-                  }
+                    </div>
+                  )}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
