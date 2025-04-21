@@ -2,22 +2,19 @@ import ExportData from '@/components/export-data'
 import React from 'react'
 import SignUpForm from '../signUp-form'
 import SignInForm from '../signIn-form'
-import { auth } from '@/lib/auth'
-import { headers } from 'next/headers'
+import { getUser } from '@/lib/auth-session'
 
 interface PageProps {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-const metadata = {
+export const metadata = {
     title: 'KINAQ | Data Export',
     description: 'Download air quality data from KINAQ',
 }
 
 const Historical = async ({ searchParams }: PageProps) => {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
+    const session = await getUser();
 
     const { signup, email } = await searchParams
     const showSignIn = signup === 'login'

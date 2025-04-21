@@ -1,5 +1,10 @@
-import React, { Suspense } from 'react'
+import { Suspense } from 'react';
 import SensorReadings from './sensor-readings';
+
+export const metadata = {
+    title: 'KINAQ | Zones',
+    description: 'Zone areas with air quality sensor from KINAQ',
+}
 
 const Districts = async () => {
     return (
@@ -11,4 +16,4 @@ const Districts = async () => {
     );
 }
 
-export default Districts
+export default Districts;
