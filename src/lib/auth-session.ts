@@ -1,4 +1,5 @@
-'use server'
+'use server';
+
 import { headers } from "next/headers";
 import { auth } from "./auth";
 import { unauthorized } from "next/navigation";

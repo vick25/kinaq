@@ -43,6 +43,15 @@ export interface IAirGradientPointData {
     timezone: string;
 }
 
+export interface IUser {
+    id: string;
+    name: string;
+    email: string;
+    emailVerified: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    image?: string | null | undefined;
+}
 
 export interface ILocationData {
     locationName: string;

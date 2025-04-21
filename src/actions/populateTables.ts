@@ -1,12 +1,12 @@
-'use server'
-import { Session } from '@/lib/auth';
+'use server';
 
 import prisma from '@/lib/prisma';
 import { fetchAllAirGradientData } from './airGradientData';
 import { revalidatePath } from 'next/cache';
+import { IUser } from '@/lib/definitions';
 
 // Filter locations with "KINAQ" in their name
-interface AirGradientLocation {
+interface IAirGradientLocation {
     locationId: string;
     locationName: string;
     latitude: number;
@@ -14,12 +14,13 @@ interface AirGradientLocation {
     serial?: string;
     offline?: boolean;
 }
+
 export async function populateLocationsTable() {
     try {
         // Fetch data from AirGradient
-        const airGradientData: AirGradientLocation[] = await fetchAllAirGradientData();
+        const airGradientData: IAirGradientLocation[] = await fetchAllAirGradientData();
 
-        const kinaqLocations: AirGradientLocation[] = airGradientData.filter(location =>
+        const kinaqLocations: IAirGradientLocation[] = airGradientData.filter(location =>
             location?.locationName?.includes('KINAQ')
         );
         // console.log(kinaqLocations)
@@ -75,11 +76,11 @@ export async function getLocations() {
     }
 }
 
-export async function getRequestData(session: Session) {
+export async function getRequestData(user: IUser) {
     try {
         const requests = await prisma.request.findMany({
             where: {
-                userId: session?.user?.id,
+                userId: user?.id,
                 deleted: false,
             },
             include: {

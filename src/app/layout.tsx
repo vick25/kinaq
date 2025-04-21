@@ -7,9 +7,8 @@ import { getLocale, getMessages } from 'next-intl/server';
 import { Toast } from "@/components/toast-component"
 import NextProgress from "@/components/next-progress"
 import { Analytics } from "@vercel/analytics/react"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers";
 import { populateLocationsTable } from "@/actions/populateTables";
+import { getUser } from "@/lib/auth-session";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,10 +25,7 @@ export default async function RootLayout({
 
   const messages = await getMessages();
   const locale = await getLocale();
-
-  const session = await auth?.api.getSession({
-    headers: await headers(),
-  });
+  const user = await getUser();
 
   await populateLocationsTable();
 
@@ -39,7 +35,7 @@ export default async function RootLayout({
         <Toast />
         <NextIntlClientProvider messages={messages}>
           <main className="flex flex-col min-h-screen">
-            <Header session={session} />
+            <Header session={user || null} />
             {children}
             <Analytics />
           </main>

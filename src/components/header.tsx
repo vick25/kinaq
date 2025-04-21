@@ -16,9 +16,9 @@ import LocaleSwitcher from "./locale-switcher";
 import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { Session } from "@/lib/auth";
+import { IUser } from "@/lib/definitions";
 
-function Header({ session }: { session: Session | null }) {
+function Header({ session }: { session: IUser | null }) {
   const router = useRouter()
   const t = useTranslations('HomePage')
   const pathname = usePathname();
@@ -110,7 +110,7 @@ function Header({ session }: { session: Session | null }) {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {session?.user && <DropdownMenuItem>
+                {session && <DropdownMenuItem>
                   <Link href="/requests" className="flex items-center w-full text-sm">
                     <User className="mr-2 h-4 w-4" />
                     My data
@@ -125,7 +125,7 @@ function Header({ session }: { session: Session | null }) {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  {!session?.user ?
+                  {!session ?
                     <Link href="/historical?signup=#" className="flex items-center w-full text-sm">
                       <LogIn className="mr-2 h-4 w-4" />
                       Login
@@ -178,7 +178,7 @@ function Header({ session }: { session: Session | null }) {
                 <span className="text-sm font-medium hover:text-primary transition-colors">User Menu</span>
               </div>
               <div className="pl-10 space-y-2">
-                {session?.user && <Link href="/requests" className="block text-sm">
+                {session && <Link href="/requests" className="block text-sm">
                   My Data
                 </Link>}
                 <div className="flex items-center justify-between">
