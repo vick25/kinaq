@@ -1,11 +1,23 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Trash, Mail } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+    TableFooter,
+} from "@/components/ui/table"
+
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { getRequestData, updateRequest } from '@/actions/populateTables';
+import Link from 'next/link';
 
 type location = {
     locationID: string;
@@ -88,38 +100,39 @@ const DownloadRequestsPage = () => {
                 {/* Requests Table */}
                 <div className="bg-white shadow-md rounded-lg overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-100">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zone of Interest</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bucket</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Date</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Delete</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                        <Table>
+                            <TableCaption>A list of your recent requests.</TableCaption>
+                            <TableHeader className='bg-gray-100'>
+                                <TableRow>
+                                    <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Id</TableHead>
+                                    <TableHead className='px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider'>Source</TableHead>
+                                    <TableHead className='px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider'>Zone of Interest</TableHead>
+                                    <TableHead className='px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider'>Bucket</TableHead>
+                                    <TableHead className='px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider'>Request Date</TableHead>
+                                    <TableHead className='px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider'>Status</TableHead>
+                                    <TableHead className='px-6 py-3 text-right text-sm font-medium text-gray-500 uppercase tracking-wider'>Delete</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
                                 {requests.map((request) => (
-                                    <tr key={request.id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.id}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{request.format}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                    <TableRow key={request.id}>
+                                        <TableCell className="font-medium">{request.id}</TableCell>
+                                        <TableCell>{request.format}</TableCell>
+                                        <TableCell>
                                             <div>{`${request.startDate} : ${request.endDate}`}</div>
                                             <div className="text-xs text-gray-500">{request.location?.locationName}</div>
-                                            <a href="#" className="text-blue-600 hover:text-blue-800 hover:underline text-xs font-medium">
+                                            <Link href="#" className="text-blue-600 hover:text-blue-800 hover:underline text-xs font-medium">
                                                 View on Map
-                                            </a>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{request.bucket}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{request.created_at?.toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                            </Link>
+                                        </TableCell>
+                                        <TableCell className="">{request.bucket}</TableCell>
+                                        <TableCell className="">{request.created_at?.toLocaleDateString()}</TableCell>
+                                        <TableCell className="">
                                             <div className="font-semibold">{request.is_delivered ? 'Processed' : 'Not processed'}</div>
                                             <div className="text-xs text-gray-500">{`on ${request.updated_at?.toLocaleDateString()}`}</div>
                                             <div className="text-xs text-gray-500">{request.is_delivered ? 'Download' : 'Download - N/A'}</div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                        </TableCell>
+                                        <TableCell className="text-right">
                                             <Button
                                                 onClick={() => handleDeleteRequest(request.id.toString())}
                                                 variant={'destructive'}
@@ -128,18 +141,20 @@ const DownloadRequestsPage = () => {
                                             >
                                                 <Trash size={16} />
                                             </Button>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 ))}
                                 {requests.length === 0 && (
-                                    <tr>
-                                        <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                                            No download requests found.
-                                        </td>
-                                    </tr>
+                                    <TableFooter>
+                                        <TableRow>
+                                            <TableCell className="px-6 py-4 text-center text-sm text-gray-500">
+                                                No download requests found.
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableFooter>
                                 )}
-                            </tbody>
-                        </table>
+                            </TableBody>
+                        </Table>
                     </div>
                 </div>
 
