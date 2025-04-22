@@ -66,9 +66,10 @@ function Header({ session }: { session: IUser | null }) {
             alt="Kinshasa Air Quality Logo"
             width={90}
             height={90}
-            className="h-12 w-auto"
+            className="h-12 w-auto rounded-full object-cover"
+            priority
           />
-          <span className="text-lg font-bold text-[#05b15d]">KINSHASA AIR QUALITY</span>
+          <span className="text-xl font-bold text-[#05b15d]">KINSHASA AIR QUALITY</span>
         </Link>
         <div className="ml-auto flex items-center space-x-4 md:gap-5">
           <div className="relative w-64 shadow-sm hidden md:block">

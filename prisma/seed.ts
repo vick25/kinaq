@@ -1,14 +1,15 @@
-import { PrismaClient, Prisma } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { Prisma } from '@prisma/client'
+import prisma from '@/lib/prisma'
 
 const userData: Prisma.UserCreateInput[] = [
     {
+        id: '1',
         firstName: 'Alice',
         email: 'alice@prisma.io',
         password: 'password'
     },
     {
+        id: '2',
         firstName: 'Bob',
         email: 'bob@prisma.io',
         password: 'password'
@@ -19,6 +20,7 @@ export async function main() {
     for (const u of userData) {
         await prisma.user.upsert({
             create: {
+                id: u.id,
                 firstName: u.firstName,
                 email: u.email,
                 password: u.password  // bcrypt hashed password

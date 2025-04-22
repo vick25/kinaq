@@ -21,7 +21,7 @@ export function getEnumKeyByValue<T extends Record<string, string>>(enumObj: T, 
 }
 
 export function formatDateToLocaleString(locale: string, date: string): string {
-  return new Date(date).toLocaleString(locale, {
+  return new Intl.DateTimeFormat(locale, {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric',
@@ -29,7 +29,15 @@ export function formatDateToLocaleString(locale: string, date: string): string {
     minute: 'numeric',
     second: 'numeric',
     hour12: true
-  });
+  }).format(new Date(date));
+}
+
+export function formatDateToLocaleStringWithoutTime(locale: string, date: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric'
+  }).format(new Date(date));
 }
 
 export function calculateAirQuality(pm2_5: number): number {

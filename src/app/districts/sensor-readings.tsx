@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import LocationGauge from "@/components/location-gauge";
 import { COLORS, ILocationData } from "@/lib/definitions";
 import { authClient } from "@/lib/auth-client"
@@ -114,9 +114,10 @@ const SensorReadings = ({ locationsData }: Props) => {
                 </div>
 
                 <div className="mt-4 flex md:justify-end">
-                    {session?.user && <Link href={`/historical?locq=${locationName}`}>
-                        <Button className="bg-green-600 hover:bg-green-700">View Historical Data</Button>
-                    </Link>
+                    {session?.user &&
+                        <Button className="bg-green-600 hover:bg-green-700" asChild>
+                            <Link href={`/historical?locq=${locationName}`}>View Historical Data</Link>
+                        </Button>
                     }
 
                     <Button className="ml-2 bg-blue-500 hover:bg-blue-600">

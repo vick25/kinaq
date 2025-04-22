@@ -83,7 +83,7 @@ export default function LocationDetails() {
                       <span className="absolute -top-[0.37rem] -right-[1.9rem] text-red-600 text-xs font-semibold">off</span>
                     </>}
                 </p>
-                <p className="text-xs">{formatDateToLocaleString(locale, locationData?.timestamp)}</p>
+                <time className="text-xs">{formatDateToLocaleString(locale, locationData?.timestamp)}</time>
               </div>
             </div>
 
@@ -169,7 +169,8 @@ export default function LocationDetails() {
                   alt="Partner Logo 1"
                   width={100}
                   height={50}
-                  className="h-24 w-auto object-contain"
+                  className="h-24 w-auto object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+                  priority
                 />
               </Link>
               <Link href="https://epic.uchicago.edu/area-of-focus/clean-air-program/" target="_blank" rel="noopener noreferrer">
@@ -178,7 +179,8 @@ export default function LocationDetails() {
                   alt="Partner Logo 2"
                   width={100}
                   height={50}
-                  className="h-16 w-auto object-contain"
+                  className="h-16 w-auto object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+                  priority
                 />
               </Link>
             </div>
@@ -189,7 +191,8 @@ export default function LocationDetails() {
                   alt="Partner Logo 2"
                   width={100}
                   height={50}
-                  className="h-12 w-auto p-1 object-contain"
+                  className="h-12 w-auto p-1 object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+                  priority
                 />
               </Link>
             </div>

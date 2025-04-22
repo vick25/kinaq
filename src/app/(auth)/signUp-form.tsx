@@ -1,32 +1,35 @@
+import { SubmitButton } from '@/components/submit-button'
 import { authClient } from '@/lib/auth-client'
 import { redirect } from 'next/navigation'
 
 type Props = {
 }
 
-const SignUpForm = async (props: Props) => {
-    return (
-        <form action={async (formdata) => {
-            'use server'
-            const email = formdata.get('email')
-            if (!email) {
-                return
-            }
-            // Send the email OTP
-            const { data, error } = await authClient.emailOtp.sendVerificationOtp({
-                email: email as string,
-                type: 'sign-in'
-            })
-            if (error) {
-                console.error("Error sending OTP:", error)
-                redirect('/historical')
-                return
-            }
-            if (data.success) {
-                redirect(`/historical?signup=login&email=${encodeURIComponent(email as string)}`)
-            }
+const SignUpForm = (props: Props) => {
 
-        }} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    async function handleSubmit(formdata: FormData) {
+        'use server';
+
+        const email = formdata.get('email');
+        if (!email) {
+            return;
+        }
+        // Send the email OTP
+        const { data, error } = await authClient.emailOtp.sendVerificationOtp({
+            email: email as string,
+            type: 'sign-in'
+        });
+        if (error) {
+            // console.error("Error sending OTP:", error)
+            return redirect('/historical');
+        }
+        if (data.success) {
+            return redirect(`/historical?signup=login&email=${encodeURIComponent(email as string)}`);
+        }
+    }
+
+    return (
+        <form action={handleSubmit} className="flex flex-col gap-1bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <h3 className="text-lg font-semibold text-gray-800 text-center mb-2">
                 Authentication through Email:
             </h3>
@@ -37,10 +40,7 @@ const SignUpForm = async (props: Props) => {
                 className="w-full border p-2 rounded-md text-gray-700"
             />
             {/* Email Code Button */}
-            <button className="mt-4 w-full bg-[#05b15d] text-white py-2 rounded-md text-lg font-medium hover:bg-green-600"
-                type='submit'>
-                Email Code
-            </button>
+            <SubmitButton />
         </form>
     )
 }

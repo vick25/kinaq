@@ -16,7 +16,9 @@ import {
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { updateRequest } from '@/actions/populateTables';
+import { useLocale } from 'next-intl';
 import Link from 'next/link';
+import { formatDateToLocaleString, formatDateToLocaleStringWithoutTime } from '@/lib/utils';
 
 type location = {
     locationID: string;
@@ -40,6 +42,7 @@ interface IRequest {
 
 const RequestsTable = ({ requests }: { requests: IRequest[] }) => {
     const router = useRouter();
+    const locale = useLocale();
 
     const handleCreateRequest = () => {
         router.push('/historical');
@@ -72,6 +75,7 @@ const RequestsTable = ({ requests }: { requests: IRequest[] }) => {
                 </Button>
                 <Button
                     onClick={handleLogout}
+                    variant={'destructive'}
                     className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-8 rounded shadow-md transition duration-150 ease-in-out"
                 >
                     Logout
@@ -99,17 +103,17 @@ const RequestsTable = ({ requests }: { requests: IRequest[] }) => {
                                     <TableCell className="font-medium">{request.id}</TableCell>
                                     <TableCell>{request.format}</TableCell>
                                     <TableCell>
-                                        <div>{`${request.startDate} : ${request.endDate}`}</div>
+                                        <div>{`${formatDateToLocaleStringWithoutTime(locale, request?.startDate ?? '')} : ${formatDateToLocaleStringWithoutTime(locale, request.endDate ?? '')}`}</div>
                                         <div className="text-xs text-gray-500">{request.location?.locationName}</div>
                                         <Link href="#" className="text-blue-600 hover:text-blue-800 hover:underline text-xs font-medium">
                                             View on Map
                                         </Link>
                                     </TableCell>
                                     <TableCell className="">{request.bucket}</TableCell>
-                                    <TableCell className="">{request.created_at?.toLocaleDateString()}</TableCell>
+                                    <TableCell className="">{formatDateToLocaleString(locale, request.created_at.toString())}</TableCell>
                                     <TableCell className="">
                                         <div className="font-semibold">{request.is_delivered ? 'Processed' : 'Not processed'}</div>
-                                        <div className="text-xs text-gray-500">{`on ${request.updated_at?.toLocaleDateString()}`}</div>
+                                        <div className="text-xs text-gray-500">{`on ${formatDateToLocaleString(locale, request.updated_at?.toString() || '')}`}</div>
                                         <div className="text-xs text-gray-500">{request.is_delivered ? 'Download' : 'Download - N/A'}</div>
                                     </TableCell>
                                     <TableCell className="text-right">

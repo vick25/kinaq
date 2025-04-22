@@ -2,24 +2,24 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { headers } from "next/headers";
+import { Button } from '@/components/ui/button';
 
 type Props = {
     loggedInEmail: string
 }
 
-const SignInForm = async ({ loggedInEmail }: Props) => {
+const SignInForm = ({ loggedInEmail }: Props) => {
 
     async function handleSubmit(formdata: FormData) {
-        'use server'
-        const code = formdata.get('code')
-        const email = loggedInEmail
+        'use server';
+        const code = formdata.get('code');
 
         // Sign in with emailed OTP
         const response = await auth.api.signInEmailOTP(
             {
                 asResponse: true,
                 body: {
-                    email: (email as string).trim(),
+                    email: (loggedInEmail as string).trim(),
                     otp: (code as string).trim(),
                 },
                 headers: await headers(),
@@ -31,16 +31,16 @@ const SignInForm = async ({ loggedInEmail }: Props) => {
                 codeError.innerHTML = 'Invalid code. Please try again.'
                 codeError.classList.add('text-red-600')
             }
-            console.error("Error verifying OTP:")
+            // console.error("Error verifying OTP:")
             if (code === '')
-                redirect(`/historical`)
-            return
+                return redirect(`/historical`);
+            return;
         }
         if (response.status === 200) {
             // console.log("OTP verified successfully")
-            redirect(`/historical?signup=success`)
+            return redirect(`/historical?signup=success`);
         }
-        redirect(`/historical`)
+        return redirect(`/historical`);
     }
 
     return (
@@ -59,9 +59,9 @@ const SignInForm = async ({ loggedInEmail }: Props) => {
                 </button>
 
                 {/* <CancelSignInForm /> */}
-                <button className="mt-4 w-full bg-[#b11605] text-white py-2 rounded-md text-lg font-medium hover:bg-red-600" id="btn_proceed_ed">
+                <Button className="mt-4 w-full bg-[#b11605] text-white py-2 rounded-md text-lg font-medium hover:bg-red-600" id="btn_proceed_ed">
                     Cancel
-                </button>
+                </Button>
             </div>
         </form>
     )

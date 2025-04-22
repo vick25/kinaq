@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { headers } from 'next/headers';
 import { getEnumKeyByValue } from '@/lib/utils';
 import { Usages } from '@/lib/definitions';
+import { getRequiredUser } from '@/lib/auth-session';
 
 export async function POST(req: NextRequest) {
     try {
-        const session = await auth.api.getSession({
-            headers: await headers(),
-        });
+        const user = await getRequiredUser();
 
-        if (!session?.user?.email) {
+        if (!user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -28,7 +25,7 @@ export async function POST(req: NextRequest) {
         // Update user's institution
         await prisma.user.update({
             where: {
-                id: session.user.id
+                id: user.id
             },
             data: {
                 institution: institution
@@ -38,7 +35,7 @@ export async function POST(req: NextRequest) {
         // Create request record
         await prisma.request.create({
             data: {
-                userId: session.user.id,
+                userId: user.id,
                 location_id: locationId.toString(),
                 usage: getEnumKeyByValue(Usages, usage as string),
                 bucket: bucket,

@@ -36,14 +36,16 @@ export async function populateLocationsTable() {
                         locationName: location.locationName,
                         latitude: location.latitude.toString(),
                         longitude: location.longitude.toString(),
-                        serial: location.serial || null
+                        serial: location.serial || null,
+                        // offline:location.offline||false
                     },
                     create: {
                         locationID: location.locationId.toString(),
                         locationName: location.locationName,
                         latitude: location.latitude.toString(),
                         longitude: location.longitude.toString(),
-                        serial: location.serial || null
+                        serial: location.serial || null,
+                        // offline:location.offline||false
                     }
                 });
             })

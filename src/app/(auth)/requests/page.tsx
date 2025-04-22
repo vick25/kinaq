@@ -1,6 +1,7 @@
 import { getRequestData } from '@/actions/populateTables';
 import RequestsTable from '@/components/requests-table';
 import { getUser } from '@/lib/auth-session';
+import { Suspense } from 'react';
 
 const DownloadRequestsPage = async () => {
     const user = await getUser();
@@ -14,7 +15,9 @@ const DownloadRequestsPage = async () => {
                     <span className="font-bold text-blue-700">{user?.email}</span>
                 </h1>}
 
-                <RequestsTable requests={requests} />
+                <Suspense fallback={<p className='text-xl font-medium text-center'>Loading table requests...</p>}>
+                    <RequestsTable requests={requests} />
+                </Suspense>
 
                 {!user && <p className="text-red-500 text-center">You must be logged in to view requests.</p>}
             </div>

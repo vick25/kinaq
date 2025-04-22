@@ -3,11 +3,12 @@ import { emailOTP } from "better-auth/plugins";
 import { openAPI } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 import transporter from "./transporter";
 import { getOtpHtmlTemplate } from "./constants";
+import prisma from "./prisma";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 // Initialize the auth middleware with the Prisma database adapter.
 export const auth = betterAuth({
