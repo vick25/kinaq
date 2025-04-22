@@ -81,6 +81,35 @@ export interface ILocationData {
     locationId: number;
 }
 
+export interface ILocationMeasure {
+    locationId: number;
+    locationName: string;
+    serialno: number;
+    model: string;
+    pm01: number;
+    pm02: number;
+    pm10: number;
+    pm01_corrected: number;
+    pm02_corrected: number;
+    pm10_corrected: number;
+    pm003Count: number;
+    atmp: number;
+    rhum: number;
+    rco2: number;
+    atmp_corrected: number;
+    rhum_corrected: number;
+    rco2_corrected: number;
+    tvoc: number;
+    tvocIndex: number;
+    noxIndex: number;
+    wifi: number;
+    datapoints: number;
+    timestamp: string;
+    firmwareVersion: string;
+    longitude: number;
+    latitude: number;
+}
+
 export interface ICustomGradientGaugeProps {
     limits: { value: number; color: string }[];
     label?: string;

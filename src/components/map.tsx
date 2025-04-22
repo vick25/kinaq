@@ -1,7 +1,6 @@
-'use client'
+'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import maplibregl, { Map, GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import useLocationStore from '../stores/location-store';
@@ -17,7 +16,6 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
     const { retrieveLocation, coordinates } = useLocationStore();
     const [currentStyleSource, setCurrentStyleSource] = useState<string>(styles[0].source);
     const popupRef = useRef<maplibregl.Popup | null>(null);
-    const router = useRouter();
     const locale = useLocale();
 
     // --- Handle Map Style Change ---
@@ -33,8 +31,8 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         console.log(`Changing style to: ${selectedStyle.label}`);
         setCurrentStyleSource(selectedStyle.source); // Update state for next potential init
 
-        const currentCenter = map.getCenter();
-        const currentZoom = map.getZoom();
+        // const currentCenter = map.getCenter();
+        // const currentZoom = map.getZoom();
 
         // Set the new style (this triggers the loading process)
         // map.setStyle(selectedStyle.source);
@@ -195,8 +193,8 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                 }))
         );
 
-        () => {
-            setMap(null)
+        return () => {
+            setMap(null);
         }
     }, [map]);
 
@@ -216,10 +214,6 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         });
 
         populateMarkers();
-
-        return () => {
-            setMap(null)
-        }
     }, [map]);
 
     // useEffect(() => {
@@ -244,7 +238,6 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                     essential: true // this animation is considered essential with respect to prefers-reduced-motion
                 })
             }, 2000);
-        router.refresh();
     }, [map, locationId, coordinates])
 
     return (

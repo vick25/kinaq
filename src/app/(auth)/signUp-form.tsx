@@ -2,10 +2,7 @@ import { SubmitButton } from '@/components/submit-button'
 import { authClient } from '@/lib/auth-client'
 import { redirect } from 'next/navigation'
 
-type Props = {
-}
-
-const SignUpForm = (props: Props) => {
+const SignUpForm = () => {
 
     async function handleSubmit(formdata: FormData) {
         'use server';

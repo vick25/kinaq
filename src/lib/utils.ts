@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { AQI, Breakpoint, ILocationData, pm10_breakpoints, pm25_breakpoints } from "./definitions";
+import { AQI, Breakpoint, ILocationData, ILocationMeasure, pm10_breakpoints, pm25_breakpoints } from "./definitions";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -168,7 +168,7 @@ export function getAqiDescription(aqi: number): { category: string; color: strin
  * Converts an array of objects into a CSV string.
  * Handles basic escaping for commas and quotes within values.
  */
-export const convertToCSV = (data: any[]): string => {
+export const convertToCSV = (data: ILocationMeasure[]): string => {
   if (!data || data.length === 0) {
     return "";
   }
@@ -182,7 +182,7 @@ export const convertToCSV = (data: any[]): string => {
   // Add data rows
   for (const row of data) {
     const values = headers.map(header => {
-      const value = row[header];
+      const value = row[header as keyof ILocationMeasure];
 
       // Handle null/undefined
       if (value === null || value === undefined) {

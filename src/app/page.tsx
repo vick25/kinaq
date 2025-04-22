@@ -4,7 +4,6 @@ import { fetchKinAQData } from "@/actions/airGradientData";
 import { IAirGradientPointData } from "@/lib/definitions";
 import React from "react";
 import { populateLocationsTable } from "@/actions/populateTables";
-import { resolve } from "path";
 
 export default function Home() {
   return (

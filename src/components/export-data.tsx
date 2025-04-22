@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import { fetchKinAQData, fetchLocationMeasures } from "@/actions/airGradientData";
 import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
-import { Usages } from "@/lib/definitions";
+import { ILocationMeasure, Usages } from "@/lib/definitions";
 
 type Props = {
     locationQuery: string;
@@ -63,7 +63,7 @@ export default function ExportData({ locationQuery }: Props) {
             const baseFilename = `Export_${locationNamePart}_${selectedBucket}_${datePart.replace(/-/g, '_')}`;
 
             // Fetch data from the API
-            const data: any = await fetchLocationMeasures(`locations/${selectedLocation}/measures/${selectedBucket}`,
+            const data: ILocationMeasure[] = await fetchLocationMeasures(`locations/${selectedLocation}/measures/${selectedBucket}`,
                 startDate as string, endDate as string);
 
             if (data) {
@@ -145,7 +145,7 @@ export default function ExportData({ locationQuery }: Props) {
         try {
             const data = await fetchKinAQData();
             if (data) {
-                const locations: LocationData[] = data.map((location: any) => ({
+                const locations: LocationData[] = data.map((location: LocationData) => ({
                     locationName: location.locationName,
                     locationId: location.locationId,
                 }));

@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import LocationGauge from "@/components/location-gauge";
 import { COLORS, ILocationData } from "@/lib/definitions";
 import { authClient } from "@/lib/auth-client"
@@ -34,7 +33,6 @@ type Props = {
 }
 
 const SensorReadings = ({ locationsData }: Props) => {
-    const searchParams = useSearchParams();
     const locale = useLocale();
     const { data: session } = authClient.useSession();
 
@@ -53,7 +51,7 @@ const SensorReadings = ({ locationsData }: Props) => {
     }, [locationsData, locationId]);
 
     useEffect(() => {
-        const selectedLocation = locationsData.find(loc => loc.locationName === locationName);
+        const selectedLocation = locationsData?.find(loc => loc.locationName === locationName);
         const fetchLocationData = async () => {
             const data = (selectedLocation?.locationID && selectedLocation?.locationID !== locationId.toString())
                 ? await fetchUniqueLocation(selectedLocation.locationID)

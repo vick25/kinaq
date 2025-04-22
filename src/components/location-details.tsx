@@ -21,39 +21,39 @@ export default function LocationDetails() {
   const [locationData, setLocationData] = useState<ILocationData>()
   const [offline, setOffline] = useState<boolean>(false)
 
-  // Fetch location data
-  const agLocationData = async () => {
-    // setLoading(true);
-    try {
-      const response = await fetchLocationData(`${locationId}`);
-
-      // If the response was unsuccessful then get the last location data
-      if (response === null) {
-        const response = await fetchUniqueLocation(`${locationId}`);
-        setLocationData(response);
-        setOffline(true);
-        return;
-      }
-      toast.promise(
-        Promise.resolve(response), // Wrap the data in a resolved promise
-        {
-          loading: "Loading data...",
-          success: "Data processed successfully!",
-          error: "Failed to load data!",
-          position: "top-right",
-        }
-      );
-      setLocationData(response);
-      setOffline(false);
-      // setLoading(false);
-    } catch (error) {
-      console.error("Error in agLocationData:", error);
-      toast.error("Failed to load data!"); // Display an error toast
-      // setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    // Fetch location data
+    const agLocationData = async () => {
+      // setLoading(true);
+      try {
+        const response = await fetchLocationData(`${locationId}`);
+
+        // If the response was unsuccessful then get the last location data
+        if (response === null) {
+          const response = await fetchUniqueLocation(`${locationId}`);
+          setLocationData(response);
+          setOffline(true);
+          return;
+        }
+        toast.promise(
+          Promise.resolve(response), // Wrap the data in a resolved promise
+          {
+            loading: "Loading data...",
+            success: "Data processed successfully!",
+            error: "Failed to load data!",
+            position: "top-right",
+          }
+        );
+        setLocationData(response);
+        setOffline(false);
+        // setLoading(false);
+      } catch (error) {
+        console.error("Error in agLocationData:", error);
+        toast.error("Failed to load data!"); // Display an error toast
+        // setLoading(false);
+      }
+    };
+
     if (locationId) {
       agLocationData();
     }
