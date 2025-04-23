@@ -4,18 +4,152 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import maplibregl, { Map, GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import useLocationStore from '../stores/location-store';
-import { IMapComponentProps } from '@/lib/definitions';
+import { IAirGradientPointData, IMapComponentProps } from '@/lib/definitions';
 import { formatDateToLocaleString, getPM25Color } from '@/lib/utils';
 import { kinAQPoints, styles } from '@/lib/constants';
 import { useLocale } from 'next-intl';
+import { fetchKinAQData } from '@/actions/airGradientData';
 
-const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
+//Fetch and add points to the map
+const populateMarkers = async (
+    map: maplibregl.Map,
+    popupRef: React.RefObject<maplibregl.Popup | null>,
+    setLocationId: (locationId: number) => void,
+    retrieveLocation: (locationId: number, coordinates: number[]) => void,
+    locale: string
+) => {
+    try {
+        const gradientData: IAirGradientPointData[] = await fetchKinAQData();
+        if (!gradientData) {
+            return;
+        }
+
+        const pointsGeoJSON: string | GeoJSON.FeatureCollection = {
+            type: "FeatureCollection",
+            features: gradientData?.map((item) => {
+                const kinAQFeature = kinAQPoints.find(feat => feat.locationId == item.locationId);
+                // console.log(kinAQFeature)
+                return {
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [kinAQFeature?.coordinates[0] as number, kinAQFeature?.coordinates[1] as number],
+                    },
+                    properties: {
+                        locationId: item.locationId,
+                        locationName: item.locationName,
+                        pm2_5: item.pm02,
+                        timestamp: item.timestamp,
+                    },
+                }
+            }),
+        };
+
+        if (map) {
+            if (map.getSource("locations")) {
+                const source = map.getSource("locations") as maplibregl.GeoJSONSource;
+                source.setData(pointsGeoJSON);
+            } else {
+                map.addSource("locations", {
+                    type: "geojson",
+                    data: pointsGeoJSON,
+                });
+
+                map.addLayer({
+                    id: "location-points",
+                    type: "circle",
+                    source: "locations",
+                    paint: {
+                        "circle-radius": 8,
+                        "circle-stroke-width": 2,
+                        "circle-stroke-color": [
+                            "case",
+                            ["==", ["get", "offline"], true], "#FFF",
+                            "darkgreen"
+                        ],
+                        // "circle-stroke-color": "#FFF",
+                        // "circle-color": "#FF5722",
+                        'circle-color': ['step',
+                            ['get', 'pm2_5'],
+                            getPM25Color(10),
+                            12,
+                            getPM25Color(35),
+                            35.4,
+                            getPM25Color(50),
+                            55.4,
+                            getPM25Color(100),
+                            150.4,
+                            getPM25Color(180),
+                            250.4,
+                            getPM25Color(300)
+                        ]
+                    },
+                });
+
+                map.on("click", "location-points", async (e) => {
+                    const coordinates = (e.features?.[0].geometry as GeoJSON.Point).coordinates.slice();
+                    const { locationId } = e.features?.[0].properties || {};
+
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+
+                    // new maplibregl.Popup()
+                    //     .setLngLat(coordinates as [number, number])
+                    //     .setHTML(
+                    //         `<strong>${locationName}</strong><br>
+                    //     PM2.5: ${pm2_5}<br>
+                    //     Time: ${new Date(timestamp).toLocaleString()}`
+                    //     )
+                    //     .addTo(map);
+
+                    retrieveLocation(locationId, coordinates); // Store the locationId
+                    setLocationId(locationId);
+                });
+
+                map.on("mousemove", "location-points", async (e) => {
+                    const coordinates = (e.features?.[0].geometry as GeoJSON.Point).coordinates.slice();
+                    const { locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
+
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+
+                    // Close the previous popup if it exists
+                    popupRef.current?.remove();
+
+                    popupRef.current = new maplibregl.Popup({ closeButton: false })
+                        .setLngLat(coordinates as [number, number])
+                        .setHTML(
+                            `<strong>${locationName}</strong><br>
+                                PM2.5: ${pm2_5 ?? "-"} μg/m³<br>
+                                Last updated: ${formatDateToLocaleString(locale, timestamp)}`)
+                        .addTo(map);
+                });
+
+                map.on("mouseenter", "location-points", () => {
+                    map.getCanvas().style.cursor = "pointer";
+                });
+
+                map.on("mouseleave", "location-points", () => {
+                    map.getCanvas().style.cursor = "";
+                    popupRef.current?.remove();
+                    // popupRef.current = null;
+                });
+            }
+        }
+    } catch (error) {
+        console.error("Failed to fetch data:", error);
+    }
+};
+
+const MapComponent: React.FC = () => {
     const [map, setMap] = useState<Map | null>(null);
     const [message, setMessage] = useState<string | null>('')
     const [locationId, setLocationId] = useState<number | null>(-1)
-    const { retrieveLocation, coordinates } = useLocationStore();
     const [currentStyleSource, setCurrentStyleSource] = useState<string>(styles[0].source);
     const popupRef = useRef<maplibregl.Popup | null>(null);
+    const { retrieveLocation, coordinates } = useLocationStore();
     const locale = useLocale();
 
     // --- Handle Map Style Change ---
@@ -37,126 +171,8 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         // Set the new style (this triggers the loading process)
         // map.setStyle(selectedStyle.source);
 
-    }, [currentStyleSource, gradientData]);
+    }, [currentStyleSource]);
 
-    //Fetch and add points to the map
-    const populateMarkers = async () => {
-        try {
-            const pointsGeoJSON: string | GeoJSON.FeatureCollection = {
-                type: "FeatureCollection",
-                features: gradientData?.map((item) => {
-                    const kinAQFeature = kinAQPoints.find(feat => feat.locationId == item.locationId);
-                    // console.log(kinAQFeature)
-                    return {
-                        type: "Feature",
-                        geometry: {
-                            type: "Point",
-                            coordinates: [kinAQFeature?.coordinates[0] as number, kinAQFeature?.coordinates[1] as number],
-                        },
-                        properties: {
-                            locationId: item.locationId,
-                            locationName: item.locationName,
-                            pm2_5: item.pm02,
-                            timestamp: item.timestamp,
-                        },
-                    }
-                }),
-            };
-
-            if (map) {
-                map.on("load", () => {
-                    map.addSource("locations", {
-                        type: "geojson",
-                        data: pointsGeoJSON,
-                    });
-
-                    map.addLayer({
-                        id: "location-points",
-                        type: "circle",
-                        source: "locations",
-                        paint: {
-                            "circle-radius": 8,
-                            "circle-stroke-width": 2,
-                            "circle-stroke-color": [
-                                "case",
-                                ["==", ["get", "offline"], true], "#FFF",
-                                "darkgreen"
-                            ],
-                            // "circle-stroke-color": "#FFF",
-                            // "circle-color": "#FF5722",
-                            'circle-color': ['step',
-                                ['get', 'pm2_5'],
-                                getPM25Color(10),
-                                12,
-                                getPM25Color(35),
-                                35.4,
-                                getPM25Color(50),
-                                55.4,
-                                getPM25Color(100),
-                                150.4,
-                                getPM25Color(180),
-                                250.4,
-                                getPM25Color(300)
-                            ]
-                        },
-                    });
-
-                    map.on("click", "location-points", async (e) => {
-                        const coordinates = (e.features?.[0].geometry as GeoJSON.Point).coordinates.slice();
-                        const { locationId } = e.features?.[0].properties || {};
-
-                        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-                        }
-
-                        // new maplibregl.Popup()
-                        //     .setLngLat(coordinates as [number, number])
-                        //     .setHTML(
-                        //         `<strong>${locationName}</strong><br>
-                        //     PM2.5: ${pm2_5}<br>
-                        //     Time: ${new Date(timestamp).toLocaleString()}`
-                        //     )
-                        //     .addTo(map);
-
-                        retrieveLocation(locationId, coordinates); // Store the locationId
-                        setLocationId(locationId);
-                    });
-
-                    map.on("mousemove", "location-points", async (e) => {
-                        const coordinates = (e.features?.[0].geometry as GeoJSON.Point).coordinates.slice();
-                        const { locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
-
-                        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-                        }
-
-                        // Close the previous popup if it exists
-                        popupRef.current?.remove();
-
-                        popupRef.current = new maplibregl.Popup({ closeButton: false })
-                            .setLngLat(coordinates as [number, number])
-                            .setHTML(
-                                `<strong>${locationName}</strong><br>
-                                    PM2.5: ${pm2_5 ?? "-"} μg/m³<br>
-                                    Last updated: ${formatDateToLocaleString(locale, timestamp)}`)
-                            .addTo(map);
-                    });
-
-                    map.on("mouseenter", "location-points", () => {
-                        map.getCanvas().style.cursor = "pointer";
-                    });
-
-                    map.on("mouseleave", "location-points", () => {
-                        map.getCanvas().style.cursor = "";
-                        popupRef.current?.remove();
-                        popupRef.current = null;
-                    });
-                });
-            }
-        } catch (error) {
-            console.error("Failed to fetch data:", error);
-        }
-    };
 
     // To Load the Map
     useEffect(function createMap() {
@@ -166,7 +182,7 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
         const initialLatitude = 0.0;   // Latitude for the center of Central Africa
         const initialZoom = 1;         // Adjust zoom level as needed
         const initialBounds: [number, number, number, number] = [14.66241, -5.501214, 17.093503, -3.307021];
-        // This is used to initialize the map. The library used here is Maplibre GL JS (https://maplibre.org).
+
         setMap(
             new maplibregl.Map({
                 container: 'map',
@@ -193,9 +209,9 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
                 }))
         );
 
-        return () => {
-            setMap(null);
-        }
+        // return () => {
+        //     setMap(null);
+        // }
     }, [map]);
 
     useEffect(() => {
@@ -213,7 +229,9 @@ const MapComponent: React.FC<IMapComponentProps> = ({ gradientData }) => {
             }
         });
 
-        populateMarkers();
+        map.on("load", () => {
+            populateMarkers(map, popupRef, setLocationId, retrieveLocation, locale);
+        });
     }, [map]);
 
     // useEffect(() => {

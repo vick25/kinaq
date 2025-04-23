@@ -5,7 +5,7 @@ import { IAirGradientPointData } from "@/lib/definitions";
 import React from "react";
 import { populateLocationsTable } from "@/actions/populateTables";
 
-export const revalidate = 60;
+// export const revalidate = 60;
 
 export default function Home() {
   return (
@@ -24,9 +24,9 @@ export default function Home() {
 
 async function MapContent() {
   await populateLocationsTable();
-  const gradientData = (await fetchKinAQData()) || [];
+  // const gradientData = (await fetchKinAQData()) || [];
   return (
-    <MapComponent gradientData={gradientData as IAirGradientPointData[]} />
+    <MapComponent />
   )
 };
 

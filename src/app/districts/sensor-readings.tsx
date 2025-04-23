@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import LocationGauge from "@/components/location-gauge";
 import { COLORS, ILocationData } from "@/lib/definitions";
-import { authClient } from "@/lib/auth-client"
+import { authClient } from "@/lib/auth-client";
 
 import {
     Select,
@@ -61,7 +61,7 @@ const SensorReadings = ({ locationsData }: Props) => {
         };
 
         fetchLocationData();
-    }, [locationId, locationName]);
+    }, [locationsData, locationId, locationName]);
 
     const AQIData = useMemo(() => {
         if (sensorData) {
@@ -108,7 +108,13 @@ const SensorReadings = ({ locationsData }: Props) => {
             <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between">
                 <div>
                     <h2 className="mb-2 text-xl font-semibold text-gray-800">Current Readings</h2>
-                    <p className="text-gray-600">Last Updated: {formatDateToLocaleString(locale, sensorData?.timestamp || "")}</p>
+                    {sensorData?.timestamp ? (
+                        <time className="text-gray-600">
+                            Last Updated: {formatDateToLocaleString(locale, sensorData.timestamp)}
+                        </time>
+                    ) : (
+                        <time className="text-gray-400">Loading...</time>
+                    )}
                 </div>
 
                 <div className="mt-4 flex md:justify-end">
