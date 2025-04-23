@@ -5,6 +5,8 @@ import { IAirGradientPointData } from "@/lib/definitions";
 import React from "react";
 import { populateLocationsTable } from "@/actions/populateTables";
 
+export const revalidate = 60;
+
 export default function Home() {
   return (
     <div className="flex flex-col md:flex-row flex-1">
