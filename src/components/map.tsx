@@ -164,7 +164,7 @@ const MapComponent: React.FC = () => {
         // Set the new style (this triggers the loading process)
         // map.setStyle(selectedStyle.source);
 
-    }, [currentStyleSource]);
+    }, [map, currentStyleSource]);
 
 
     // To Load the Map
@@ -227,7 +227,6 @@ const MapComponent: React.FC = () => {
         });
 
         const refreshData = async () => {
-            console.log('running interval');
             // Refresh map markers
             await populateMarkers(map, popupRef, setLocationId, retrieveLocation, locale);
             // If there's a selected location, refresh its details
@@ -249,7 +248,7 @@ const MapComponent: React.FC = () => {
         if (!map) return;
         // Fly to a random location by offsetting the point -74.50, 40
         // by up to 5 degrees.
-        if (locationId)
+        if (locationId && coordinates) {
             setTimeout(() => {
                 map.flyTo({
                     center: [
@@ -259,7 +258,8 @@ const MapComponent: React.FC = () => {
                     zoom: 12,
                     essential: true // this animation is considered essential with respect to prefers-reduced-motion
                 })
-            }, 2000);
+            }, 1500);
+        }
     }, [map, locationId, coordinates])
 
     return (

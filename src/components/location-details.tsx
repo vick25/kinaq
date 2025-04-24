@@ -35,15 +35,17 @@ export default function LocationDetails() {
           setOffline(true);
           return;
         }
-        toast.promise(
-          Promise.resolve(response), // Wrap the data in a resolved promise
-          {
-            loading: "Loading data...",
-            success: "Data processed successfully!",
-            error: "Failed to load data!",
-            position: "top-right",
-          }
-        );
+        if (!isMapUpdated) {
+          toast.promise(
+            Promise.resolve(response), // Wrap the data in a resolved promise
+            {
+              loading: "Loading data...",
+              success: "Data processed successfully!",
+              error: "Failed to load data!",
+              position: "top-right",
+            }
+          );
+        }
         setLocationData(response);
         setOffline(false);
         // setLoading(false);
@@ -156,7 +158,7 @@ export default function LocationDetails() {
               </div>
             </div>
           </div> :
-          <div className="text-sm">No data found. Click on a location !</div>
+          <div className="text-sm text-center font-medium animate-pulse text-green-700">No data found. Click on a location !</div>
       }
       <footer className="mt-auto pt-5">
         <Separator className="mt-4" />

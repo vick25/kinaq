@@ -89,6 +89,7 @@ model Location {
   // Relation based on foreign keys pointing to locations.id
   requests Request[]
 
+  @@index([locationID], name: "locationID_index")
   // Optional: Explicitly map to the SQL table name "locations"
   @@map("locations")
 }

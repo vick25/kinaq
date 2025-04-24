@@ -1,4 +1,5 @@
 import { SubmitButton } from '@/components/submit-button'
+import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth-client'
 import { redirect } from 'next/navigation'
 
@@ -30,11 +31,10 @@ const SignUpForm = () => {
             <h3 className="text-lg font-semibold text-gray-800 text-center mb-2">
                 Authentication through Email:
             </h3>
-            <input
+            <Input
                 type="email"
                 name="email"
                 placeholder="Enter email address"
-                className="w-full border p-2 rounded-md text-gray-700"
             />
             {/* Email Code Button */}
             <SubmitButton />

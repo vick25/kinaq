@@ -1,7 +1,5 @@
 import LocationDetails from "@/components/location-details";
 import MapComponent from "@/components/map";
-import { fetchKinAQData } from "@/actions/airGradientData";
-import { IAirGradientPointData } from "@/lib/definitions";
 import React from "react";
 import { populateLocationsTable } from "@/actions/populateTables";
 

@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { API_URL } from '../lib/constants';
 
 const AIRGRADIENT_TOKEN = process.env.AIRGRADIENT_TOKEN;

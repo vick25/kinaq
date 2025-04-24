@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Users, Database, Building2 } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 interface AboutDialogProps {
   open: boolean
@@ -94,8 +95,8 @@ export default function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
             <div className="space-y-2 text-[#58595b]">
               <div className="flex items-center gap-2">
                 <span>📧</span>
-                <a href="mailto:contact@wasaru.org" className="hover:text-black">
-                  contact@wasaru.org
+                <a href="mailto:kinshasaairquality.wasaru@gmail.com" className="hover:text-black">
+                  kinshasaairquality.wasaru@gmail.com
                 </a>
               </div>
               <div className="flex items-center gap-2">
@@ -110,9 +111,9 @@ export default function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
               </div>
               <div className="flex items-center gap-2">
                 <span>🌐</span>
-                <a href="https://wasaru.org" target="_blank" rel="noopener noreferrer" className="hover:text-black">
-                  https://wasaru.org
-                </a>
+                <Link href="https://wasaruwash.org" target="_blank" rel="noopener noreferrer" className="hover:text-black">
+                  https://wasaruwash.org
+                </Link>
               </div>
             </div>
           </div>
