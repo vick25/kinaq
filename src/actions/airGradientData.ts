@@ -1,4 +1,5 @@
-'use server'
+'use server';
+
 import { revalidatePath } from 'next/cache';
 import { API_URL } from '../lib/constants';
 
@@ -14,8 +15,7 @@ export async function fetchAllAirGradientData() {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const data = await response.json();
-        return data;
+        return await response.json();
     } catch (error) {
         console.error("Failed to fetch Air Gradient data:", error);
         return null;
@@ -26,10 +26,10 @@ export async function fetchLocationData(locationId: string) {
     const endPoint = `${API_URL}world/locations/${locationId}/measures/current`;
 
     try {
-        const response = await fetch(endPoint);
-        const data = await response.json();
-
-        return data;
+        const response = await fetch(endPoint, {
+            next: { revalidate: 60 }
+        });
+        return await response.json();
     } catch (error) {
         console.error("Failed to fetch Air Gradient data:", error);
         return null;
@@ -46,6 +46,7 @@ export async function fetchKinAQData() {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        // revalidatePath('/');
         return await response.json();
     } catch (error) {
         console.error("Failed to fetch Air Gradient data:", error);
@@ -58,9 +59,10 @@ export async function fetchUniqueLocation(locationID: string) {
     const endPoint = `${API_URL}locations/${locationID}/measures/current?token=${AIRGRADIENT_TOKEN}`;
 
     try {
-        const response = await fetch(endPoint);
-        const data = await response.json();
-        return data;
+        const response = await fetch(endPoint, {
+            next: { revalidate: 60 }
+        });
+        return await response.json();
     } catch (error) {
         console.error("Failed to fetch Air Gradient data:", error);
         return null;
@@ -82,8 +84,7 @@ export async function fetchLocationMeasures(downloadUrl: string, from?: string, 
     console.log(endPoint);
     try {
         const response = await fetch(endPoint);
-        const data = await response.json();
-        return data;
+        return await response.json();
     } catch (error) {
         console.error("Failed to fetch Location measures data:", error);
         return null;

@@ -4,11 +4,12 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import maplibregl, { Map, GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import useLocationStore from '../stores/location-store';
-import { IAirGradientPointData, IMapComponentProps } from '@/lib/definitions';
+import { IAirGradientPointData } from '@/lib/definitions';
 import { formatDateToLocaleString, getPM25Color } from '@/lib/utils';
 import { kinAQPoints, styles } from '@/lib/constants';
 import { useLocale } from 'next-intl';
 import { fetchKinAQData } from '@/actions/airGradientData';
+import { useRouter } from 'next/navigation';
 
 //Fetch and add points to the map
 const populateMarkers = async (
@@ -28,7 +29,6 @@ const populateMarkers = async (
             type: "FeatureCollection",
             features: gradientData?.map((item) => {
                 const kinAQFeature = kinAQPoints.find(feat => feat.locationId == item.locationId);
-                // console.log(kinAQFeature)
                 return {
                     type: "Feature",
                     geometry: {
@@ -94,15 +94,6 @@ const populateMarkers = async (
                         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
                     }
 
-                    // new maplibregl.Popup()
-                    //     .setLngLat(coordinates as [number, number])
-                    //     .setHTML(
-                    //         `<strong>${locationName}</strong><br>
-                    //     PM2.5: ${pm2_5}<br>
-                    //     Time: ${new Date(timestamp).toLocaleString()}`
-                    //     )
-                    //     .addTo(map);
-
                     retrieveLocation(locationId, coordinates); // Store the locationId
                     setLocationId(locationId);
                 });
@@ -149,8 +140,10 @@ const MapComponent: React.FC = () => {
     const [locationId, setLocationId] = useState<number | null>(-1)
     const [currentStyleSource, setCurrentStyleSource] = useState<string>(styles[0].source);
     const popupRef = useRef<maplibregl.Popup | null>(null);
-    const { retrieveLocation, coordinates } = useLocationStore();
+    const { retrieveLocation, coordinates, locationId: storeLocationId, setIsMapUpdated } = useLocationStore();
+
     const locale = useLocale();
+    const router = useRouter();
 
     // --- Handle Map Style Change ---
     const handleMapChange = useCallback((mapType: string) => {
@@ -232,13 +225,24 @@ const MapComponent: React.FC = () => {
         map.on("load", () => {
             populateMarkers(map, popupRef, setLocationId, retrieveLocation, locale);
         });
-    }, [map]);
 
-    // useEffect(() => {
-    //     populateMarkers();
-    //     const interval = setInterval(populateMarkers, 300000); // 5 minutes
-    //     return () => clearInterval(interval);
-    // }, []);
+        const refreshData = async () => {
+            console.log('running interval');
+            // Refresh map markers
+            await populateMarkers(map, popupRef, setLocationId, retrieveLocation, locale);
+            // If there's a selected location, refresh its details
+            if (storeLocationId && storeLocationId !== -1) {
+                retrieveLocation(storeLocationId, coordinates);
+                setIsMapUpdated(true);
+            }
+
+            router.refresh();
+        };
+
+        const interval = setInterval(refreshData, 60000);
+
+        return () => clearInterval(interval);
+    }, [map, locationId, coordinates]);
 
     // Use the user last location as the default air quality information when the application loads
     useEffect(() => {

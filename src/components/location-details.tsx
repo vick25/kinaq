@@ -16,10 +16,10 @@ import { useLocale } from 'next-intl';
 
 export default function LocationDetails() {
   const locale = useLocale();
-  const { locationId } = useLocationStore(); // Get locationId from store
+  const { locationId, isMapUpdated, setIsMapUpdated } = useLocationStore(); // Get locationId from store
   // const [loading, setLoading] = useState<boolean>(false)
-  const [locationData, setLocationData] = useState<ILocationData>()
-  const [offline, setOffline] = useState<boolean>(false)
+  const [locationData, setLocationData] = useState<ILocationData>();
+  const [offline, setOffline] = useState<boolean>(false);
 
   useEffect(() => {
     // Fetch location data
@@ -56,8 +56,9 @@ export default function LocationDetails() {
 
     if (locationId) {
       agLocationData();
+      setIsMapUpdated(false);
     }
-  }, [locationId])
+  }, [locationId, isMapUpdated, setIsMapUpdated]);
 
   const AQIData = useMemo(() => {
     if (locationData) {
