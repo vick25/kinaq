@@ -3,6 +3,7 @@ import React from 'react'
 import SignUpForm from '../signUp-form'
 import SignInForm from '../signIn-form'
 import { getUser } from '@/lib/auth-session'
+import { getLocations } from '@/actions/populateTables'
 
 interface PageProps {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -15,6 +16,7 @@ export const metadata = {
 
 const Historical = async ({ searchParams }: PageProps) => {
     const session = await getUser();
+    const locationsData = await getLocations();
 
     const { signup, email, locq } = await searchParams
     const showSignIn = signup === 'login'
@@ -62,7 +64,7 @@ const Historical = async ({ searchParams }: PageProps) => {
                 </div>
             </section>
 
-            {(session || showExport) && <ExportData locationQuery={locq as string} />}
+            {(session || showExport) && <ExportData locationQuery={locq as string} locationsData={locationsData} />}
         </div>
     )
 }

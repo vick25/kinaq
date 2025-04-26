@@ -44,7 +44,7 @@ export const auth = betterAuth({
                 switch (type) {
                     case 'sign-in': // Example type, check better-auth usage for actual types
                         textContent = `Welcome! Your KINAQ verification code is: ${otp}
-                                       If you have not initiated this process, please disregard or contact us at contact@wasaruwash.org.
+                                       If you have not initiated this process, please disregard or contact us at info@wasaruwash.org.
                                        Thank you,
                                        KINAQ Team`;
                         htmlContent = getOtpHtmlTemplate(otp) || `<p>Welcome!</p><p>Your verification code is: <strong>${otp}</strong></p><p>This code is valid for 5 minutes.</p>`;
