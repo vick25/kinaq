@@ -18,7 +18,7 @@ const SignUpForm = () => {
             type: 'sign-in'
         });
         if (error) {
-            // console.error("Error sending OTP:", error)
+            console.error("Error sending OTP:", error)
             return redirect('/historical');
         }
         if (data.success) {
