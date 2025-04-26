@@ -17,6 +17,7 @@ import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { IUser } from "@/lib/definitions";
+import { revalidatePath } from "next/cache";
 
 function Header({ session }: { session: IUser | null }) {
   const router = useRouter()
@@ -31,7 +32,8 @@ function Header({ session }: { session: IUser | null }) {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push('/')
+          revalidatePath('/');
+          router.push('/');
         }
       }
     });
@@ -72,7 +74,7 @@ function Header({ session }: { session: IUser | null }) {
           <span className="text-xl font-bold text-[#05b15d]">KINSHASA AIR QUALITY</span>
         </Link>
         <div className="ml-auto flex items-center space-x-4 md:gap-5">
-          <div className="relative w-64 shadow-sm hidden md:block">
+          <div className="relative w-64 shadow-sm hidden lg:block">
             <Input placeholder="Search zones" className="pl-8" ref={searchRef} onChange={handleInputChange} />
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           </div>

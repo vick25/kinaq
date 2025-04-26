@@ -12,22 +12,28 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import Link from "next/link";
-import { fetchKinAQData, fetchLocationMeasures } from "@/actions/airGradientData";
+import { fetchLocationMeasures } from "@/actions/airGradientData";
 import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
 import { ILocationMeasure, Usages } from "@/lib/definitions";
+import { Button } from "./ui/button";
+import useLocationStore from "@/stores/location-store";
 
 type Props = {
     locationQuery: string;
-}
-type LocationData = {
-    locationName: string;
-    locationId: string;
+    locationsData: ILocation[];
 }
 
-export default function ExportData({ locationQuery }: Props) {
+interface ILocation {
+    id: number;
+    locationName: string;
+    locationID: string;
+}
+
+export default function ExportData({ locationQuery, locationsData }: Props) {
+    const { locationId } = useLocationStore();
+
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
-    const [locationsData, setLocationsData] = useState<LocationData[]>([]);
     const [selectedLocation, setSelectedLocation] = useState<string | undefined>();
     const [selectedBucket, setSelectedBucket] = useState<string | undefined>();
     const [institution, setInstitution] = useState<string>('');
@@ -59,7 +65,7 @@ export default function ExportData({ locationQuery }: Props) {
             const datePart = (startDate && endDate) ?
                 `${formatToYYYYMMDD(startDate as string)}-${formatToYYYYMMDD(endDate as string)}` :
                 new Date().toISOString().split('T')[0];
-            const locationNamePart = locationsData.find(loc => loc.locationId === selectedLocation)?.locationName.replace(/\s+/g, '_') || selectedLocation;  // Use name or ID
+            const locationNamePart = locationsData.find(loc => loc.locationID === selectedLocation)?.locationName.replace(/\s+/g, '_') || selectedLocation;  // Use name or ID
             const baseFilename = `Export_${locationNamePart}_${selectedBucket}_${datePart.replace(/-/g, '_')}`;
 
             // Fetch data from the API
@@ -141,26 +147,28 @@ export default function ExportData({ locationQuery }: Props) {
         URL.revokeObjectURL(url); // Release the object URL
     };
 
-    const getLocationData = async () => {
-        try {
-            const data = await fetchKinAQData();
-            if (data) {
-                const locations: LocationData[] = data.map((location: LocationData) => ({
-                    locationName: location.locationName,
-                    locationId: location.locationId,
-                }));
-                setLocationsData(locations);
-            } else {
-                console.error("Failed to fetch data");
-            }
-        } catch (error) {
-            console.error("Failed to fetch location data:", error);
-        }
-    };
-
+    // Add this effect to handle locationQuery
     useEffect(() => {
-        getLocationData();
-    }, []);
+        if (locationQuery && locationsData.length > 0) {
+            const location = locationsData.find(loc => loc.locationName === locationQuery);
+            if (location) {
+                setSelectedLocation(location.locationID);
+            }
+        }
+    }, [locationQuery, locationsData]);
+
+    // Modify the existing effect to handle both locationId and locationQuery
+    useEffect(() => {
+        if (locationsData.length > 0) {
+            let selectedLoc;
+            if (locationId) {
+                selectedLoc = locationsData.find(loc => loc.locationID === locationId.toString());
+            }
+            if (selectedLoc) {
+                setSelectedLocation(selectedLoc.locationID);
+            }
+        }
+    }, [locationsData, locationId]);
 
     // Effect to update download button disable state
     useEffect(() => {
@@ -175,7 +183,7 @@ export default function ExportData({ locationQuery }: Props) {
     return (
         <section className="pb-10">
             {/* Main Content */}
-            <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+            <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h2 className="text-2xl font-semibold text-[#05b15d]">Export Data as CSV</h2>
 
                 {/* Warning Box */}
@@ -195,8 +203,8 @@ export default function ExportData({ locationQuery }: Props) {
                 {/* Filters */}
                 <div className="mt-6 flex items-center flex-wrap gap-4">
                     <Select
-                        value={locationsData.find(loc => loc.locationName === locationQuery)?.locationId}
-                        //   defaultValue={locationsData.find(loc => loc.locationName === locationName)?.locationID}
+                        value={selectedLocation}
+                        defaultValue={selectedLocation}
                         onValueChange={(value) => setSelectedLocation(value)}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select a location" />
@@ -206,7 +214,7 @@ export default function ExportData({ locationQuery }: Props) {
                                 <SelectLabel>Locations</SelectLabel>
                                 {locationsData.length > 0 ? (
                                     locationsData.map((location) => (
-                                        <SelectItem value={location.locationId} key={location.locationId}>{location.locationName}</SelectItem>
+                                        <SelectItem value={location.locationID} key={location.locationID}>{location.locationName}</SelectItem>
                                     ))
                                 ) : (
                                     <SelectItem value="loading" disabled>Loading locations...</SelectItem>
@@ -309,7 +317,7 @@ export default function ExportData({ locationQuery }: Props) {
                     </div>
                 </fieldset>
 
-                <button className={`mt-6 bg-orange-500 text-white py-2 px-6 rounded-md text-lg font-semibold hover:bg-orange-600
+                <Button className={`mt-6 bg-orange-500 text-white py-2 px-6 rounded-md text-lg font-semibold hover:bg-orange-600
                                 ${isDownloadDisabled ? 'opacity-50 cursor-not-allowed' : ''} `}
                     onClick={() => handleDownload('csv')}>
                     {isLoading ? (
@@ -319,7 +327,7 @@ export default function ExportData({ locationQuery }: Props) {
                     ) : (
                         'Download'
                     )}
-                </button>
+                </Button>
             </div>
         </section>
     );

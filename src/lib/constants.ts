@@ -177,7 +177,7 @@ export function getOtpHtmlTemplate(otp: string): string {
         <div style="padding: 24px; font-size: 16px; color: #000;">
           <p><strong>KINAQ LOGIN CODE: <span style="font-size: 24px;">${otp}</span></strong><p>This code is valid for 10 minutes.</p></p>
           <p>If you have not initiated this process, please disregard or contact us at 
-            <a href="mailto:contact@wasaruwash.org">contact@wasaruwash.org</a>.
+            <a href="mailto:info@wasaruwash.org">info@wasaruwash.org</a>.
           </p>
           <p>Thank you,<br>KINAQ Team</p>
         </div>
