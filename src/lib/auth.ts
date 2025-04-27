@@ -3,7 +3,6 @@ import { emailOTP } from "better-auth/plugins";
 import { openAPI } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-// import { PrismaClient } from "@prisma/client";
 import transporter from "./transporter";
 import { getOtpHtmlTemplate } from "./constants";
 import prisma from "./prisma";
@@ -34,7 +33,7 @@ export const auth = betterAuth({
         emailOTP({
             expiresIn: 600,
             async sendVerificationOTP({ email, otp, type }) {
-                // console.log(`Attempting to send OTP ${otp} to ${email} (Type: ${type})`);
+                console.log(`Attempting to send OTP ${otp} to ${email} (Type: ${type})`);
 
                 const subject = `KINAQ ${type === 'sign-in' ? 'Sign-In' : (type === 'email-verification' ? 'Verification' : 'Action')} Code: ${otp}`;
                 let htmlContent = '';
