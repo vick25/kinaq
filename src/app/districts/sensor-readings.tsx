@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import LocationGauge from "@/components/location-gauge";
-import { COLORS, ILocationData } from "@/lib/definitions";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
+import { COLORS, ILocationData } from "@/lib/definitions";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
+import { fetchUniqueLocation } from "@/actions/airGradientData";
 import {
     Select,
     SelectContent,
@@ -16,8 +17,7 @@ import {
     SelectLabel,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import { fetchUniqueLocation } from "@/actions/airGradientData";
+} from "@/components/ui/select";
 import { calculateOverallAqi, formatDateToLocaleString, getAqiDescription } from "@/lib/utils";
 import useLocationStore from "@/stores/location-store";
 import { useLocale } from 'next-intl';

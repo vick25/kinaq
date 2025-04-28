@@ -1,7 +1,7 @@
-import { SubmitButton } from '@/components/submit-button'
+import { SubmitButton } from '@/components/submit-button';
 import { Input } from '@/components/ui/input';
-import { authClient } from '@/lib/auth-client'
-import { redirect } from 'next/navigation'
+import { authClient } from '@/lib/auth-client';
+import { redirect } from 'next/navigation';
 
 const SignUpForm = () => {
 

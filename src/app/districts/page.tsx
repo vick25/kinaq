@@ -1,6 +1,6 @@
+import { getLocations } from '@/actions/populateTables';
 import { Suspense } from 'react';
 import SensorReadings from './sensor-readings';
-import { getLocations } from '@/actions/populateTables';
 
 export const metadata = {
     title: 'KINAQ | Zones',

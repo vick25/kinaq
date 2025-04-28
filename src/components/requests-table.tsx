@@ -1,24 +1,24 @@
 'use client';
 
-import { Trash, Mail } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
     Table,
     TableBody,
     TableCaption,
     TableCell,
+    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
-    TableFooter,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
+import { Mail, Trash } from 'lucide-react';
 
-import { authClient } from '@/lib/auth-client';
-import { useRouter } from 'next/navigation';
 import { updateRequest } from '@/actions/populateTables';
+import { authClient } from '@/lib/auth-client';
+import { formatDateToLocaleString, formatDateToLocaleStringWithoutTime } from '@/lib/utils';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
-import { formatDateToLocaleString, formatDateToLocaleStringWithoutTime } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 type location = {
     locationID: string;

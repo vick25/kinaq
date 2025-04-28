@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import maplibregl, { Map, GeolocateControl, NavigationControl, AttributionControl, ScaleControl } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
-import useLocationStore from '../stores/location-store';
+import { fetchKinAQData } from '@/actions/airGradientData';
+import { kinAQPoints, styles } from '@/lib/constants';
 import { IAirGradientPointData } from '@/lib/definitions';
 import { formatDateToLocaleString, getPM25Color } from '@/lib/utils';
-import { kinAQPoints, styles } from '@/lib/constants';
+import useLocationStore from '@/stores/location-store';
+import maplibregl, { AttributionControl, GeolocateControl, Map, NavigationControl, ScaleControl } from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { useLocale } from 'next-intl';
-import { fetchKinAQData } from '@/actions/airGradientData';
 import { useRouter } from 'next/navigation';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 //Fetch and add points to the map
 const populateMarkers = async (

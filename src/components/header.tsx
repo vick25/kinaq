@@ -1,22 +1,22 @@
 'use client';
-import Image from "next/image"
-import Link from "next/link"
-import { Search, Menu, User, Settings, LogIn, LogOut } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import React, { useCallback, useRef, useState } from "react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Switch } from "@/components/ui/switch"
-import AboutDialog from "./about-dialog";
-import { useTheme } from "next-themes";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import LocaleSwitcher from "./locale-switcher";
-import { useTranslations } from "next-intl";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 import { IUser } from "@/lib/definitions";
+import { cn } from "@/lib/utils";
+import { LogIn, LogOut, Menu, Search, Settings, User } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import React, { useCallback, useRef, useState } from "react";
+import AboutDialog from "./about-dialog";
+import LocaleSwitcher from "./locale-switcher";
 
 function Header({ session }: { session: IUser | null }) {
   const router = useRouter()

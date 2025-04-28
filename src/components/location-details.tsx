@@ -1,18 +1,17 @@
 'use client'
-// import { Progress } from "@/components/ui/progress"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Droplets, Thermometer } from "lucide-react"
-import Image from "next/image"
-import useLocationStore from "../stores/location-store"
-import { useEffect, useMemo, useState } from "react"
-import { fetchLocationData, fetchUniqueLocation } from "@/actions/airGradientData"
-import LocationGauge from "./location-gauge"
-import { toast } from "react-fox-toast"
-import { COLORS, ILocationData } from "@/lib/definitions"
-import { calculateOverallAqi, formatDateToLocaleString, formatTo2Places, getAqiDescription } from "@/lib/utils"
-import Link from "next/link";
+import { fetchLocationData, fetchUniqueLocation } from "@/actions/airGradientData";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { COLORS, ILocationData } from "@/lib/definitions";
+import { calculateOverallAqi, formatDateToLocaleString, formatTo2Places, getAqiDescription } from "@/lib/utils";
+import useLocationStore from "@/stores/location-store";
+import { Droplets, Thermometer } from "lucide-react";
 import { useLocale } from 'next-intl';
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-fox-toast";
+import LocationGauge from "./location-gauge";
 
 export default function LocationDetails() {
   const locale = useLocale();

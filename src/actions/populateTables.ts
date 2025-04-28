@@ -1,9 +1,9 @@
 'use server';
 
-import prisma from '@/lib/prisma';
-import { fetchAllAirGradientData } from './airGradientData';
-import { revalidatePath } from 'next/cache';
 import { IUser } from '@/lib/definitions';
+import prisma from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
+import { fetchAllAirGradientData } from './airGradientData';
 
 // Filter locations with "KINAQ" in their name
 interface IAirGradientLocation {

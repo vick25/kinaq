@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import { Info, Loader2 } from "lucide-react";
+import { fetchLocationMeasures } from "@/actions/airGradientData";
 import {
     Select,
     SelectContent,
@@ -10,13 +9,14 @@ import {
     SelectLabel,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import Link from "next/link";
-import { fetchLocationMeasures } from "@/actions/airGradientData";
-import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
+} from "@/components/ui/select";
 import { ILocationMeasure, Usages } from "@/lib/definitions";
-import { Button } from "./ui/button";
+import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
 import useLocationStore from "@/stores/location-store";
+import { Info, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
 
 type Props = {
     locationQuery: string;

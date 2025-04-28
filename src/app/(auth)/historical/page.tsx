@@ -1,9 +1,8 @@
-import ExportData from '@/components/export-data'
-import React from 'react'
-import SignUpForm from '../signUp-form'
-import SignInForm from '../signIn-form'
-import { getUser } from '@/lib/auth-session'
 import { getLocations } from '@/actions/populateTables'
+import ExportData from '@/components/export-data'
+import { getUser } from '@/lib/auth-session'
+import SignInForm from '../signIn-form'
+import SignUpForm from '../signUp-form'
 
 interface PageProps {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>

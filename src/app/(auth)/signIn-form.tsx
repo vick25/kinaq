@@ -1,11 +1,9 @@
-import React from 'react'
-import { redirect } from 'next/navigation'
-import { auth } from '@/lib/auth'
-import { headers } from "next/headers";
 import { Button } from '@/components/ui/button';
-import FormError from '@/components/form-error';
 import { Input } from '@/components/ui/input';
+import { auth } from '@/lib/auth';
+import { headers } from "next/headers";
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 type Props = {
     loggedInEmail: string
@@ -45,7 +43,6 @@ const SignInForm = ({ loggedInEmail }: Props) => {
             <div className="lbCode">
                 <Input type="text" name="code" placeholder="123456" />
             </div>
-            <FormError message='' />
             <div className='flex space-x-4 items-center justify-center'>
                 <Button type='submit' className="mt-4 w-full bg-[#05b15d] text-white py-2 rounded-md text-lg font-medium hover:bg-green-600" id="btn_proceed_email">
                     Sign-in with code

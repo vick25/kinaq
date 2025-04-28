@@ -1,7 +1,7 @@
+import { populateLocationsTable } from "@/actions/populateTables";
 import LocationDetails from "@/components/location-details";
 import MapComponent from "@/components/map";
 import React from "react";
-import { populateLocationsTable } from "@/actions/populateTables";
 
 // export const revalidate = 60;
 

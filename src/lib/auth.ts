@@ -1,11 +1,10 @@
 import { betterAuth } from "better-auth";
-import { emailOTP } from "better-auth/plugins";
-import { openAPI } from "better-auth/plugins";
-import { nextCookies } from "better-auth/next-js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import transporter from "./transporter";
+import { nextCookies } from "better-auth/next-js";
+import { emailOTP, openAPI } from "better-auth/plugins";
 import { getOtpHtmlTemplate } from "./constants";
 import prisma from "./prisma";
+import transporter from "./transporter";
 
 // const prisma = new PrismaClient();
 

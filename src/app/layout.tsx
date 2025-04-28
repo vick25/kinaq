@@ -1,13 +1,13 @@
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import Header from "@/components/header"
+import Header from "@/components/header";
+import NextProgress from "@/components/next-progress";
+import { Toast } from "@/components/toast-component";
+import { getUser } from "@/lib/auth-session";
+import { Analytics } from "@vercel/analytics/react";
+import type { Metadata } from "next";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
-import { Toast } from "@/components/toast-component"
-import NextProgress from "@/components/next-progress"
-import { Analytics } from "@vercel/analytics/react"
-import { getUser } from "@/lib/auth-session";
+import { Inter } from "next/font/google";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] })
 
