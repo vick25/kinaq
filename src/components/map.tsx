@@ -269,13 +269,13 @@ const MapComponent: React.FC = () => {
                     {message}
                 </div>
             )}
-            <div className="absolute left-2 top-2 z-20 flex rounded-md shadow-sm">
+            <div className="absolute left-2 top-2 z-20 flex rounded-md shadow-xs">
                 {styles.map((style, index) => (
                     <button
                         key={style.label}
                         onClick={() => handleMapChange(style.label)}
                         className={`
-                             px-4 py-2 text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                             px-4 py-2 text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-hidden focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                              ${index === 0 ? 'rounded-l-md' : ''}
                              ${index === styles.length - 1 ? 'rounded-r-md' : '-ml-px'}
                              ${currentStyleSource === style.source ? 'bg-gray-200 font-bold' : ''} // Indicate active style
