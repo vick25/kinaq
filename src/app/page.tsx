@@ -21,7 +21,9 @@ export default function Home() {
 };
 
 async function MapContent() {
-  await populateLocationsTable();
+  setInterval(async () => {
+    await populateLocationsTable();
+  }, 300000);
   // const gradientData = (await fetchKinAQData()) || [];
   return (
     <MapComponent />
