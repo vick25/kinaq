@@ -65,7 +65,9 @@ export async function getLocations() {
             select: {
                 id: true,
                 locationName: true,
-                locationID: true
+                locationID: true,
+                latitude: true,
+                longitude: true,
             },
             orderBy: {
                 locationName: 'asc'

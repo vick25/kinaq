@@ -3,10 +3,13 @@
 import LocationGauge from "@/components/location-gauge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { authClient } from "@/lib/auth-client";
 import { COLORS, ILocationData } from "@/lib/definitions";
-import Link from "next/link";
+import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from "react";
+
+const MapLocation = dynamic(() => import('./map-location'), {
+    ssr: false
+})
 
 import { fetchUniqueLocation } from "@/actions/airGradientData";
 import {
@@ -18,14 +21,18 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { authClient } from "@/lib/auth-client";
 import { calculateOverallAqi, formatDateToLocaleString, getAqiDescription } from "@/lib/utils";
 import useLocationStore from "@/stores/location-store";
 import { useLocale } from 'next-intl';
+import Link from "next/link";
 
 interface ILocation {
     id: number;
     locationName: string;
     locationID: string;
+    latitude: string | null;
+    longitude: string | null;
 }
 
 type Props = {
@@ -38,6 +45,7 @@ const SensorReadings = ({ locationsData }: Props) => {
 
     const { locationId } = useLocationStore();
     const [locationName, setLocationName] = useState("");
+    const [currentLocation, setCurrentLocation] = useState<ILocation | undefined>()
     const [sensorData, setSensorData] = useState<ILocationData>();
 
     // Handle setting location name whenever locations or locationId changes
@@ -47,6 +55,7 @@ const SensorReadings = ({ locationsData }: Props) => {
             if (selectedLocation) {
                 setLocationName(selectedLocation.locationName);
             }
+            setCurrentLocation(selectedLocation);
         }
     }, [locationsData, locationId]);
 
@@ -56,11 +65,11 @@ const SensorReadings = ({ locationsData }: Props) => {
             const data = (selectedLocation?.locationID && selectedLocation?.locationID !== locationId.toString())
                 ? await fetchUniqueLocation(selectedLocation.locationID)
                 : await fetchUniqueLocation(locationId.toString());
-
             setSensorData(data);
         };
 
         fetchLocationData();
+        setCurrentLocation(selectedLocation);
     }, [locationsData, locationId, locationName]);
 
     const AQIData = useMemo(() => {
@@ -68,6 +77,23 @@ const SensorReadings = ({ locationsData }: Props) => {
             return calculateOverallAqi(sensorData);
         }
     }, [sensorData]);
+
+    const LocationMapSection = useMemo(() => {
+        return (
+            <div className="mb-12 relative">
+                <h2 className="mb-4 text-xl font-semibold text-gray-800">Sensor Location</h2>
+                <div className="h-[400px] w-full overflow-hidden rounded-lg border border-gray-200">
+                    <div className="relative h-full w-full bg-gray-200">
+                        <MapLocation
+                            key={`${currentLocation?.latitude}-${currentLocation?.longitude}`}
+                            latitude={currentLocation?.latitude!}
+                            longitude={currentLocation?.longitude!}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }, [currentLocation]);
 
     const handleLocationChange = (locationId: string) => {
         const selectedLocation = locationsData.find(loc => loc.locationID === locationId);
@@ -101,7 +127,7 @@ const SensorReadings = ({ locationsData }: Props) => {
                 </Select>
             </div>
 
-            <hr className="border-teal-300 my-8" />
+            <hr className="border-[#05b15d] my-8" />
 
             <h1 className="mb-6 text-3xl font-bold text-gray-900">{locationName}</h1>
 
@@ -229,28 +255,7 @@ const SensorReadings = ({ locationsData }: Props) => {
             </Card>
 
             {/* Sensor Location Map */}
-            <div className="mb-12">
-                <h2 className="mb-4 text-xl font-semibold text-gray-800">Sensor Location</h2>
-                <div className="h-[400px] w-full overflow-hidden rounded-lg border border-gray-200">
-                    {/* This would be a Google Maps component in a real application */}
-                    <div className="relative h-full w-full bg-gray-200">
-                        <div className="absolute left-0 top-0 z-10 m-2 flex">
-                            <button className="rounded-l-md bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                Map
-                            </button>
-                            <button className="rounded-r-md bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                Satellite
-                            </button>
-                        </div>
-                        <div className="h-full w-full bg-[#e5e3df]">
-                            {/* Sample map placeholder */}
-                            <div className="flex h-full w-full items-center justify-center">
-                                <p className="text-xl text-gray-500">Map data would appear here</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {LocationMapSection}
         </div>
     )
 }
