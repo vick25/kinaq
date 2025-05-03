@@ -10,8 +10,8 @@ type MapLocationProps = {
 }
 
 const mapStyle = {
-    streets: 'https://demotiles.maplibre.org/style.json',
-    satellite: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json' // Hybrid alternative
+    streets: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+    satellite: 'https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/arcgis_hybrid.json' // Hybrid alternative
 }
 
 const MapLocation = ({ latitude, longitude }: MapLocationProps) => {
@@ -28,7 +28,8 @@ const MapLocation = ({ latitude, longitude }: MapLocationProps) => {
             container: mapContainer.current!,
             style: mapStyle[styleType],
             center: [parseFloat(longitude), parseFloat(latitude)],
-            zoom: 13
+            zoom: 15,
+            maxZoom: 15
         })
 
         markerRef.current = new maplibregl.Marker()
