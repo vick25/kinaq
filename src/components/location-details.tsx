@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import { fetchLocationData, fetchUniqueLocation } from "@/actions/airGradientData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -151,8 +152,16 @@ export default function LocationDetails() {
                   <p><span className="font-semibold">{formatTo2Places(locationData?.pm10)}</span>&nbsp;μg/m³</p>
                 </div>
                 <div className="flex justify-between">
-                  <span>NO2</span>
+                  <span>CO2</span>
+                  <p><span className="font-semibold">{formatTo2Places(locationData?.rco2)}</span></p>
+                </div>
+                <div className="flex justify-between">
+                  <span>NOx</span>
                   <p><span className="font-semibold">{formatTo2Places(locationData?.noxIndex)}</span>&nbsp;ppb</p>
+                </div>
+                <div className="flex justify-between">
+                  <span>TVOC</span>
+                  <p><span className="font-semibold">{formatTo2Places(locationData?.tvoc)}</span></p>
                 </div>
               </div>
             </div>
@@ -200,7 +209,7 @@ export default function LocationDetails() {
             </div>
           </div>
         </div>
-        <div className="text-center text-xs text-muted-foreground">© Copyright WASARU {new Date().getFullYear()}</div>
+        <div className="mt-3 text-center text-xs text-muted-foreground">© Copyright WASARU {new Date().getFullYear()}</div>
       </footer>
     </div>
   )
