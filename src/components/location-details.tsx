@@ -2,6 +2,7 @@
 
 import { fetchLocationData, fetchUniqueLocation } from "@/actions/airGradientData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { COLORS, ILocationData } from "@/lib/definitions";
 import { calculateOverallAqi, formatDateToLocaleString, formatTo2Places, getAqiDescription } from "@/lib/utils";
@@ -73,7 +74,7 @@ export default function LocationDetails() {
       {
         // loading ? <div>Loading ...</div> :
         locationData ?
-          <div className="space-y-5">
+          <div className="space-y-4">
             <div>
               <h2 className="text-2xl font-bold mb-2">Location details</h2>
               <div className="flex justify-between items-center gap-3 text-sm text-muted-foreground">
@@ -111,60 +112,62 @@ export default function LocationDetails() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <Card>
-                <CardHeader className="p-3">
-                  <CardTitle className="flex items-center text-sm font-medium">
-                    <Thermometer className="mr-2 h-4 w-4" />
-                    Temperature
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-3 pt-0">
-                  <div className="text-lg font-bold">{formatTo2Places(locationData?.atmp)} °C</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="p-3">
-                  <CardTitle className="flex items-center text-sm font-medium">
-                    <Droplets className="mr-2 h-4 w-4" />
-                    Humidity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-3 pt-0">
-                  <div className="text-lg font-bold">{formatTo2Places(locationData?.rhum)} %</div>
-                </CardContent>
-              </Card>
-            </div>
+            <ScrollArea className="max-h-auto">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <Card>
+                  <CardHeader className="p-3">
+                    <CardTitle className="flex items-center text-sm font-medium">
+                      <Thermometer className="mr-2 h-4 w-4" />
+                      Temperature
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-3 pt-0">
+                    <div className="text-lg font-bold">{formatTo2Places(locationData?.atmp)} °C</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="p-3">
+                    <CardTitle className="flex items-center text-sm font-medium">
+                      <Droplets className="mr-2 h-4 w-4" />
+                      Humidity
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-3 pt-0">
+                    <div className="text-lg font-bold">{formatTo2Places(locationData?.rhum)} %</div>
+                  </CardContent>
+                </Card>
+              </div>
 
-            <div className="space-y-4">
-              <h3 className="font-semibold">Pollutants</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>PM01</span>
-                  <p><span className="font-semibold">{formatTo2Places(locationData?.pm01)}</span>&nbsp;μg/m³</p>
-                </div>
-                <div className="flex justify-between">
-                  <span>PM2.5</span>
-                  <p><span className="font-semibold">{formatTo2Places(locationData?.pm02)}</span>&nbsp;μg/m³</p>
-                </div>
-                <div className="flex justify-between">
-                  <span>PM10</span>
-                  <p><span className="font-semibold">{formatTo2Places(locationData?.pm10)}</span>&nbsp;μg/m³</p>
-                </div>
-                <div className="flex justify-between">
-                  <span>CO2</span>
-                  <p><span className="font-semibold">{formatTo2Places(locationData?.rco2)}</span></p>
-                </div>
-                <div className="flex justify-between">
-                  <span>NOx</span>
-                  <p><span className="font-semibold">{formatTo2Places(locationData?.noxIndex)}</span>&nbsp;ppb</p>
-                </div>
-                <div className="flex justify-between">
-                  <span>TVOC</span>
-                  <p><span className="font-semibold">{formatTo2Places(locationData?.tvoc)}</span></p>
+              <div className="space-y-4">
+                <h3 className="font-semibold">Pollutants</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>PM01</span>
+                    <p><span className="font-semibold">{formatTo2Places(locationData?.pm01)}</span>&nbsp;μg/m³</p>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>PM2.5</span>
+                    <p><span className="font-semibold">{formatTo2Places(locationData?.pm02)}</span>&nbsp;μg/m³</p>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>PM10</span>
+                    <p><span className="font-semibold">{formatTo2Places(locationData?.pm10)}</span>&nbsp;μg/m³</p>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>CO2</span>
+                    <p><span className="font-semibold">{formatTo2Places(locationData?.rco2)}</span></p>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>NOx</span>
+                    <p><span className="font-semibold">{formatTo2Places(locationData?.noxIndex)}</span>&nbsp;ppb</p>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>TVOC</span>
+                    <p><span className="font-semibold">{formatTo2Places(locationData?.tvoc)}</span></p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </ScrollArea>
           </div> :
           <div className="text-sm text-center font-medium animate-pulse text-green-700">No data found. Click on a location !</div>
       }
@@ -211,6 +214,6 @@ export default function LocationDetails() {
         </div>
         <div className="mt-3 text-center text-xs text-muted-foreground">© Copyright WASARU {new Date().getFullYear()}</div>
       </footer>
-    </div>
+    </div >
   )
 }
