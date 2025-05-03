@@ -1,7 +1,6 @@
 import Header from "@/components/header";
 import NextProgress from "@/components/next-progress";
 import { Toast } from "@/components/toast-component";
-import { getUser } from "@/lib/auth-session";
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from 'next-intl';
@@ -24,7 +23,6 @@ export default async function RootLayout({
 
   const messages = await getMessages();
   const locale = await getLocale();
-  const user = await getUser();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -32,7 +30,7 @@ export default async function RootLayout({
         <Toast />
         <NextIntlClientProvider messages={messages}>
           <main className="flex flex-col min-h-screen">
-            <Header session={user || null} />
+            <Header />
             {children}
             <NextProgress />
             <Analytics />

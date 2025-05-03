@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { auth } from "./auth";
-import { unauthorized } from "next/navigation";
+// import { unauthorized } from "next/navigation";
 
 export const getUser = async () => {
     const session = await auth.api.getSession({
@@ -14,7 +14,8 @@ export const getUser = async () => {
 export const getRequiredUser = async () => {
     const user = await getUser();
     if (!user) {
-        unauthorized();
+        return null;
+        // unauthorized();
     }
     return user;
 };

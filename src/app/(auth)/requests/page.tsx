@@ -1,11 +1,14 @@
 import { getRequestData } from '@/actions/populateTables';
 import RequestsTable from '@/components/requests-table';
 import { getUser } from '@/lib/auth-session';
+import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 const DownloadRequestsPage = async () => {
     const user = await getUser();
     const requests = user ? await getRequestData(user) : [];
+
+    if (!user) redirect('/historical');
 
     return (
         <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8">

@@ -1,6 +1,11 @@
 import { Building2, Database, Globe, Mail, Users } from "lucide-react";
 import Link from "next/link";
 
+export const metadata = {
+    title: 'KINAQ | About Us',
+    description: 'Download air quality data from KINAQ',
+}
+
 const AboutPage = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
@@ -106,7 +111,6 @@ const AboutPage = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     );

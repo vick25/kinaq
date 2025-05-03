@@ -106,8 +106,8 @@ const SensorReadings = ({ locationsData }: Props) => {
         <div className="container mx-auto px-4 py-8">
             <div>
                 <Select onValueChange={handleLocationChange}
-                    value={locationsData.find(loc => loc.locationName === locationName)?.locationID}
-                    defaultValue={locationsData.find(loc => loc.locationName === locationName)?.locationID}>
+                    value={currentLocation?.locationID}
+                    defaultValue={currentLocation?.locationID}>
                     <SelectTrigger className="w-[280px]">
                         <SelectValue placeholder="Select a location" />
                     </SelectTrigger>
@@ -116,10 +116,10 @@ const SensorReadings = ({ locationsData }: Props) => {
                             <SelectLabel>Locations</SelectLabel>
                             {locationsData.map((location) => (
                                 <SelectItem
-                                    key={location.id}
-                                    value={location.locationID}
+                                    key={location?.id}
+                                    value={location?.locationID}
                                 >
-                                    {location.locationName}
+                                    {location?.locationName}
                                 </SelectItem>
                             ))}
                         </SelectGroup>

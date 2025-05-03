@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { getRequiredUser } from "@/lib/auth-session";
 import { IUser } from "@/lib/definitions";
 import { cn } from "@/lib/utils";
 import { LogIn, LogOut, Menu, Search, Settings, User } from "lucide-react";
@@ -12,17 +13,27 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import LocaleSwitcher from "./locale-switcher";
 
-function Header({ session }: { session: IUser | null }) {
+function Header() {
+  const [session, setSession] = useState<IUser | null>(null)
   const router = useRouter()
   const t = useTranslations('HomePage')
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    const fetchSession = async () => {
+      const s = await getRequiredUser();
+      setSession(s);
+    }
+    fetchSession();
+  }, [])
+
   const handleSignOut = async () => {
+    setSession(await getRequiredUser());
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {

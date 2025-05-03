@@ -214,7 +214,7 @@ export default function ExportData({ locationQuery, locationsData }: Props) {
                                 <SelectLabel>Locations</SelectLabel>
                                 {locationsData.length > 0 ? (
                                     locationsData.map((location) => (
-                                        <SelectItem value={location.locationID} key={location.locationID}>{location.locationName}</SelectItem>
+                                        <SelectItem value={location?.locationID} key={location?.locationID}>{location?.locationName}</SelectItem>
                                     ))
                                 ) : (
                                     <SelectItem value="loading" disabled>Loading locations...</SelectItem>
