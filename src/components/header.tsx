@@ -4,25 +4,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { authClient } from "@/lib/auth-client";
 import { IUser } from "@/lib/definitions";
 import { cn } from "@/lib/utils";
 import { LogIn, LogOut, Menu, Search, Settings, User } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import LocaleSwitcher from "./locale-switcher";
 
 function Header({ session }: { session: IUser | null }) {
   const router = useRouter()
   const t = useTranslations('HomePage')
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme()
-  const [open, setOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -37,13 +33,13 @@ function Header({ session }: { session: IUser | null }) {
     });
   }
 
-  const handleThemeToggle = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation()
-      setTheme(theme === "dark" ? "light" : "dark")
-    },
-    [theme, setTheme],
-  );
+  // const handleThemeToggle = useCallback(
+  //   (e: React.MouseEvent) => {
+  //     e.stopPropagation()
+  //     setTheme(theme === "dark" ? "light" : "dark")
+  //   },
+  //   [theme, setTheme],
+  // );
 
   const navLinks = [
     { href: "/", label: `${t('menu1')}` },
@@ -171,10 +167,10 @@ function Header({ session }: { session: IUser | null }) {
                 {session && <Link href="/requests" className="block text-sm">
                   My Data
                 </Link>}
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                   <span className="text-sm">Dark mode</span>
                   <Switch onClick={handleThemeToggle} />
-                </div>
+                </div> */}
                 <Link href="/settings" className="block text-sm">
                   Settings
                 </Link>
