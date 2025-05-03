@@ -13,6 +13,7 @@ export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
+    trustedOrigins: [process.env.VERCEL_URL! || "http://localhost:3000"],
     advanced: {
         useSecureCookies: process.env.NODE_ENV === "production",
     },

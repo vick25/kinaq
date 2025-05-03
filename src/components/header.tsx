@@ -15,7 +15,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useCallback, useRef, useState } from "react";
-import AboutDialog from "./about-dialog";
 import LocaleSwitcher from "./locale-switcher";
 
 function Header({ session }: { session: IUser | null }) {
@@ -79,28 +78,16 @@ function Header({ session }: { session: IUser | null }) {
           </div>
           <nav className="hidden md:flex md:gap-5 items-center space-x-4">
             {navLinks.map((link) => (
-              link.href.includes('about') ?
-                <Link
-                  key={link.href}
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setOpen(true)
-                  }}
-                  className="text-sm text-muted-foreground font-medium hover:text-primary transition-colors"
-                >
-                  {link.label}
-                </Link> :
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-primary",
-                    pathname === link.href ? "text-primary font-bold border-b-2 border-primary" : "text-muted-foreground",
-                  )}
-                >
-                  {link.label}
-                </Link>
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  pathname === link.href ? "text-primary font-bold border-b-2 border-primary" : "text-muted-foreground",
+                )}
+              >
+                {link.label}
+              </Link>
             ))}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -150,7 +137,6 @@ function Header({ session }: { session: IUser | null }) {
             <span className="sr-only">Toggle menu</span>
           </Button>
         </div>
-        <AboutDialog open={open} onOpenChange={setOpen} />
       </div>
       {mobileMenuOpen && (
         <div className="md:hidden border-t">
