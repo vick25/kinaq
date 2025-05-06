@@ -18,6 +18,7 @@ const SignUpForm = () => {
             email,
             type: 'sign-in'
         });
+        console.log({ data, error })
 
         if (error || !data?.success) {
             console.error('OTP sending error:', error)
@@ -28,7 +29,7 @@ const SignUpForm = () => {
     }
 
     return (
-        <form action={handleSubmit} className="flex flex-col gap-4 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form id='formSignUp' action={handleSubmit} className="flex flex-col gap-4 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <h3 className="text-lg font-semibold text-gray-800 text-center mb-2">
                 Authentication through Email:
             </h3>
