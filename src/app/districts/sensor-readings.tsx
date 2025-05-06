@@ -32,31 +32,27 @@ interface ILocation {
     longitude: string | null;
 }
 
-type Props = {
-    locationsData: ILocation[];
-};
-
-const SensorReadings = ({ locationsData }: Props) => {
+const SensorReadings = () => {
     const locale = useLocale();
     const { data: session } = authClient.useSession();
 
-    const { locationId } = useLocationStore();
+    const { locationId, locations } = useLocationStore();
     const [locationName, setLocationName] = useState("");
     const [currentLocation, setCurrentLocation] = useState<ILocation | undefined>();
     const [sensorData, setSensorData] = useState<ILocationData>();
 
     useEffect(() => {
-        if (locationId && locationsData.length > 0) {
-            const selectedLocation = locationsData.find(loc => loc.locationID === locationId.toString());
+        if (locationId && locations.length > 0) {
+            const selectedLocation = locations.find(loc => loc.locationID === locationId.toString());
             if (selectedLocation) {
                 setLocationName(selectedLocation.locationName);
                 setCurrentLocation(selectedLocation);
             }
         }
-    }, [locationsData, locationId]);
+    }, [locations, locationId]);
 
     useEffect(() => {
-        const selectedLocation = locationsData.find(loc => loc.locationName === locationName);
+        const selectedLocation = locations.find(loc => loc.locationName === locationName);
         if (!selectedLocation) return;
 
         const fetchLocationData = async () => {
@@ -67,12 +63,12 @@ const SensorReadings = ({ locationsData }: Props) => {
         };
 
         fetchLocationData();
-    }, [locationName, locationsData]);
+    }, [locationName, locations]);
 
     const AQIData = sensorData ? calculateOverallAqi(sensorData) : undefined;
 
     const handleLocationChange = (locationId: string) => {
-        const selectedLocation = locationsData.find(loc => loc.locationID === locationId);
+        const selectedLocation = locations.find(loc => loc.locationID === locationId);
         if (selectedLocation) {
             setLocationName(selectedLocation.locationName);
         }
@@ -91,7 +87,7 @@ const SensorReadings = ({ locationsData }: Props) => {
                     <SelectContent>
                         <SelectGroup>
                             <SelectLabel>Locations</SelectLabel>
-                            {locationsData.map((location) => (
+                            {locations.map((location) => (
                                 <SelectItem
                                     key={location.locationID}
                                     value={location.locationID}

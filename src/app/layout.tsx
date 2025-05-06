@@ -1,4 +1,6 @@
+import { getLocations } from "@/actions/populateTables";
 import Header from "@/components/header";
+import LocationsInitializer from "@/components/location-initializer";
 import NextProgress from "@/components/next-progress";
 import { Toast } from "@/components/toast-component";
 import { Analytics } from "@vercel/analytics/react";
@@ -23,6 +25,7 @@ export default async function RootLayout({
 
   const messages = await getMessages();
   const locale = await getLocale();
+  const locationsData = await getLocations();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -31,7 +34,9 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <main className="flex flex-col min-h-screen">
             <Header />
-            {children}
+            <LocationsInitializer locationsData={locationsData}>
+              {children}
+            </LocationsInitializer>
             <NextProgress />
             <Analytics />
           </main>

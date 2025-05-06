@@ -1,4 +1,3 @@
-import { getLocations } from '@/actions/populateTables'
 import ExportData from '@/components/export-data'
 import { getUser } from '@/lib/auth-session'
 import SignInForm from '../signIn-form'
@@ -15,8 +14,6 @@ export const metadata = {
 
 const Historical = async ({ searchParams }: PageProps) => {
     const session = await getUser();
-    const locationsData = await getLocations();
-
     const { signup, email, locq } = await searchParams
     const showSignIn = signup === 'login'
     const showExport = signup === 'success'
@@ -62,7 +59,7 @@ const Historical = async ({ searchParams }: PageProps) => {
                 </div>
             </section>
 
-            {isAuthenticated && <ExportData locationQuery={locq as string} locationsData={locationsData} />}
+            {isAuthenticated && <ExportData locationQuery={locq as string} />}
         </div>
     )
 }

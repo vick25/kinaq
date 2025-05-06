@@ -20,17 +20,10 @@ import { Button } from "./ui/button";
 
 type Props = {
     locationQuery: string;
-    locationsData: ILocation[];
 }
 
-interface ILocation {
-    id: number;
-    locationName: string;
-    locationID: string;
-}
-
-export default function ExportData({ locationQuery, locationsData }: Props) {
-    const { locationId } = useLocationStore();
+export default function ExportData({ locationQuery }: Props) {
+    const { locationId, locations } = useLocationStore();
 
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
@@ -65,7 +58,7 @@ export default function ExportData({ locationQuery, locationsData }: Props) {
             const datePart = (startDate && endDate) ?
                 `${formatToYYYYMMDD(startDate as string)}-${formatToYYYYMMDD(endDate as string)}` :
                 new Date().toISOString().split('T')[0];
-            const locationNamePart = locationsData.find(loc => loc.locationID === selectedLocation)?.locationName.replace(/\s+/g, '_') || selectedLocation;  // Use name or ID
+            const locationNamePart = locations.find(loc => loc.locationID === selectedLocation)?.locationName.replace(/\s+/g, '_') || selectedLocation;  // Use name or ID
             const baseFilename = `Export_${locationNamePart}_${selectedBucket}_${datePart.replace(/-/g, '_')}`;
 
             // Fetch data from the API
@@ -149,26 +142,26 @@ export default function ExportData({ locationQuery, locationsData }: Props) {
 
     // Add this effect to handle locationQuery
     useEffect(() => {
-        if (locationQuery && locationsData.length > 0) {
-            const location = locationsData.find(loc => loc.locationName === locationQuery);
+        if (locationQuery && locations.length > 0) {
+            const location = locations.find(loc => loc.locationName === locationQuery);
             if (location) {
                 setSelectedLocation(location.locationID);
             }
         }
-    }, [locationQuery, locationsData]);
+    }, [locationQuery, locations]);
 
     // Modify the existing effect to handle both locationId and locationQuery
     useEffect(() => {
-        if (locationsData.length > 0) {
+        if (locations.length > 0) {
             let selectedLoc;
             if (locationId) {
-                selectedLoc = locationsData.find(loc => loc.locationID === locationId.toString());
+                selectedLoc = locations.find(loc => loc.locationID === locationId.toString());
             }
             if (selectedLoc) {
                 setSelectedLocation(selectedLoc.locationID);
             }
         }
-    }, [locationsData, locationId]);
+    }, [locations, locationId]);
 
     // Effect to update download button disable state
     useEffect(() => {
@@ -212,8 +205,8 @@ export default function ExportData({ locationQuery, locationsData }: Props) {
                         <SelectContent>
                             <SelectGroup>
                                 <SelectLabel>Locations</SelectLabel>
-                                {locationsData.length > 0 ? (
-                                    locationsData.map((location) => (
+                                {locations.length > 0 ? (
+                                    locations.map((location) => (
                                         <SelectItem value={location?.locationID} key={location?.locationID}>{location?.locationName}</SelectItem>
                                     ))
                                 ) : (

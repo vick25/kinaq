@@ -1,4 +1,3 @@
-import { getLocations } from '@/actions/populateTables';
 import { Card, CardContent } from "@/components/ui/card";
 import React, { Suspense } from 'react';
 
@@ -10,11 +9,10 @@ export const metadata = {
 }
 
 export default async function Districts() {
-    const locationsData = await getLocations();
     return (
         <div className='container mx-auto px-4 py-12'>
             <Suspense fallback={<AQILoadingFallback />}>
-                <SensorReadings locationsData={locationsData} />
+                <SensorReadings />
             </Suspense>
         </div>
     );
