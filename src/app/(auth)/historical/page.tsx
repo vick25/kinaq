@@ -22,6 +22,9 @@ const Historical = async ({ searchParams }: PageProps) => {
     const showExport = signup === 'success'
     const loggedInEmail = typeof email === 'string' ? email : ''
 
+    const shouldShowSignUp = !showSignIn && !showExport;
+    const isAuthenticated = session || showExport;
+
     return (
         <div className='container mx-auto'>
             <section className='my-5 space-y-4'>
@@ -47,11 +50,7 @@ const Historical = async ({ searchParams }: PageProps) => {
 
                     {!session && (
                         <div className="my-6 bg-white border shadow-md rounded-md p-6 max-w-3xl mx-auto">
-                            {!showSignIn && !showExport && (
-                                <div>
-                                    <SignUpForm />
-                                </div>
-                            )}
+                            {shouldShowSignUp && <SignUpForm />}
 
                             {showSignIn && (
                                 <div id="email_code_block">
@@ -63,7 +62,7 @@ const Historical = async ({ searchParams }: PageProps) => {
                 </div>
             </section>
 
-            {(session || showExport) && <ExportData locationQuery={locq as string} locationsData={locationsData} />}
+            {isAuthenticated && <ExportData locationQuery={locq as string} locationsData={locationsData} />}
         </div>
     )
 }

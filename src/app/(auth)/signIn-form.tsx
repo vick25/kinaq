@@ -13,7 +13,11 @@ const SignInForm = ({ loggedInEmail }: Props) => {
 
     async function handleSubmit(formdata: FormData) {
         'use server';
-        const code = formdata.get('code');
+
+        const code = (formdata.get('code') as string).trim();
+        if (!/^\d{6}$/.test(code)) {
+            return redirect(`/historical?signup=login`);
+        }
 
         // Sign in with emailed OTP
         const response = await auth.api.signInEmailOTP({
@@ -25,13 +29,15 @@ const SignInForm = ({ loggedInEmail }: Props) => {
             headers: await headers(),
         });
 
-        if (response !== null && response.status !== 200) {
-            return redirect(`/historical?signup=login`);
+        if (!response || !response.status) {
+            return redirect(`/historical`);
         }
+
         if (response.status === 200) {
             return redirect(`/historical?signup=success`);
         }
-        return redirect(`/historical`);
+
+        return redirect(`/historical?signup=login`);
     }
 
     return (

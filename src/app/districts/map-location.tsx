@@ -1,8 +1,8 @@
 'use client'
 
-import maplibregl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css'
-import { useEffect, useRef, useState } from 'react'
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import { useEffect, useRef, useState } from 'react';
 
 type MapLocationProps = {
     latitude: string
@@ -70,4 +70,4 @@ const MapLocation = ({ latitude, longitude }: MapLocationProps) => {
     )
 }
 
-export default MapLocation
+export default MapLocation;

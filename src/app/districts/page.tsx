@@ -1,7 +1,8 @@
 import { getLocations } from '@/actions/populateTables';
 import { Card, CardContent } from "@/components/ui/card";
-import { Suspense } from 'react';
-import SensorReadings from './sensor-readings';
+import React, { Suspense } from 'react';
+
+const SensorReadings = React.lazy(() => import('./sensor-readings'));
 
 export const metadata = {
     title: 'KINAQ | Zones',

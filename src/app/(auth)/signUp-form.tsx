@@ -8,26 +8,27 @@ const SignUpForm = () => {
     async function handleSubmit(formdata: FormData) {
         'use server';
 
-        const email = formdata.get('email');
-        if (!email) {
-            return;
+        const email = (formdata.get('email') as string)?.trim();
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return redirect('/historical?signup=invalid')
         }
         // Send the email OTP
         const { data, error } = await authClient.emailOtp.sendVerificationOtp({
-            email: email as string,
+            email,
             type: 'sign-in'
         });
-        if (error) {
-            console.error("Error sending OTP:", error)
-            return redirect('/historical');
+
+        if (error || !data?.success) {
+            console.error('OTP sending error:', error)
+            return redirect('/historical?signup=error')
         }
-        if (data.success) {
-            return redirect(`/historical?signup=login&email=${encodeURIComponent(email as string)}`);
-        }
+
+        return redirect(`/historical?signup=login&email=${encodeURIComponent(email)}`);
     }
 
     return (
-        <form action={handleSubmit} className="flex flex-col gap-1bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form action={handleSubmit} className="flex flex-col gap-4 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <h3 className="text-lg font-semibold text-gray-800 text-center mb-2">
                 Authentication through Email:
             </h3>
@@ -35,8 +36,9 @@ const SignUpForm = () => {
                 type="email"
                 name="email"
                 placeholder="Enter email address"
+                className="w-full"
+                required
             />
-            {/* Email Code Button */}
             <SubmitButton />
         </form>
     )
