@@ -2,42 +2,76 @@
 
 import { fetchLocationMeasures } from "@/actions/airGradientData";
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
+    Select, SelectContent, SelectGroup, SelectItem,
+    SelectLabel, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { ILocationMeasure, Usages } from "@/lib/definitions";
 import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
 import useLocationStore from "@/stores/location-store";
 import { Info, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "./ui/button";
 
 type Props = {
     locationQuery: string;
-}
+};
 
 export default function ExportData({ locationQuery }: Props) {
     const { locationId, locations } = useLocationStore();
 
-    const [startDate, setStartDate] = useState<string | undefined>();
-    const [endDate, setEndDate] = useState<string | undefined>();
-    const [selectedLocation, setSelectedLocation] = useState<string | undefined>();
-    const [selectedBucket, setSelectedBucket] = useState<string | undefined>();
+    const [startDate, setStartDate] = useState<string>();
+    const [endDate, setEndDate] = useState<string>();
+    const [selectedLocation, setSelectedLocation] = useState<string>();
+    const [selectedBucket, setSelectedBucket] = useState<string>();
     const [institution, setInstitution] = useState<string>('');
-    const [selectedUsage, setSelectedUsage] = useState<Usages | undefined>(Usages.academic_research);
+    const [selectedUsage, setSelectedUsage] = useState<Usages>(Usages.academic_research);
     const [isLoading, setIsLoading] = useState(false);
-    const [isDownloadDisabled, setIsDownloadDisabled] = useState(true);
+
+    const isDownloadDisabled = !selectedLocation || !selectedBucket;
+
+    const selectedLocationName = useMemo(() => {
+        return locations.find(loc => loc.locationID === selectedLocation)?.locationName ?? selectedLocation;
+    }, [locations, selectedLocation]);
+
+    useEffect(() => {
+        if (!locations.length) return;
+
+        const foundByQuery = locations.find(loc => loc.locationName === locationQuery);
+        const foundById = locationId && locations.find(loc => loc.locationID === locationId.toString());
+
+        if (foundByQuery) {
+            setSelectedLocation(foundByQuery.locationID);
+        } else if (foundById) {
+            setSelectedLocation(foundById.locationID);
+        }
+    }, [locations, locationQuery, locationId]);
+
+    const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newEndDate = e.target.value;
+        if (startDate && newEndDate < startDate) {
+            alert("End date cannot be earlier than the start date.");
+            e.target.value = endDate || '';
+        } else {
+            setEndDate(newEndDate);
+        }
+    };
+
+    const triggerFileDownload = (content: string, filename: string, mimeType: string) => {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
 
     const handleDownload = async (format: 'csv' | 'json') => {
         if (!selectedLocation || !selectedBucket) {
-            console.error("Missing required parameters for download.");
-            alert("Please select location, bucket.");
+            alert("Please select location and bucket.");
             return;
         }
 
@@ -46,7 +80,7 @@ export default function ExportData({ locationQuery }: Props) {
             return;
         }
 
-        if (endDate! < startDate!) {
+        if (startDate && endDate && endDate < startDate) {
             alert("End date cannot be earlier than the start date.");
             return;
         }
@@ -54,169 +88,79 @@ export default function ExportData({ locationQuery }: Props) {
         setIsLoading(true);
 
         try {
-            //Generate Filename
-            const datePart = (startDate && endDate) ?
-                `${formatToYYYYMMDD(startDate as string)}-${formatToYYYYMMDD(endDate as string)}` :
-                new Date().toISOString().split('T')[0];
-            const locationNamePart = locations.find(loc => loc.locationID === selectedLocation)?.locationName.replace(/\s+/g, '_') || selectedLocation;  // Use name or ID
-            const baseFilename = `Export_${locationNamePart}_${selectedBucket}_${datePart.replace(/-/g, '_')}`;
+            const datePart = (startDate && endDate)
+                ? `${formatToYYYYMMDD(startDate)}-${formatToYYYYMMDD(endDate)}`
+                : new Date().toISOString().split('T')[0];
 
-            // Fetch data from the API
-            const data: ILocationMeasure[] = await fetchLocationMeasures(`locations/${selectedLocation}/measures/${selectedBucket}`,
-                startDate as string, endDate as string);
+            const safeLocation = selectedLocationName?.replace(/\s+/g, '_');
+            const filename = `Export_${safeLocation}_${selectedBucket}_${datePart.replace(/-/g, '_')}`;
 
-            if (data) {
-                if (format === 'csv') {
-                    const csvData = convertToCSV(data);
-                    triggerFileDownload(csvData, `${baseFilename}.csv`, 'text/csv;charset=utf-8;');
-                } else if (format === 'json') {
-                    const jsonData = JSON.stringify(data, null, 2); // Pretty print JSON
-                    triggerFileDownload(jsonData, `${baseFilename}.json`, 'application/json;charset=utf-8;');
-                }
+            const data: ILocationMeasure[] = await fetchLocationMeasures(
+                `locations/${selectedLocation}/measures/${selectedBucket}`,
+                startDate ?? '', endDate ?? ''
+            );
 
-                // Update database after successful download
-                try {
-                    const response = await fetch('/api/export-data', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            institution,
-                            locationId: selectedLocation,
-                            bucket: selectedBucket,
-                            usage: selectedUsage,
-                            startDate,
-                            endDate,
-                            format
-                        }),
-                    });
+            if (!data?.length) throw new Error("No data returned from the API.");
 
-                    if (!response.ok) {
-                        throw new Error('Failed to update database');
-                    }
-                } catch (error) {
-                    console.error('Error updating database:', error);
-                }
+            if (format === 'csv') {
+                triggerFileDownload(convertToCSV(data), `${filename}.csv`, 'text/csv;charset=utf-8;');
             } else {
-                console.error("No data returned from the API.");
+                triggerFileDownload(JSON.stringify(data, null, 2), `${filename}.json`, 'application/json;charset=utf-8;');
             }
-        } catch (error) {
-            // Error already logged and message set in fetchExportData
-            console.error(`Download failed for ${format.toUpperCase()}:`, error);
-            // Error message state is already set by fetchExportData, no need to alert again unless desired
-            // alert(`Failed to download data: ${errorMessage || 'Unknown error'}`);
+
+            await fetch('/api/export-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    institution,
+                    locationId: selectedLocation,
+                    bucket: selectedBucket,
+                    usage: selectedUsage,
+                    startDate,
+                    endDate,
+                    format
+                }),
+            });
+        } catch (err) {
+            console.error('Export error:', err);
         } finally {
-            setIsLoading(false); // Stop loading indicator regardless of success or failure
-        }
-    }
-
-    // Handle End Date Change - includes validation against start date
-    const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newEndDate = e.target.value;
-
-        // Prevent setting end date if it's earlier than the start date
-        if (startDate && newEndDate < startDate) {
-            alert("End date cannot be earlier than the start date.");
-            // Optionally reset the input visually if needed: 
-            e.target.value = endDate || '';
-        } else {
-            setEndDate(newEndDate);
+            setIsLoading(false);
         }
     };
-
-    /**
-       * Triggers a browser file download.
-    */
-    const triggerFileDownload = (content: string, filename: string, mimeType: string) => {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a); // Append link to body
-        a.click(); // Programmatically click the link
-        document.body.removeChild(a); // Remove link from body
-        URL.revokeObjectURL(url); // Release the object URL
-    };
-
-    // Add this effect to handle locationQuery
-    useEffect(() => {
-        if (locationQuery && locations.length > 0) {
-            const location = locations.find(loc => loc.locationName === locationQuery);
-            if (location) {
-                setSelectedLocation(location.locationID);
-            }
-        }
-    }, [locationQuery, locations]);
-
-    // Modify the existing effect to handle both locationId and locationQuery
-    useEffect(() => {
-        if (locations.length > 0) {
-            let selectedLoc;
-            if (locationId) {
-                selectedLoc = locations.find(loc => loc.locationID === locationId.toString());
-            }
-            if (selectedLoc) {
-                setSelectedLocation(selectedLoc.locationID);
-            }
-        }
-    }, [locations, locationId]);
-
-    // Effect to update download button disable state
-    useEffect(() => {
-        // Enable button only if both location and bucket are selected
-        if (selectedLocation && selectedBucket) {
-            setIsDownloadDisabled(false);
-        } else {
-            setIsDownloadDisabled(true);
-        }
-    }, [selectedLocation, selectedBucket]);
 
     return (
         <section className="pb-10">
-            {/* Main Content */}
             <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h2 className="text-2xl font-semibold text-[#05b15d]">Export Data as CSV</h2>
 
-                {/* Warning Box */}
                 <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mt-4 flex gap-2">
                     <Info className="text-xl" />
                     <p className="text-sm">
                         <strong>All data are uncorrected values</strong>
                         <br />
-                        All air quality parameters exported are raw values. We recommend applying
-                        correction algorithms. See more at{" "}
+                        Air quality parameters are raw values. Apply corrections. See{" "}
                         <Link href="https://www.airgradient.com/documentation/correction-algorithms/" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">
                             Correction Algorithms
                         </Link>.
                     </p>
                 </div>
 
-                {/* Filters */}
                 <div className="mt-6 flex items-center flex-wrap gap-4">
-                    <Select
-                        value={selectedLocation}
-                        defaultValue={selectedLocation}
-                        onValueChange={(value) => setSelectedLocation(value)}>
+                    <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select a location" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
                                 <SelectLabel>Locations</SelectLabel>
-                                {locations.length > 0 ? (
-                                    locations.map((location) => (
-                                        <SelectItem value={location?.locationID} key={location?.locationID}>{location?.locationName}</SelectItem>
-                                    ))
-                                ) : (
-                                    <SelectItem value="loading" disabled>Loading locations...</SelectItem>
-                                )}
+                                {locations.map(loc => (
+                                    <SelectItem key={loc.locationID} value={loc.locationID}>{loc.locationName}</SelectItem>
+                                ))}
                             </SelectGroup>
                         </SelectContent>
                     </Select>
 
-                    <Select onValueChange={(value) => setSelectedBucket(value)}>
+                    <Select onValueChange={setSelectedBucket}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select bucket" />
                         </SelectTrigger>
@@ -234,7 +178,6 @@ export default function ExportData({ locationQuery }: Props) {
                         </p>}
                 </div>
 
-                {/* Date Inputs */}
                 <div className="mt-4 flex items-center flex-wrap gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Start date</label>
@@ -260,11 +203,8 @@ export default function ExportData({ locationQuery }: Props) {
                 </div>
 
                 <fieldset className="mt-6 border border-gray-300 p-4 rounded-md">
-                    <legend className="text-base font-semibold text-gray-600 px-2">
-                        Usage Information
-                    </legend>
+                    <legend className="text-base font-semibold text-gray-600 px-2">Usage Information</legend>
 
-                    {/* Institution Input */}
                     <div className="mt-3">
                         <label htmlFor="institution" className="block text-sm font-medium text-gray-700">
                             Institution / Company Name
@@ -276,17 +216,12 @@ export default function ExportData({ locationQuery }: Props) {
                             value={institution}
                             onChange={(e) => setInstitution(e.target.value)}
                             className="mt-1 border p-2 rounded-md w-full focus:border-blue-500 focus:ring-blue-500"
-                            placeholder="e.g., University of Example, Example Corp"
                         />
                     </div>
 
-                    {/* Usage Radio Buttons */}
                     <div className="mt-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Primary Usage
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Primary Usage</label>
                         <div className="flex flex-col sm:flex-row sm:flex-wrap gap-x-6 gap-y-2">
-                            {/* Layout radios */}
                             {Object.keys(Usages)
                                 .filter(key => isNaN(Number(key)))
                                 .map((usageKey) => (
@@ -310,16 +245,17 @@ export default function ExportData({ locationQuery }: Props) {
                     </div>
                 </fieldset>
 
-                <Button className={`mt-6 bg-orange-500 text-white py-2 px-6 rounded-md text-lg font-semibold hover:bg-orange-600
-                                ${isDownloadDisabled ? 'opacity-50 cursor-not-allowed' : ''} `}
-                    onClick={() => handleDownload('csv')}>
+                <Button
+                    className={`mt-6 bg-orange-500 text-white py-2 px-6 rounded-md text-lg font-semibold hover:bg-orange-600
+                        ${isDownloadDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={() => handleDownload('csv')}
+                    disabled={isDownloadDisabled}
+                >
                     {isLoading ? (
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center">
                             <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Downloading...
                         </div>
-                    ) : (
-                        'Download'
-                    )}
+                    ) : 'Download'}
                 </Button>
             </div>
         </section>
