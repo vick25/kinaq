@@ -1,3 +1,4 @@
+import { populateLocationsTable } from "@/actions/populateTables";
 import LocationDetails from "@/components/location-details";
 import MapComponent from "@/components/map";
 import React from "react";
@@ -20,9 +21,10 @@ export default function Home() {
 };
 
 async function MapContent() {
-  // setInterval(async () => {
-  //   await populateLocationsTable();
-  // }, 300000);
+  setInterval(async () => {
+    console.log('Filling locations table...')
+    await populateLocationsTable();
+  }, 300000);
   // const gradientData = (await fetchKinAQData()) || [];
   return (
     <MapComponent />
