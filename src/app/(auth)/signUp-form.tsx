@@ -40,7 +40,7 @@ const SignUpForm = () => {
                 className="w-full"
                 required
             />
-            <SubmitButton />
+            <SubmitButton primaryText='Email Code' secondaryText='Emailing code...' />
         </form>
     )
 }

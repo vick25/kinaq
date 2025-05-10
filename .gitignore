@@ -48,3 +48,6 @@ next-env.d.ts
 *.txt
 
 # src/app/generated
+
+#vscode
+.vscode

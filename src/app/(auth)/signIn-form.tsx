@@ -1,3 +1,4 @@
+import { SubmitButton } from '@/components/submit-button';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { auth } from '@/lib/auth';
@@ -50,9 +51,7 @@ const SignInForm = ({ loggedInEmail }: Props) => {
                 <Input type="text" name="code" placeholder="123456" />
             </div>
             <div className='flex space-x-4 items-center justify-center'>
-                <Button type='submit' className="mt-4 w-full bg-[#05b15d] text-white py-2 rounded-md text-lg font-medium hover:bg-green-600" id="btn_proceed_email">
-                    Sign-in with code
-                </Button>
+                <SubmitButton primaryText='Sign-in with code' secondaryText='Signing in...' />
 
                 {/* <CancelSignInForm /> */}
                 <Button asChild className="mt-4 w-full bg-[#b11605] text-white py-2 rounded-md text-lg font-medium hover:bg-red-600" id="btn_proceed_ed">
