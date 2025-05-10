@@ -47,7 +47,7 @@ next-env.d.ts
 *copy.tsx
 *.txt
 
-# src/app/generated
+src/generated
 
 #vscode
 .vscode
