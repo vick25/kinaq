@@ -16,7 +16,7 @@ export async function fetchAllAirGradientData() {
         }
         return await response.json();
     } catch (error) {
-        console.error("Failed to fetch Air Gradient data:", error);
+        console.error("Failed to fetch all Air Gradient data:", error);
         return null;
     }
 }
@@ -30,7 +30,7 @@ export async function fetchLocationData(locationId: string) {
         });
         return await response.json();
     } catch (error) {
-        console.error("Failed to fetch Air Gradient data:", error);
+        console.error("Failed to fetch world Location Gradient data:", error);
         return null;
     }
 }
@@ -48,7 +48,7 @@ export async function fetchKinAQData() {
         // revalidatePath('/');
         return await response.json();
     } catch (error) {
-        console.error("Failed to fetch Air Gradient data:", error);
+        console.error("Failed to KinAQ Air Gradient data:", error);
         return null;
     }
 }
@@ -63,7 +63,7 @@ export async function fetchUniqueLocation(locationID: string) {
         });
         return await response.json();
     } catch (error) {
-        console.error("Failed to fetch Air Gradient data:", error);
+        console.error("Failed to fetch KINAQ location Air Gradient data:", error);
         return null;
     }
 }

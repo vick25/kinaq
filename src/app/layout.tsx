@@ -28,7 +28,7 @@ export default async function RootLayout({
   const locationsData = await getLocations();
 
   return (
-    <html lang={locale} className="h-full" suppressHydrationWarning>
+    <html lang={locale} className="h-dvh" suppressHydrationWarning>
       <body className={inter.className}>
         <Toast />
         <NextIntlClientProvider messages={messages}>
