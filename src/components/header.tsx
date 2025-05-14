@@ -6,34 +6,25 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { getRequiredUser } from "@/lib/auth-session";
-import { IUser } from "@/lib/definitions";
 import { cn } from "@/lib/utils";
 import { LogIn, LogOut, Menu, Search, Settings, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import LocaleSwitcher from "./locale-switcher";
 
 function Header() {
-  const [session, setSession] = useState<IUser | null>(null)
+  const { data: session } = authClient.useSession();
   const router = useRouter()
-  const t = useTranslations('HomePage')
+  const t = useTranslations('Header')
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      const s = await getRequiredUser();
-      setSession(s);
-    }
-    fetchSession();
-  }, [])
-
   const handleSignOut = async () => {
-    setSession(await getRequiredUser());
+    await getRequiredUser();
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
@@ -53,10 +44,10 @@ function Header() {
   // );
 
   const navLinks = [
-    { href: "/", label: `${t('menu1')}` },
-    { href: "/about", label: `${t('menu2')}` },
-    { href: "/districts", label: `${t('menu3')}` },
-    { href: "/historical", label: `${t('menu4')}` },
+    { href: "/", label: `${t('home')}` },
+    { href: "/about", label: `${t('about')}` },
+    { href: "/districts", label: `${t('zone')}` },
+    { href: "/historical", label: `${t('historical')}` },
   ]
 
   const handleInputChange = () => {
@@ -110,14 +101,14 @@ function Header() {
                   <DropdownMenuItem onSelect={() => router.push('/requests')}>
                     <div className="flex items-center w-full text-sm">
                       <User className="mr-2 h-4 w-4" />
-                      My data
+                      {t('myData')}
                     </div>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onSelect={() => router.push('/settings')}>
                   <div className="flex items-center w-full text-sm">
                     <Settings className="mr-2 h-4 w-4" />
-                    Settings
+                    {t('settings')}
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -125,12 +116,12 @@ function Header() {
                   {!session ? (
                     <div onClick={() => router.push('/historical?signup=#')} className="flex items-center w-full text-sm">
                       <LogIn className="mr-2 h-4 w-4" />
-                      Login
+                      {t('login')}
                     </div>
                   ) : (
                     <div onClick={handleSignOut} className="flex items-center w-full text-sm">
                       <LogOut className="mr-2 h-4 w-4" />
-                      Logout
+                      {t('logout')}
                     </div>
                   )}
                 </DropdownMenuItem>
@@ -176,17 +167,17 @@ function Header() {
               </div>
               <div className="pl-10 space-y-2">
                 {session && <Link href="/requests" className="block text-sm">
-                  My Data
+                  {t('myData')}
                 </Link>}
                 {/* <div className="flex items-center justify-between">
                   <span className="text-sm">Dark mode</span>
                   <Switch onClick={handleThemeToggle} />
                 </div> */}
                 <Link href="/settings" className="block text-sm">
-                  Settings
+                  {t('settings')}
                 </Link>
                 {<Link href="/login" className="block text-sm">
-                  Login
+                  {t('login')}
                 </Link>}
               </div>
             </nav>

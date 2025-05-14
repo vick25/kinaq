@@ -22,16 +22,15 @@ export default function Home() {
 
 async function MapContent() {
   setInterval(async () => {
-    console.log('Filling locations table...')
     await populateLocationsTable();
-  }, 300000);
+  }, 600000);
   // const gradientData = (await fetchKinAQData()) || [];
   return (
     <MapComponent />
   )
 };
 
-const FallbackMap = () => {
+const FallbackMap = async () => {
   return (
     <div className="w-full h-full flex items-center justify-center bg-gray-100">
       <div className="animate-pulse relative w-full h-full">

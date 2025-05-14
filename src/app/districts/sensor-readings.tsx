@@ -22,7 +22,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { calculateOverallAqi, formatDateToLocaleString, getAqiDescription } from "@/lib/utils";
 import useLocationStore from "@/stores/location-store";
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from "next/link";
 
 interface ILocation {
@@ -35,6 +35,8 @@ interface ILocation {
 const SensorReadings = () => {
     const locale = useLocale();
     const { data: session } = authClient.useSession();
+    const t = useTranslations('SensorReadings');
+    const m = useTranslations('Map');
 
     const { locationId, locations } = useLocationStore();
     const [locationName, setLocationName] = useState("");
@@ -106,13 +108,13 @@ const SensorReadings = () => {
 
             <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between">
                 <div>
-                    <h2 className="mb-2 text-xl font-semibold text-gray-800">Current Readings</h2>
+                    <h2 className="mb-2 text-xl font-semibold text-gray-800">{t('currentReadings')}</h2>
                     {sensorData?.timestamp ? (
                         <time className="text-gray-600">
-                            Last Updated: {formatDateToLocaleString(locale, sensorData.timestamp)}
+                            {m('lastUpdated')}: {formatDateToLocaleString(locale, sensorData.timestamp)}
                         </time>
                     ) : (
-                        <time className="text-gray-400">Loading...</time>
+                        <p className="text-gray-400">{m('loading')}</p>
                     )}
                 </div>
 
@@ -120,7 +122,7 @@ const SensorReadings = () => {
                     {session?.user && (
                         <Button className="bg-green-600 hover:bg-green-700" asChild>
                             <Link href={`/historical?locq=${locationName}`}>
-                                View Historical Data
+                                {t('viewHistorical')}
                             </Link>
                         </Button>
                     )}
@@ -171,9 +173,9 @@ const SensorReadings = () => {
                                 { label: 'PM2.5', value: sensorData?.pm02, unit: 'μg/m³' },
                                 { label: 'PM10', value: sensorData?.pm10, unit: 'μg/m³' },
                                 { label: 'CO2', value: sensorData?.rco2, unit: '' },
-                                { label: 'Nitrogen Dioxide', value: sensorData?.noxIndex, unit: 'ppb' },
-                                { label: 'Temperature', value: sensorData?.atmp, unit: '°C' },
-                                { label: 'Humidity', value: sensorData?.rhum, unit: '%' },
+                                { label: `${t('measurements.no2')}`, value: sensorData?.noxIndex, unit: 'ppb' },
+                                { label: `${m('temperature')}`, value: sensorData?.atmp, unit: '°C' },
+                                { label: `${m('humidity')}`, value: sensorData?.rhum, unit: '%' },
                             ].map(({ label, value, unit }) => (
                                 <div key={label} className="rounded-lg bg-gray-50 p-4 text-center">
                                     <h4 className="mb-2 text-xs sm:text-sm lg:text-base font-medium text-gray-700">{label}</h4>

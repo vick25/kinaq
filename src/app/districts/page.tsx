@@ -18,7 +18,7 @@ export default async function Districts() {
     );
 }
 
-function AQILoadingFallback() {
+async function AQILoadingFallback() {
     return (
         <Card className="mb-12 overflow-hidden border border-gray-200 animate-pulse">
             <CardContent className="p-4 sm:p-6 flex flex-col lg:flex-row gap-8">

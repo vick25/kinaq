@@ -8,7 +8,7 @@ import { COLORS, ILocationData } from "@/lib/definitions";
 import { calculateOverallAqi, formatDateToLocaleString, formatTo2Places, getAqiDescription } from "@/lib/utils";
 import useLocationStore from "@/stores/location-store";
 import { Droplets, Thermometer } from "lucide-react";
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -17,15 +17,14 @@ import LocationGauge from "./location-gauge";
 
 export default function LocationDetails() {
   const locale = useLocale();
+  const t = useTranslations('Map');
   const { locationId, isMapUpdated, setIsMapUpdated } = useLocationStore(); // Get locationId from store
-  // const [loading, setLoading] = useState<boolean>(false)
   const [locationData, setLocationData] = useState<ILocationData>();
   const [offline, setOffline] = useState<boolean>(false);
 
   useEffect(() => {
     // Fetch location data
     const agLocationData = async () => {
-      // setLoading(true);
       try {
         const response = await fetchLocationData(`${locationId}`);
 
@@ -40,20 +39,17 @@ export default function LocationDetails() {
           toast.promise(
             Promise.resolve(response), // Wrap the data in a resolved promise
             {
-              loading: "Loading data...",
-              success: "Data processed successfully!",
-              error: "Failed to load data!",
+              loading: `${t('loading')}`,
+              success: `${t('sucess')}`,
+              error: `${t('error')}`,
               position: "top-right",
             }
           );
         }
         setLocationData(response);
         setOffline(false);
-        // setLoading(false);
       } catch (error) {
-        console.error("Error in agLocationData:", error);
-        toast.error("Failed to load data!"); // Display an error toast
-        // setLoading(false);
+        toast.error(`${t('error')}`); // Display an error toast
       }
     };
 
@@ -76,7 +72,7 @@ export default function LocationDetails() {
         locationData ?
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Location details</h2>
+              <h2 className="text-2xl font-bold mb-2">{t('location')}</h2>
               <div className="flex justify-between items-center gap-3 text-sm text-muted-foreground">
                 <p className="relative flex items-center">{locationData?.locationName}
                   {offline &&
@@ -93,7 +89,7 @@ export default function LocationDetails() {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="font-medium">Air Quality Index</span>
+                <span className="font-medium">{t('aqiIndex')}</span>
                 <span className="text-xl font-bold">{AQIData?.Overall_AQI}</span>
               </div>
               <LocationGauge
@@ -118,7 +114,7 @@ export default function LocationDetails() {
                   <CardHeader className="p-3">
                     <CardTitle className="flex items-center text-sm font-medium">
                       <Thermometer className="mr-2 h-4 w-4" />
-                      Temperature
+                      {t('temperature')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-3 pt-0">
@@ -129,7 +125,7 @@ export default function LocationDetails() {
                   <CardHeader className="p-3">
                     <CardTitle className="flex items-center text-sm font-medium">
                       <Droplets className="mr-2 h-4 w-4" />
-                      Humidity
+                      {t('humidity')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-3 pt-0">
@@ -139,7 +135,7 @@ export default function LocationDetails() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="font-semibold">Pollutants</h3>
+                <h3 className="font-semibold">{t('pollutants')}</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>PM01</span>
@@ -169,12 +165,12 @@ export default function LocationDetails() {
               </div>
             </ScrollArea>
           </div> :
-          <div className="text-sm text-center font-medium animate-pulse text-green-700">No data found. Click on a location !</div>
+          <div className="text-sm text-center font-medium animate-pulse text-green-700">{t('nodata')}</div>
       }
       <footer className="mt-auto pt-5">
         <Separator className="mt-4" />
         <div className="space-y-4">
-          <h3 className="font-semibold mt-2">Our Partners</h3>
+          <h3 className="font-semibold mt-2">{t('partners')}</h3>
           <div className="flex flex-col justify-center space-y-2">
             <div className="flex justify-center items-center space-x-2">
               <Link href="https://wasaruwash.org/" target="_blank" rel="noopener noreferrer">
