@@ -1,13 +1,139 @@
 {
-    "TabTitle": {
+    "Header": {
         "home": "Accueil",
-        "about": "A propos",
-        "contact": "Contact"
+        "about": "À propos",
+        "zone": "Zones bénéficiaires",
+        "historical": "Données historiques",
+        "myData": "Mes données",
+        "requests": "Mes demandes",
+        "settings": "Paramètres",
+        "login": "Connexion",
+        "logout": "Déconnexion"
     },
-    "HomePage": {
-        "menu1": "Accueil",
-        "menu2": "A propos",
-        "menu3": "Zones bénéficiaires",
-        "menu4": "Données historiques"
+    "Map": {
+        "selectLocation": "Sélectionner un lieu",
+        "lastUpdated": "Dernière mise à jour",
+        "loading": "Chargement...",
+        "success": "Données chargées avec succès",
+        "error": "Echec de chargement!",
+        "location": "Détails du lieu",
+        "aqiIndex": "Indice de qualité de l’air",
+        "temperature": "Température",
+        "humidity": "Humidité",
+        "pollutants": "Polluants",
+        "nodata": "Aucune donnée trouvée. Cliquez sur un lieu !",
+        "partners": "Nos partenaires"
+    },
+    "SensorReadings": {
+        "currentReadings": "Mesures actuelles",
+        "viewHistorical": "Voir les données historiques",
+        "measurements": {
+            "pm1": "PM1",
+            "pm25": "PM2.5",
+            "pm10": "PM10",
+            "co2": "CO2",
+            "no2": "Dioxyde d’azote",
+            "temperature": "Température",
+            "humidity": "Humidité"
+        }
+    },
+    "ExportData": {
+        "export": "Exporter les données",
+        "title": "Exporter les données en CSV",
+        "downloadInstructions": "Téléchargez les informations actives sur la qualité de l'air datant de plus de 7 jours :",
+        "csv": "fichiers texte séparés par des virgules (.csv) ou",
+        "json": "fichiers JSON (.json)",
+        "warning": {
+            "title": "Toutes les données sont des valeurs non corrigées",
+            "description": "Les paramètres de qualité de l’air sont des valeurs brutes. Appliquez des corrections. Voir",
+            "link": "Algorithmes de correction"
+        },
+        "form": {
+            "source": "Source des données",
+            "location": "Sélectionner un lieu",
+            "bucket": "Sélectionner un bucket",
+            "rawData": "Données brutes",
+            "pastData": "Données passées",
+            "usage": "Objectif d’utilisation",
+            "institution": "Nom de l’institution / compagnie",
+            "dateRange": {
+                "start": "Date de début",
+                "end": "Date de fin"
+            }
+        },
+        "button": {
+            "download": "Télécharger",
+            "downloading": "Téléchargement..."
+        },
+        "errors": {
+            "selectLocation": "Veuillez sélectionner un lieu et un bucket.",
+            "selectDates": "Veuillez sélectionner une date de début et une date de fin.",
+            "invalidDates": "La date de fin ne peut pas être antérieure à la date de début."
+        }
+    },
+    "Auth": {
+        "signIn": {
+            "title": "Entrez le CODE envoyé par email à :",
+            "signInCode": "Vérifier le code",
+            "signingIn": "Connexion en cours...",
+            "cancel": "Annuler"
+        },
+        "signUp": {
+            "title": "Inscrivez-vous pour accéder aux données",
+            "emailPlaceholder": "Entrez votre email",
+            "emailCode": "Obtenir le code de vérification",
+            "emailingCode": "Envoi du code..."
+        }
+    },
+    "Error": {
+        "title": "Une erreur s’est produite !",
+        "description": "Une erreur est survenue lors du traitement de votre demande.",
+        "tryAgain": "Réessayer",
+        "goHome": "Retour à l’accueil"
+    },
+    "About": {
+        "meta": {
+            "title": "KINAQ | À propos de nous",
+            "description": "Téléchargez les données sur la qualité de l’air de KINAQ et découvrez notre mission d’amélioration de la qualité de l’air à Kinshasa et en RDC."
+        },
+        "hero": {
+            "title": "À propos de KINAQ",
+            "subtitle": "Surveillance de la qualité de l’air à Kinshasa"
+        },
+        "impact": {
+            "title": "Notre impact",
+            "stats": {
+                "children": "Enfants informés",
+                "users": "Utilisateurs aidés",
+                "dataPoints": "Points de données collectés",
+                "campaigns": "Campagnes de sensibilisation"
+            }
+        },
+        "mission": {
+            "title": "Notre mission",
+            "description": "Le Projet Qualité de l'Air de Kinshasa (KINAQ) est mis en œuvre par WASARU (dirigé par Paulson KASEREKA), en partenariat avec le professeur Daniel Westervelt de l'Université Columbia (États-Unis), avec le soutien financier de l'Institut de Politique Energétique de l'Université de Chicago (EPIC).",
+            "goals": {
+                "awareness": "fournit des solutions innovantes, notamment le déploiement de capteurs à faible coût, la fourniture de données ouvertes en temps réel et le partage d'informations exploitables pour la surveillance de la qualité de l'air afin de réduire la pollution atmosphérique, d'améliorer la qualité de l'air et de prévenir ses effets à Kinshasa et en RDC. Nous sensibilisons également à la pollution atmosphérique et plaidons en faveur de politiques de qualité de l'air auprès des gouvernements nationaux et locaux.",
+                "data": "Nous nous engageons à fournir des données ouvertes précises et en temps réel sur la qualité de l'air et des informations exploitables afin de protéger les communautés des effets de la pollution atmosphérique et de les aider à prendre des décisions éclairées concernant leur santé environnementale."
+            }
+        },
+        "team": {
+            "title": "Notre équipe"
+        },
+        "contact": {
+            "title": "Contactez-nous",
+            "contribution": "🤝 Si vous souhaitez apporter une contribution ou faire un don, veuillez nous contacter à cette adresse e-mail.",
+            "email": "Envoyez-nous un email",
+            "visit": "Visitez notre site web",
+            "follow": "Suivez-nous"
+        }
+    },
+    "Request": {
+        "title": "Requêtes téléchargées pour",
+        "loading": "Chargement des requêtes de table...",
+        "newRequest": "Créer une nouvelle requête",
+        "Logout": "Déconnexion",
+        "listTitle": "Liste de vos requêtes récentes.",
+        "nodata": "Aucune demande de téléchargement trouvée."
     }
 }

@@ -1,13 +1,139 @@
 {
-    "TabTitle": {
+    "Header": {
         "home": "Home",
         "about": "About",
-        "contact": "Contact"
+        "zone": "Beneficiary zones",
+        "historical": "Historical data",
+        "myData": "My data",
+        "requests": "My Requests",
+        "settings": "Settings",
+        "login": "Login",
+        "logout": "Logout"
     },
-    "HomePage": {
-        "menu1": "Home",
-        "menu2": "About",
-        "menu3": "Beneficiary zones",
-        "menu4": "Historical data"
+    "Map": {
+        "selectLocation": "Select a location",
+        "lastUpdated": "Last updated",
+        "loading": "Loading...",
+        "success": "Data processed successfully!",
+        "error": "Failed to load data!",
+        "location": "Location details",
+        "aqiIndex": "Air Quality Index",
+        "temperature": "Temperature",
+        "humidity": "Humidity",
+        "pollutants": "Pollutants",
+        "nodata": "No data found. Click on a location !",
+        "partners": "Our Partners"
+    },
+    "SensorReadings": {
+        "currentReadings": "Current Readings",
+        "viewHistorical": "View Historical Data",
+        "measurements": {
+            "pm1": "PM1",
+            "pm25": "PM2.5",
+            "pm10": "PM10",
+            "co2": "CO2",
+            "no2": "Nitrogen Dioxide",
+            "temperature": "Temperature",
+            "humidity": "Humidity"
+        }
+    },
+    "ExportData": {
+        "export": "Data Export",
+        "title": "Export Data as CSV",
+        "downloadInstructions": "Download active air quality information older than 7 days:",
+        "csv": "comma-separated text files (.csv) or",
+        "json": "JSON files (.json)",
+        "warning": {
+            "title": "All data are uncorrected values",
+            "description": "Air quality parameters are raw values. Apply corrections. See",
+            "link": "Correction Algorithms"
+        },
+        "form": {
+            "source": "Data Source",
+            "location": "Select a location",
+            "bucket": "Select bucket",
+            "rawData": "Raw Data",
+            "pastData": "Past Data",
+            "usage": "Usage purpose",
+            "institution": "Institution / Company name",
+            "dateRange": {
+                "start": "Start date",
+                "end": "End date"
+            }
+        },
+        "button": {
+            "download": "Download",
+            "downloading": "Downloading..."
+        },
+        "errors": {
+            "selectLocation": "Please select location and bucket.",
+            "selectDates": "Please select a start and end date.",
+            "invalidDates": "End date cannot be earlier than the start date."
+        }
+    },
+    "Auth": {
+        "signIn": {
+            "title": "Enter CODE emailed to:",
+            "signInCode": "Verify Code",
+            "signingIn": "Signing in...",
+            "cancel": "Cancel"
+        },
+        "signUp": {
+            "title": "Sign up for data access",
+            "emailPlaceholder": "Enter your email",
+            "emailCode": "Get Verification Code",
+            "emailingCode": "Sending code..."
+        }
+    },
+    "Error": {
+        "title": "Something went wrong!",
+        "description": "An error occurred while processing your request.",
+        "tryAgain": "Try again",
+        "goHome": "Go home"
+    },
+    "About": {
+        "meta": {
+            "title": "KINAQ | About Us",
+            "description": "Download air quality data from KINAQ and learn about our mission to improve air quality in Kinshasa and DR Congo."
+        },
+        "hero": {
+            "title": "About KINAQ",
+            "subtitle": "Monitoring Air Quality in Kinshasa"
+        },
+        "impact": {
+            "title": "Our Impact",
+            "stats": {
+                "children": "Children informed",
+                "users": "Users helped",
+                "dataPoints": "Data points collected",
+                "campaigns": "Awareness campaign"
+            }
+        },
+        "mission": {
+            "title": "Our Mission",
+            "description": "The Kinshasa Air Quality Project (KINAQ) is implemented by WASARU (led by Paulson KASEREKA), in partnership with Professor Daniel Westervelt of Columbia University (USA), with financial support of the Energy Policy Institute at the University of Chicago (EPIC).",
+            "goals": {
+                "awareness": "provides innovative solutions that include the deployment of low-cost sensors, providing real-time open data, and sharing actionable information for air quality monitoring to reduce air pollution, improve air quality, and prevent air pollution related effects in Kinshasa and the DR Congo. We also raise awareness about air pollution and advocate for clean air policies with national and local government.",
+                "data": "Dedicated to providing accurate and real-time air quality open data and actionable information to protect communities from the effects of air pollution and help them make informed decisions about their environmental health."
+            }
+        },
+        "team": {
+            "title": "Our Team"
+        },
+        "contact": {
+            "title": "Get in Touch",
+            "contribution": "🤝 If you would like to make a contribution or donate, please contact us at this email address.",
+            "email": "Email us",
+            "visit": "Visit our website",
+            "follow": "Follow us"
+        }
+    },
+    "Request": {
+        "title": "Download Requests for",
+        "loading": "Loading table requests...",
+        "newRequest": "Create New Request",
+        "Logout": "Logout",
+        "listTitle": "A list of your recent requests.",
+        "nodata": "No download requests found."
     }
 }
