@@ -1,7 +1,8 @@
-import ExportData from '@/components/export-data'
-import { getUser } from '@/lib/auth-session'
-import SignInForm from '../signIn-form'
-import SignUpForm from '../signUp-form'
+import ExportData from '@/components/export-data';
+import { getUser } from '@/lib/auth-session';
+import { getTranslations } from 'next-intl/server';
+import SignInForm from '../signIn-form';
+import SignUpForm from '../signUp-form';
 
 interface PageProps {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -14,10 +15,12 @@ export const metadata = {
 
 const Historical = async ({ searchParams }: PageProps) => {
     const session = await getUser();
-    const { signup, email, locq } = await searchParams
-    const showSignIn = signup === 'login'
-    const showExport = signup === 'success'
-    const loggedInEmail = typeof email === 'string' ? email : ''
+    const t = await getTranslations('ExportData');
+
+    const { signup, email, locq } = await searchParams;
+    const showSignIn = signup === 'login';
+    const showExport = signup === 'success';
+    const loggedInEmail = typeof email === 'string' ? email : '';
 
     const shouldShowSignUp = !showSignIn && !showExport;
     const isAuthenticated = session || showExport;
@@ -26,21 +29,21 @@ const Historical = async ({ searchParams }: PageProps) => {
         <div className='container mx-auto'>
             <section className='my-5 space-y-4'>
                 <div className="text-[#f0f0f0] bg-[#222] text-2xl font-semibold leading-5 relative pl-[2.3rem] pr-0 py-4 rounded-[3rem_0_0_3rem]">
-                    KINAQ | Data Export
+                    KINAQ | {t('export')}
                 </div>
 
                 <div className='mt-8 w-full'>
                     {/* {session && <p className='mb-3 text-center'>Download Requests for <span className='font-bold text-blue-700'>{session.user.email}</span></p>} */}
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800">
-                            Download active air quality information older than the last 7 days:
+                            {t('downloadInstructions')}
                         </h2>
                         <ul className="mt-2 space-y-1 list-inside list-disc relative left-8">
                             <li className="text-blue-600 hover:underline">
-                                comma-separated text files (.csv) or
+                                {t('csv')}
                             </li>
                             <li className="text-blue-600 hover:underline">
-                                JSON files (.json)
+                                {t('json')}
                             </li>
                         </ul>
                     </div>

@@ -89,8 +89,8 @@ function Header() {
             ))}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Avatar className="h-5 w-5 cursor-pointer hover:text-primary transition-colors">
-                  <AvatarImage src="/placeholder-avatar.svg" alt="User avatar" />
+                <Avatar className="h-6 w-6 cursor-pointer hover:text-primary transition-colors">
+                  <AvatarImage src="/user-16.svg" alt="User avatar" />
                   <AvatarFallback>
                     <User className="h-4 w-4" />
                   </AvatarFallback>

@@ -134,6 +134,8 @@
         "newRequest": "Créer une nouvelle requête",
         "Logout": "Déconnexion",
         "listTitle": "Liste de vos requêtes récentes.",
-        "nodata": "Aucune demande de téléchargement trouvée."
+        "nodata": "Aucune demande de téléchargement trouvée.",
+        "raw": "L'intervalle de .. à est limité à 2 jours.",
+        "past": "L'intervalle de .. à est limité à 10 jours."
     }
 }

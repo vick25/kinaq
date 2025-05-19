@@ -1,6 +1,7 @@
-export const dynamic = 'force-static'
+// export const dynamic = 'force-static'
 
 import { Building2, Database, Globe, Mail, Users } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 export const metadata = {
@@ -30,13 +31,6 @@ export const metadata = {
     },
 };
 
-const impactItems = [
-    { icon: Users, value: "2000+", label: "Children informed" },
-    { icon: Users, value: "150+", label: "Users helped" },
-    { icon: Database, value: "1M+", label: "Data points collected" },
-    { icon: Building2, value: "15+", label: "Awareness campaign" },
-];
-
 const socialLinks = [
     {
         href: "https://www.facebook.com/profile.php?id=100090179774395&locale=fr_FR",
@@ -54,30 +48,38 @@ const socialLinks = [
     },
 ];
 
-const AboutPage = () => {
+const AboutPage = async () => {
+    const t = await getTranslations('About');
+
+    const impactItems = [
+        { icon: Users, value: "2000+", label: t('impact.stats.children') },
+        { icon: Users, value: "150+", label: t('impact.stats.users') },
+        { icon: Database, value: "1M+", label: t('impact.stats.dataPoints') },
+        { icon: Building2, value: "15+", label: t('impact.stats.campaigns') },
+    ];
+
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="p-6 sm:p-8 bg-white rounded-lg shadow-md">
-                <h1 className="text-2xl font-bold mb-8">About KINAQ</h1>
+                <h1 className="text-2xl font-bold mb-8">{t('hero.title')}</h1>
 
                 <div className="bg-[#f3f4f6] rounded-lg p-6 mb-8">
                     <p className="text-[#58595b] leading-relaxed mb-3">
-                        The Kinshasa Air Quality Project (KINAQ) is implemented by WASARU (led by Paulson KASEREKA), in partnership with Professor Daniel Westervelt of Columbia University (USA), with financial support of the Energy Policy Institute at the University of Chicago (EPIC).
+                        {t('mission.description')}
                     </p>
                     <p className="text-[#58595b] leading-relaxed">
-                        <span className="font-extrabold text-[#05b15d]">KINAQ</span> provides innovative solutions that include the deployment of low-cost sensors, providing real-time open data, and sharing actionable information for air quality monitoring to reduce air pollution, improve air quality, and prevent air pollution related effects in Kinshasa and the DR Congo. We also raise awareness about air pollution and advocate for clean air policies with national and local government.
-                    </p>
+                        <span className="font-extrabold text-[#05b15d]">KINAQ</span> {t('mission.goals.awareness')} </p>
                 </div>
 
                 <div className="bg-[#f3f4f6] rounded-lg p-6 mb-8">
-                    <h3 className="text-xl font-semibold mb-2">Mission</h3>
+                    <h3 className="text-xl font-semibold mb-2">{t('mission.title')}</h3>
                     <p className="text-[#58595b] leading-relaxed">
-                        Dedicated to providing accurate and real-time air quality open data and actionable information to protect communities from the effects of air pollution and help them make informed decisions about their environmental health.
+                        {t('mission.goals.data')}
                     </p>
                 </div>
 
                 <div className="mb-12">
-                    <h3 className="text-2xl font-bold mb-8">Impact</h3>
+                    <h3 className="text-2xl font-bold mb-8">{t('impact.title')}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {impactItems.map((item, i) => (
                             <div key={i} className="bg-[#f3f4f6] p-6 rounded-lg text-center">
@@ -90,19 +92,19 @@ const AboutPage = () => {
                 </div>
 
                 <div className="mb-12">
-                    <h3 className="text-2xl font-bold mb-8">Our Team</h3>
+                    <h3 className="text-2xl font-bold mb-8">{t('team.title')}</h3>
                     <Link
                         href="https://wasaruwash.org"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 underline hover:text-black"
                     >
-                        Visit our website
+                        {t('contact.visit')}
                     </Link>
                 </div>
 
                 <div className="bg-[#f3f4f6] rounded-lg p-6">
-                    <h3 className="text-xl font-semibold mb-4">Contact Us</h3>
+                    <h3 className="text-xl font-semibold mb-4">{t('contact.title')}</h3>
                     <div className="space-y-4 text-[#58595b]">
                         <div className="flex items-center gap-2">
                             <Mail size={18} />
@@ -110,8 +112,11 @@ const AboutPage = () => {
                                 kinshasaairquality.wasaru@gmail.com
                             </a>
                         </div>
+                        <p className="text-sm italic">
+                            {t('contact.contribution')}
+                        </p>
                         <div className="space-y-2 text-sm">
-                            <p className="font-medium">Follow us on Social Media</p>
+                            <p className="font-medium">{t('contact.follow')}</p>
                             <div className="flex flex-col gap-2">
                                 {socialLinks.map((link, idx) => (
                                     <a

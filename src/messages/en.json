@@ -134,6 +134,8 @@
         "newRequest": "Create New Request",
         "Logout": "Logout",
         "listTitle": "A list of your recent requests.",
-        "nodata": "No download requests found."
+        "nodata": "No download requests found.",
+        "raw": "The from .. to interval is limited to 2 days.",
+        "past": "The from .. to interval is limited to 10 days."
     }
 }

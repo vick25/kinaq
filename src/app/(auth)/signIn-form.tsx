@@ -2,6 +2,7 @@ import { SubmitButton } from '@/components/submit-button';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { auth } from '@/lib/auth';
+import { getTranslations } from 'next-intl/server';
 import { headers } from "next/headers";
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -10,7 +11,8 @@ type Props = {
     loggedInEmail: string
 }
 
-const SignInForm = ({ loggedInEmail }: Props) => {
+const SignInForm = async ({ loggedInEmail }: Props) => {
+    const t = await getTranslations('Auth');
 
     async function handleSubmit(formdata: FormData) {
         'use server';
@@ -44,18 +46,18 @@ const SignInForm = ({ loggedInEmail }: Props) => {
     return (
         <form action={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <h3 className="text-lg font-semibold text-gray-800 text-center mb-2">
-                Enter CODE emailed to:&nbsp;
+                {t('signIn.title')}:&nbsp;
                 <span className='text-blue-700'>{loggedInEmail}</span>
             </h3>
             <div className="lbCode">
                 <Input type="text" name="code" placeholder="123456" />
             </div>
             <div className='flex space-x-4 items-center justify-center'>
-                <SubmitButton primaryText='Sign-in with code' secondaryText='Signing in...' />
+                <SubmitButton primaryText={t('signIn.signInCode')} secondaryText={t('signIn.signingIn')} />
 
                 {/* <CancelSignInForm /> */}
                 <Button asChild className="mt-4 w-full bg-[#b11605] text-white py-2 rounded-md text-lg font-medium hover:bg-red-600" id="btn_proceed_ed">
-                    <Link href="/historical">Cancel</Link>
+                    <Link href="/historical">{t('signIn.cancel')}</Link>
                 </Button>
             </div>
         </form>

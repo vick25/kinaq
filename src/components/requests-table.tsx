@@ -16,7 +16,7 @@ import { Mail, Trash } from 'lucide-react';
 import { updateRequest } from '@/actions/populateTables';
 import { authClient } from '@/lib/auth-client';
 import { formatDateToLocaleString, formatDateToLocaleStringWithoutTime } from '@/lib/utils';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -43,6 +43,7 @@ interface IRequest {
 const RequestsTable = ({ requests }: { requests: IRequest[] }) => {
     const router = useRouter();
     const locale = useLocale();
+    const t = useTranslations('Request');
 
     const handleCreateRequest = () => {
         router.push('/historical');
@@ -71,21 +72,21 @@ const RequestsTable = ({ requests }: { requests: IRequest[] }) => {
                     onClick={handleCreateRequest}
                     className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-6 rounded shadow-md transition duration-150 ease-in-out"
                 >
-                    Create New Request
+                    {t('newRequest')}
                 </Button>
                 <Button
                     onClick={handleLogout}
                     variant={'destructive'}
                     className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-8 rounded shadow-md transition duration-150 ease-in-out"
                 >
-                    Logout
+                    {t('Logout')}
                 </Button>
             </div>
             {/* Requests Table */}
             <div className="bg-white shadow-md rounded-lg overflow-hidden">
                 <div className="overflow-x-auto">
                     <Table>
-                        {requests.length !== 0 && (<TableCaption>A list of your recent requests.</TableCaption>)}
+                        {requests.length !== 0 && (<TableCaption>{t('listTitle')}</TableCaption>)}
                         <TableHeader className='bg-gray-100'>
                             <TableRow>
                                 <TableHead className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Id</TableHead>
@@ -94,7 +95,7 @@ const RequestsTable = ({ requests }: { requests: IRequest[] }) => {
                                 <TableHead className='px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider'>Bucket</TableHead>
                                 <TableHead className='px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider'>Request Date</TableHead>
                                 <TableHead className='px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider'>Status</TableHead>
-                                <TableHead className='px-6 py-3 text-right text-sm font-medium text-gray-500 uppercase tracking-wider'>Delete</TableHead>
+                                <TableHead className='px-6 py-3 text-right text-sm font-medium text-gray-500 uppercase tracking-wider' title="Delete">{ }</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

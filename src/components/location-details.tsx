@@ -40,7 +40,7 @@ export default function LocationDetails() {
             Promise.resolve(response), // Wrap the data in a resolved promise
             {
               loading: `${t('loading')}`,
-              success: `${t('sucess')}`,
+              success: `${t('success')}`,
               error: `${t('error')}`,
               position: "top-right",
             }

@@ -1,6 +1,7 @@
 'use client';
 
 import { fetchLocationMeasures } from "@/actions/airGradientData";
+import { Label } from "@/components/ui/label";
 import {
     Select, SelectContent, SelectGroup, SelectItem,
     SelectLabel, SelectTrigger, SelectValue,
@@ -8,7 +9,8 @@ import {
 import { ILocationMeasure, Usages } from "@/lib/definitions";
 import { convertToCSV, formatToYYYYMMDD } from "@/lib/utils";
 import useLocationStore from "@/stores/location-store";
-import { Info, Loader2 } from "lucide-react";
+import { Download, FileDown, Info, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "./ui/button";
@@ -19,6 +21,7 @@ type Props = {
 
 export default function ExportData({ locationQuery }: Props) {
     const { locationId, locations } = useLocationStore();
+    const t = useTranslations('ExportData');
 
     const [startDate, setStartDate] = useState<string>();
     const [endDate, setEndDate] = useState<string>();
@@ -50,7 +53,7 @@ export default function ExportData({ locationQuery }: Props) {
     const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newEndDate = e.target.value;
         if (startDate && newEndDate < startDate) {
-            alert("End date cannot be earlier than the start date.");
+            alert(t('errors.invalidDates'));
             e.target.value = endDate || '';
         } else {
             setEndDate(newEndDate);
@@ -71,17 +74,17 @@ export default function ExportData({ locationQuery }: Props) {
 
     const handleDownload = async (format: 'csv' | 'json') => {
         if (!selectedLocation || !selectedBucket) {
-            alert("Please select location and bucket.");
+            alert(t('errors.selectLocation'));
             return;
         }
 
         if (selectedBucket === 'past' && (!startDate || !endDate)) {
-            alert("Please select a start and end date.");
+            alert(t('errors.selectDates'));
             return;
         }
 
         if (startDate && endDate && endDate < startDate) {
-            alert("End date cannot be earlier than the start date.");
+            alert(t('errors.invalidDates'));
             return;
         }
 
@@ -131,57 +134,73 @@ export default function ExportData({ locationQuery }: Props) {
     return (
         <section className="pb-10">
             <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
-                <h2 className="text-2xl font-semibold text-[#05b15d]">Export Data as CSV</h2>
+                <h2 className="flex items-center text-2xl font-semibold text-[#05b15d]">
+                    <FileDown className="h-6 w-6" />
+                    {t('title')}
+                </h2>
 
                 <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mt-4 flex gap-2">
                     <Info className="text-xl" />
                     <p className="text-sm">
-                        <strong>All data are uncorrected values</strong>
+                        <strong>{t('warning.title')}</strong>
                         <br />
-                        Air quality parameters are raw values. Apply corrections. See{" "}
+                        {t('warning.description')}{" "}
                         <Link href="https://www.airgradient.com/documentation/correction-algorithms/" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">
-                            Correction Algorithms
+                            {t('warning.link')}
                         </Link>.
                     </p>
                 </div>
 
-                <div className="mt-6 flex items-center flex-wrap gap-4">
-                    <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Select a location" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Locations</SelectLabel>
-                                {locations.map(loc => (
-                                    <SelectItem key={loc.locationID} value={loc.locationID}>{loc.locationName}</SelectItem>
-                                ))}
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="data-source" className="text-slate-700">
+                            {t('form.source')}
+                        </Label>
+                        <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                            <SelectTrigger id="data-source" className="bg-white border-slate-200 focus:ring-emerald-500">
+                                <SelectValue placeholder={t('form.location')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Locations</SelectLabel>
+                                    {locations.map(loc => (
+                                        <SelectItem key={loc.locationID} value={loc.locationID}>{loc.locationName}</SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                    <Select onValueChange={setSelectedBucket}>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Select bucket" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectItem value="raw">Raw Data</SelectItem>
-                                <SelectItem value="past">Past Data</SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                    <div className="space-y-2">
+                        <Label htmlFor="bucket" className="text-slate-700">
+                            Bucket
+                        </Label>
+                        <Select onValueChange={setSelectedBucket}>
+                            <SelectTrigger id="bucket" className="bg-white border-slate-200 focus:ring-emerald-500">
+                                <SelectValue placeholder={t('form.bucket')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem value="raw">{t('form.rawData')}</SelectItem>
+                                    <SelectItem value="past">{t('form.pastData')}</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
 
                     {selectedBucket &&
-                        <p className="text-xs text-red-600 ml-4">
-                            {selectedBucket === 'raw' ? 'The from .. to interval is limited to 2 days.' : 'The from .. to interval is limited to 10 days.'}
+                        <p className="md:col-[2/-1] text-xs text-red-600 ml-4">
+                            {selectedBucket === 'raw' ? t('raw') : t('past')}
                         </p>}
                 </div>
 
-                <div className="mt-4 flex items-center flex-wrap gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Start date</label>
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="start-date" className="text-slate-700">
+                            {t('form.dateRange.start')}
+                        </Label>
                         <input
+                            id="start-date"
                             type="date"
                             max={endDate}
                             value={startDate || ''}
@@ -190,9 +209,11 @@ export default function ExportData({ locationQuery }: Props) {
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">End date</label>
-                        <input
+                    <div className="space-y-2">
+                        <Label htmlFor="end-date" className="text-slate-700">
+                            {t('form.dateRange.end')}
+                        </Label>
+                        <input id="end-date"
                             type="date"
                             min={startDate}
                             value={endDate || ''}
@@ -207,7 +228,7 @@ export default function ExportData({ locationQuery }: Props) {
 
                     <div className="mt-3">
                         <label htmlFor="institution" className="block text-sm font-medium text-gray-700">
-                            Institution / Company Name
+                            {t('form.institution')}
                         </label>
                         <input
                             type="text"
@@ -220,7 +241,7 @@ export default function ExportData({ locationQuery }: Props) {
                     </div>
 
                     <div className="mt-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Primary Usage</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('form.usage')}</label>
                         <div className="flex flex-col sm:flex-row sm:flex-wrap gap-x-6 gap-y-2">
                             {Object.keys(Usages)
                                 .filter(key => isNaN(Number(key)))
@@ -251,11 +272,12 @@ export default function ExportData({ locationQuery }: Props) {
                     onClick={() => handleDownload('csv')}
                     disabled={isDownloadDisabled}
                 >
+                    <Download className="mr-2 h-5 w-5" />
                     {isLoading ? (
                         <div className="flex items-center">
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Downloading...
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />{t('button.downloading')}
                         </div>
-                    ) : 'Download'}
+                    ) : t('button.download')}
                 </Button>
             </div>
         </section>
