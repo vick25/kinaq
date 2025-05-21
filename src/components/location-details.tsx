@@ -49,7 +49,7 @@ export default function LocationDetails() {
         setLocationData(response);
         setOffline(false);
       } catch (error) {
-        toast.error(`${t('error')}`); // Display an error toast
+        toast.error(`${t('error')} ${(error as Error).message}`); // Display an error toast
       }
     };
 

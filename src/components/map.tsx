@@ -5,267 +5,240 @@ import { kinAQPoints, styles } from '@/lib/constants';
 import { IAirGradientPointData } from '@/lib/definitions';
 import { formatDateToLocaleString, getPM25Color } from '@/lib/utils';
 import useLocationStore from '@/stores/location-store';
-import maplibregl, { AttributionControl, GeolocateControl, Map, NavigationControl, ScaleControl } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import maplibregl, { AttributionControl, GeolocateControl, Map, NavigationControl, ScaleControl } from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-//Fetch and add points to the map
-const populateMarkers = async (
-    map: maplibregl.Map,
-    popupRef: React.RefObject<maplibregl.Popup | null>,
-    setLocationId: (locationId: number) => void,
-    retrieveLocation: (locationId: number, coordinates: number[]) => void,
-    locale: string
-) => {
-    try {
-        const gradientData: IAirGradientPointData[] = await fetchKinAQData();
-        if (!gradientData) {
+const useScrollZoomControl = (map: Map | null, isMobile: boolean) => {
+    const [message, setMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!map) return;
+
+        const enableZoom = () => map.scrollZoom.enable();
+        const disableZoom = () => map.scrollZoom.disable();
+
+        if (isMobile) {
+            enableZoom();
             return;
         }
 
-        const pointsGeoJSON: string | GeoJSON.FeatureCollection = {
-            type: "FeatureCollection",
-            features: gradientData?.map((item) => {
-                const kinAQFeature = kinAQPoints.find(feat => feat.locationId == item.locationId);
-                return {
-                    type: "Feature",
-                    geometry: {
-                        type: "Point",
-                        coordinates: [kinAQFeature?.coordinates[0] as number, kinAQFeature?.coordinates[1] as number],
-                    },
-                    properties: {
-                        locationId: item.locationId,
-                        locationName: item.locationName,
-                        pm2_5: item.pm02,
-                        timestamp: item.timestamp,
-                    },
-                }
-            }),
+        disableZoom();
+
+        const handleWheel = (e: WheelEvent) => {
+            if (e.ctrlKey) {
+                setMessage(null);
+                enableZoom();
+            } else {
+                setMessage('Hold Ctrl to zoom');
+                disableZoom();
+                setTimeout(() => setMessage(null), 1500);
+            }
         };
 
-        if (map) {
-            if (map.getSource("locations")) {
-                const source = map.getSource("locations") as maplibregl.GeoJSONSource;
-                source.setData(pointsGeoJSON);
-            } else {
-                map.addSource("locations", {
-                    type: "geojson",
-                    data: pointsGeoJSON,
-                });
+        map.getCanvas().addEventListener('wheel', handleWheel, { passive: false });
 
-                map.addLayer({
-                    id: "location-points",
-                    type: "circle",
-                    source: "locations",
-                    paint: {
-                        "circle-radius": 8,
-                        "circle-stroke-width": 2,
-                        "circle-stroke-color": [
-                            "case",
-                            ["==", ["get", "offline"], true], "#FFF",
-                            "darkgreen"
-                        ],
-                        // "circle-stroke-color": "#FFF",
-                        // "circle-color": "#FF5722",
-                        'circle-color': ['step',
-                            ['get', 'pm2_5'],
-                            getPM25Color(10),
-                            12,
-                            getPM25Color(35),
-                            35.4,
-                            getPM25Color(50),
-                            55.4,
-                            getPM25Color(100),
-                            150.4,
-                            getPM25Color(180),
-                            250.4,
-                            getPM25Color(300)
-                        ]
-                    },
-                });
+        return () => {
+            map.getCanvas().removeEventListener('wheel', handleWheel);
+        };
+    }, [map, isMobile]);
 
-                map.on("click", "location-points", async (e) => {
-                    const coordinates = (e.features?.[0].geometry as GeoJSON.Point).coordinates.slice();
-                    const { locationId } = e.features?.[0].properties || {};
+    return message;
+};
 
-                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-                    }
+const useDeviceType = (): boolean => {
+    const [isMobile, setIsMobile] = useState(false);
 
-                    retrieveLocation(locationId, coordinates); // Store the locationId
-                    setLocationId(locationId);
-                });
+    useEffect(() => {
+        const update = () => setIsMobile(window.innerWidth < 768);
+        update();
+        window.addEventListener('resize', update);
+        return () => window.removeEventListener('resize', update);
+    }, []);
 
-                map.on("mousemove", "location-points", async (e) => {
-                    const coordinates = (e.features?.[0].geometry as GeoJSON.Point).coordinates.slice();
-                    const { locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
+    return isMobile;
+};
 
-                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-                    }
+const populateMarkers = async (
+    map: Map,
+    popupRef: React.RefObject<maplibregl.Popup | null>,
+    setLocationId: (id: number) => void,
+    retrieveLocation: (id: number, coords: number[]) => void,
+    locale: string
+) => {
+    const data: IAirGradientPointData[] = await fetchKinAQData();
 
-                    // Close the previous popup if it exists
-                    popupRef.current?.remove();
-
-                    popupRef.current = new maplibregl.Popup({ closeButton: false })
-                        .setLngLat(coordinates as [number, number])
-                        .setHTML(
-                            `<strong>${locationName}</strong><br>
-                                PM2.5: ${pm2_5 ?? "-"} μg/m³<br>
-                                Last updated: ${formatDateToLocaleString(locale, timestamp)}`)
-                        .addTo(map);
-                });
-
-                map.on("mouseenter", "location-points", () => {
-                    map.getCanvas().style.cursor = "pointer";
-                });
-
-                map.on("mouseleave", "location-points", () => {
-                    map.getCanvas().style.cursor = "";
-                    popupRef.current?.remove();
-                    // popupRef.current = null;
-                });
+    const features: GeoJSON.Feature[] = data.map(item => {
+        const kinPoint = kinAQPoints.find(p => p.locationId === item.locationId)!;
+        return {
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: kinPoint.coordinates
+            },
+            properties: {
+                locationId: item.locationId,
+                locationName: item.locationName,
+                pm2_5: item.pm02,
+                timestamp: item.timestamp,
+                offline: item.offline
             }
-        }
-    } catch (error) {
-        console.error("Failed to fetch data:", error);
+        };
+    });
+
+    const geojson: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features
+    };
+
+    if (map.getSource('locations')) {
+        const source = map.getSource('locations') as maplibregl.GeoJSONSource;
+        source.setData(geojson);
+    } else {
+        map.addSource('locations', { type: 'geojson', data: geojson });
+
+        map.addLayer({
+            id: 'location-points',
+            type: 'circle',
+            source: 'locations',
+            paint: {
+                'circle-radius': 8,
+                'circle-stroke-width': 2,
+                'circle-stroke-color': [
+                    "case",
+                    ["==", ["get", "offline"], true], "#FFF",
+                    "darkgray"
+                ],
+                'circle-color': [
+                    'step',
+                    ['get', 'pm2_5'],
+                    getPM25Color(10), 12,
+                    getPM25Color(35), 35.4,
+                    getPM25Color(50), 55.4,
+                    getPM25Color(100), 150.4,
+                    getPM25Color(180), 250.4,
+                    getPM25Color(300)
+                ]
+            }
+        });
+
+        map.on('click', 'location-points', (e) => {
+            const coords = (e.features?.[0].geometry as GeoJSON.Point).coordinates;
+            const { locationId } = e.features?.[0].properties || {};
+            retrieveLocation(locationId, coords);
+            setLocationId(locationId);
+        });
+
+        map.on('mousemove', 'location-points', (e) => {
+            const coords = (e.features?.[0].geometry as GeoJSON.Point).coordinates;
+            const { locationName, pm2_5, timestamp } = e.features?.[0].properties || {};
+
+            popupRef.current?.remove();
+            popupRef.current = new maplibregl.Popup({ closeButton: false })
+                .setLngLat(coords as [number, number])
+                .setHTML(`<strong>${locationName}</strong><br>PM2.5: ${pm2_5 ?? '-'} μg/m³<br>Last updated: ${formatDateToLocaleString(locale, timestamp)}`)
+                .addTo(map);
+        });
+
+        map.on('mouseenter', 'location-points', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'location-points', () => {
+            map.getCanvas().style.cursor = '';
+            popupRef.current?.remove();
+        });
     }
 };
 
 const MapComponent: React.FC = () => {
-    const [map, setMap] = useState<Map | null>(null);
-    const [message, setMessage] = useState<string | null>('')
-    const [locationId, setLocationId] = useState<number | null>(-1)
-    const [currentStyleSource, setCurrentStyleSource] = useState<string>(styles[0].source);
+    const mapRef = useRef<Map | null>(null);
     const popupRef = useRef<maplibregl.Popup | null>(null);
-    const { retrieveLocation, coordinates, locationId: storeLocationId, setIsMapUpdated } = useLocationStore();
+    const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
+    const isMobile = useDeviceType();
     const locale = useLocale();
     const router = useRouter();
 
-    // --- Handle Map Style Change ---
-    const handleMapChange = useCallback((mapType: string) => {
-        if (!map) return;
+    const [currentStyleSource, setCurrentStyleSource] = useState(styles[0].source);
+    const { retrieveLocation, coordinates, locationId, setIsMapUpdated } = useLocationStore();
 
-        const selectedStyle = styles.find(style => style.label === mapType);
-        if (!selectedStyle || selectedStyle.source === currentStyleSource) {
-            console.log("Style change skipped: No style found or already active.");
-            return; // Don't reload if style is the same
-        }
-
-        console.log(`Changing style to: ${selectedStyle.label}`);
-        setCurrentStyleSource(selectedStyle.source); // Update state for next potential init
-
-        // const currentCenter = map.getCenter();
-        // const currentZoom = map.getZoom();
-
-        // Set the new style (this triggers the loading process)
-        // map.setStyle(selectedStyle.source);
-
-    }, [map, currentStyleSource]);
-
-
-    // To Load the Map
-    useEffect(function createMap() {
-        if (map) return;
-
-        const initialLongitude = 20.0; // Longitude for the center of Central Africa
-        const initialLatitude = 0.0;   // Latitude for the center of Central Africa
-        const initialZoom = 1;         // Adjust zoom level as needed
-        const initialBounds: [number, number, number, number] = [14.66241, -5.501214, 17.093503, -3.307021];
-
-        setMap(
-            new maplibregl.Map({
-                container: 'map',
-                style:
-                    // 'https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/openStreetMap.json',
-                    // "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-                    'https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/openStreetMap.json',
-                center: [initialLongitude, initialLatitude],
-                zoom: initialZoom,
-                maxBounds: initialBounds,
-                attributionControl: false
-            })
-                .addControl(new NavigationControl(), 'top-right')
-                .addControl(new GeolocateControl({
-                    positionOptions: { enableHighAccuracy: true },
-                }))
-                .addControl(new ScaleControl({
-                    maxWidth: 80,
-                    unit: 'metric'
-                }))
-                .addControl(new AttributionControl({
-                    customAttribution: '<a href="https://www.airgradient.com/" target="_blank">&copy; AirGradient</a> | <a href="https://www.wasaru.org/" target="_blank">&copy; WASARU </a>',
-                    compact: true,
-                }))
-        );
-
-        // return () => {
-        //     setMap(null);
-        // }
-    }, [map]);
+    const message = useScrollZoomControl(mapRef.current, isMobile);
 
     useEffect(() => {
-        if (!map) return; // Prevent reinitialization
+        if (mapRef.current || !mapContainerRef.current) return;
 
-        map.on('wheel', (e) => {
-            if (!e.originalEvent.ctrlKey) {
-                map.scrollZoom.disable();
-                setMessage('Hold Ctrl to zoom');
-                const timer = setTimeout(() => setMessage(''), 1500);
-                return () => clearTimeout(timer);
-            } else {
-                setMessage('');
-                map.scrollZoom.enable();
-            }
+        const map = new maplibregl.Map({
+            container: mapContainerRef.current,
+            style: currentStyleSource,
+            center: [20.0, 0.0],
+            zoom: 1,
+            maxBounds: [14.66241, -5.501214, 17.093503, -3.307021],
+            attributionControl: false
         });
 
-        map.on("load", () => {
-            populateMarkers(map, popupRef, setLocationId, retrieveLocation, locale);
-        });
+        map.addControl(new NavigationControl(), 'top-right');
+        map.addControl(new GeolocateControl({ positionOptions: { enableHighAccuracy: true } }));
+        map.addControl(new ScaleControl({ maxWidth: 80, unit: 'metric' }));
+        map.addControl(new AttributionControl({
+            compact: true,
+            customAttribution: '<a href="https://www.airgradient.com/" target="_blank">&copy; AirGradient</a> | <a href="https://www.wasaru.org/" target="_blank">&copy; WASARU</a>'
+        }));
 
-        const refreshData = async () => {
-            // Refresh map markers
-            await populateMarkers(map, popupRef, setLocationId, retrieveLocation, locale);
-            // If there's a selected location, refresh its details
-            if (storeLocationId && storeLocationId !== -1) {
-                retrieveLocation(storeLocationId, coordinates);
+        mapRef.current = map;
+
+        map.on('load', () => {
+            populateMarkers(map, popupRef, () => { }, retrieveLocation, locale);
+        });
+    }, []);
+
+    useEffect(() => {
+        if (!mapRef.current) return;
+
+        const interval = setInterval(async () => {
+            await populateMarkers(mapRef.current!, popupRef, () => { }, retrieveLocation, locale);
+
+            if (locationId !== -1 && coordinates) {
+                retrieveLocation(locationId, coordinates);
                 setIsMapUpdated(true);
             }
 
             router.refresh();
-        };
-
-        const interval = setInterval(refreshData, 60000);
+        }, 60000);
 
         return () => clearInterval(interval);
-    }, [map, locationId, coordinates]);
+    }, [locationId, coordinates]);
 
-    // Use the user last location as the default air quality information when the application loads
     useEffect(() => {
-        if (!map) return;
-        // Fly to a random location by offsetting the point -74.50, 40
-        // by up to 5 degrees.
-        if (locationId && coordinates) {
-            setTimeout(() => {
-                map.flyTo({
-                    center: [
-                        coordinates[0], // -74.5 + (Math.random() - 0.5) * 10,
-                        coordinates[1] // 40 + (Math.random() - 0.5) * 10
-                    ],
-                    zoom: 12,
-                    essential: true // this animation is considered essential with respect to prefers-reduced-motion
-                })
-            }, 1500);
+        if (!mapRef.current || !coordinates || coordinates.length === 0) return;
+
+        const timer = setTimeout(() => {
+            mapRef.current?.flyTo({
+                center: coordinates as [number, number],
+                zoom: 12,
+                essential: true
+            });
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, [coordinates]);
+
+    const handleMapChange = (label: string) => {
+        if (!mapRef.current) return;
+
+        const selected = styles.find(style => style.label === label);
+        if (selected && selected.source !== currentStyleSource) {
+            setCurrentStyleSource(selected.source);
+            mapRef.current.setStyle(selected.source);
         }
-    }, [map, locationId, coordinates])
+    };
 
     return (
         <div className='relative h-full w-full'>
             {message && (
-                <div className='absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 text-white text-lg font-semibold z-10 pointer-events-none'>
+                <div className='absolute inset-0 flex items-center justify-center bg-black/50 bg-opacity-50 text-white z-10 pointer-events-none'>
                     {message}
                 </div>
             )}
@@ -274,18 +247,16 @@ const MapComponent: React.FC = () => {
                     <button
                         key={style.label}
                         onClick={() => handleMapChange(style.label)}
-                        className={`
-                             px-4 py-2 text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-hidden focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                             ${index === 0 ? 'rounded-l-md' : ''}
-                             ${index === styles.length - 1 ? 'rounded-r-md' : '-ml-px'}
-                             ${currentStyleSource === style.source ? 'bg-gray-200 font-bold' : ''} // Indicate active style
-                         `}
+                        className={`px-4 py-2 text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50
+                            ${index === 0 ? 'rounded-l-md' : ''} 
+                            ${index === styles.length - 1 ? 'rounded-r-md' : '-ml-px'} 
+                            ${currentStyleSource === style.source ? 'bg-gray-300 font-bold' : ''}`}
                     >
                         {style.label}
                     </button>
                 ))}
             </div>
-            <div id='map' className='h-full w-full' />
+            <div ref={mapContainerRef} className="h-full w-full" />
         </div>
     );
 };

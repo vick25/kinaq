@@ -10,7 +10,7 @@ export const metadata = {
 
 export default async function Districts() {
     return (
-        <div className='container mx-auto px-4 py-12'>
+        <div className='container mx-auto md:px-4 py-4 md:py-8'>
             <Suspense fallback={<AQILoadingFallback />}>
                 <SensorReadings />
             </Suspense>

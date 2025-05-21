@@ -33,7 +33,7 @@ export async function populateLocationsTable() {
                     latitude: location.latitude.toString(),
                     longitude: location.longitude.toString(),
                     serial: location.serial || null,
-                    offline: location.offline || false
+                    offline: location.offline ?? true
                 };
 
                 return await prisma.location.upsert({
