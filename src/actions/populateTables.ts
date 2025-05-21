@@ -28,24 +28,22 @@ export async function populateLocationsTable() {
         // Create locations in database
         const createdLocations = await Promise.all(
             kinaqLocations.map(async (location) => {
+                const locationData = {
+                    locationName: location.locationName,
+                    latitude: location.latitude.toString(),
+                    longitude: location.longitude.toString(),
+                    serial: location.serial || null,
+                    offline: location.offline || false
+                };
+
                 return await prisma.location.upsert({
                     where: {
                         locationID: location.locationId.toString()
                     },
-                    update: {
-                        locationName: location.locationName,
-                        latitude: location.latitude.toString(),
-                        longitude: location.longitude.toString(),
-                        serial: location.serial || null,
-                        offline: location.offline || false
-                    },
+                    update: locationData,
                     create: {
                         locationID: location.locationId.toString(),
-                        locationName: location.locationName,
-                        latitude: location.latitude.toString(),
-                        longitude: location.longitude.toString(),
-                        serial: location.serial || null,
-                        offline: location.offline || false
+                        ...locationData
                     }
                 });
             })
@@ -54,7 +52,7 @@ export async function populateLocationsTable() {
         console.log(`Successfully populated ${createdLocations.length} KINAQ locations`);
         return createdLocations;
     } catch (error) {
-        console.error('Error populating locations:', error);
+        console.error('Error populating locations:', (error as Error).message);
         throw error;
     }
 }
@@ -75,7 +73,7 @@ export async function getLocations() {
         })
         return locations
     } catch (error) {
-        console.error('Error fetching locations:', error)
+        console.error('Error fetching locations:', (error as Error).message)
         return []
     }
 }
@@ -101,7 +99,7 @@ export async function getRequestData(user: IUser) {
         });
         return requests;
     } catch (error) {
-        console.error('Error fetching requests:', error);
+        console.error('Error fetching requests:', (error as Error).message);
         return [];
     }
 }
@@ -119,7 +117,7 @@ export async function updateRequest(id: string) {
         revalidatePath('/requests');
         return updatedRequest;
     } catch (error) {
-        console.error('Error updating request:', error);
+        console.error('Error updating request:', (error as Error).message);
         throw error;
     }
 }
