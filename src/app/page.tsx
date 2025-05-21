@@ -1,4 +1,5 @@
 import { populateLocationsTable } from "@/actions/populateTables";
+import ResponsiveAside from "@/components/aside";
 import LocationDetails from "@/components/location-details";
 import MapComponent from "@/components/map";
 import React from "react";
@@ -13,9 +14,13 @@ export default function Home() {
           <MapContent />
         </React.Suspense>
       </div>
-      <aside className="w-full md:w-96">
+      <aside className="hidden md:block w-full md:w-96">
         <LocationDetails />
       </aside>
+      {/* Mobile panel */}
+      <ResponsiveAside className="md:hidden">
+        <LocationDetails />
+      </ResponsiveAside>
     </div>
   )
 };

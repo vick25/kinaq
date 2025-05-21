@@ -66,7 +66,7 @@ export default function LocationDetails() {
   }, [locationData])
 
   return (
-    <div className="w-96 border-l bg-background p-4 flex flex-col h-full">
+    <div className="w-full md:w-96 mx-auto md:border-l md:border-gray-200 bg-background p-6 md:p-6 flex flex-col h-full rounded md:rounded-none">
       {
         // loading ? <div>Loading ...</div> :
         locationData ?
@@ -83,7 +83,7 @@ export default function LocationDetails() {
                       <span className="absolute -top-[0.37rem] -right-[1.9rem] text-red-600 text-xs font-semibold">off</span>
                     </>}
                 </p>
-                <time className="text-xs">{formatDateToLocaleString(locale, locationData?.timestamp)}</time>
+                <time className="text-xs text-right">{formatDateToLocaleString(locale, locationData?.timestamp)}</time>
               </div>
             </div>
 
