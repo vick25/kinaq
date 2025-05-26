@@ -109,7 +109,7 @@ const populateMarkers = async (
                 'circle-stroke-color': [
                     "case",
                     ["==", ["get", "offline"], true], "#FFF",
-                    "darkgray"
+                    "darkgreen"
                 ],
                 'circle-color': [
                     'step',

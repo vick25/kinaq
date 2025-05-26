@@ -66,7 +66,7 @@ export default function LocationDetails() {
   }, [locationData])
 
   return (
-    <div className="w-full md:w-96 mx-auto md:border-l md:border-gray-200 bg-background p-6 md:p-6 flex flex-col h-full rounded md:rounded-none">
+    <div className="w-full md:w-96 mx-auto md:border-l md:border-gray-200 bg-background p-4 md:p-6 flex flex-col h-full rounded md:rounded-none">
       {
         // loading ? <div>Loading ...</div> :
         locationData ?
@@ -118,7 +118,7 @@ export default function LocationDetails() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-3 pt-0">
-                    <div className="text-lg font-bold">{formatTo2Places(locationData?.atmp)} °C</div>
+                    <div className="text-sm md:text-lg font-bold">{formatTo2Places(locationData?.atmp)} °C</div>
                   </CardContent>
                 </Card>
                 <Card>
@@ -129,7 +129,7 @@ export default function LocationDetails() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-3 pt-0">
-                    <div className="text-lg font-bold">{formatTo2Places(locationData?.rhum)} %</div>
+                    <div className="text-sm md:text-lg font-bold">{formatTo2Places(locationData?.rhum)} %</div>
                   </CardContent>
                 </Card>
               </div>
@@ -172,7 +172,7 @@ export default function LocationDetails() {
         <div className="space-y-4">
           <h3 className="font-semibold mt-2">{t('partners')}</h3>
           <div className="flex flex-col justify-center space-y-2">
-            <div className="flex justify-center items-center space-x-2">
+            <div className="flex flex-col space-y-3 md:flex-row justify-center items-center space-x-2">
               <Link href="https://wasaruwash.org/" target="_blank" rel="noopener noreferrer">
                 <Image
                   src="/logo-wasaru.jpg"
@@ -201,7 +201,7 @@ export default function LocationDetails() {
                   alt="Partner Logo 2"
                   width={100}
                   height={50}
-                  className="h-12 w-auto p-1 object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+                  className="h-12 w-auto p-1 object-fit md:object-cover transition-transform duration-300 ease-in-out hover:scale-105"
                   priority
                 />
               </Link>

@@ -32,7 +32,7 @@ export default async function RootLayout({
       <body className={inter.className}>
         <Toast />
         <NextIntlClientProvider messages={messages}>
-          <main className="flex flex-col min-h-screen">
+          <main className="flex flex-col min-h-screen mx-auto">
             <Header />
             <LocationsInitializer locationsData={locationsData}>
               {children}

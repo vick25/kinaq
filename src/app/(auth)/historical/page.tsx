@@ -26,7 +26,7 @@ const Historical = async ({ searchParams }: PageProps) => {
     const isAuthenticated = session || showExport;
 
     return (
-        <div className='container mx-auto'>
+        <div className='container mx-auto px-6 md:px-4 lg:p-0'>
             <section className='my-5 space-y-4'>
                 <div className="text-[#f0f0f0] bg-[#222] text-2xl font-semibold leading-5 relative pl-[2.3rem] pr-0 py-4 rounded-[3rem_0_0_3rem]">
                     KINAQ | {t('export')}
@@ -49,7 +49,7 @@ const Historical = async ({ searchParams }: PageProps) => {
                     </div>
 
                     {!session && (
-                        <div className="my-6 bg-white border shadow-md rounded-md p-6 max-w-3xl mx-auto">
+                        <div className="my-6 bg-white border shadow-md rounded-md p-4 md:p-6 max-w-3xl mx-auto">
                             {shouldShowSignUp && <SignUpForm />}
 
                             {showSignIn && (

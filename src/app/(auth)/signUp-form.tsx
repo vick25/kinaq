@@ -31,7 +31,7 @@ const SignUpForm = async () => {
     }
 
     return (
-        <form id='formSignUp' action={handleSubmit} className="flex flex-col gap-4 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form id='formSignUp' action={handleSubmit} className="flex flex-col gap-4 bg-white shadow-md rounded px-4 md:px-8 pt-6 pb-8 mb-4">
             <h3 className="text-lg font-semibold text-gray-800 text-center mb-2">
                 {t('signUp.title')}
             </h3>
