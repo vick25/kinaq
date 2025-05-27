@@ -231,6 +231,27 @@ const MapComponent: React.FC = () => {
         const selected = styles.find(style => style.label === label);
         if (selected && selected.source !== currentStyleSource) {
             setCurrentStyleSource(selected.source);
+
+            // Store current coordinates and zoom level
+            const currentCenter = mapRef.current.getCenter();
+            const currentZoom = mapRef.current.getZoom();
+
+            mapRef.current.once('styledata', () => {
+                // Re-add sources and layers after new style loads
+                populateMarkers(
+                    mapRef.current!,
+                    popupRef,
+                    () => { },
+                    retrieveLocation,
+                    locale
+                );
+
+                // Restore map position
+                mapRef.current!.setCenter(currentCenter);
+                mapRef.current!.setZoom(currentZoom);
+            });
+
+            // Set new style
             mapRef.current.setStyle(selected.source);
         }
     };
@@ -250,7 +271,7 @@ const MapComponent: React.FC = () => {
                         className={`px-4 py-2 text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50
                             ${index === 0 ? 'rounded-l-md' : ''} 
                             ${index === styles.length - 1 ? 'rounded-r-md' : '-ml-px'} 
-                            ${currentStyleSource === style.source ? 'bg-gray-300 font-bold' : ''}`}
+                            ${currentStyleSource === style.source ? 'bg-gray-300 font-bold outline-2 outline-blue-500 z-10' : ''}`}
                     >
                         {style.label}
                     </button>
