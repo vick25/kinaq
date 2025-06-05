@@ -14,8 +14,11 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Kinshasa Air Quality",
+  keywords: ["Next.js", "Kinshasa Air Quality", "KINAQ", "WASARU WASH", "SaaS", "Web App"],
+  authors: [{ name: "Victor Kadiata", url: "https://kinaq.vercel.app" }],
+  creator: "Victor Kadiata",
   description: "Air quality monitoring dashboard for Kinshasa",
-}
+};
 
 export default async function RootLayout({
   children,
