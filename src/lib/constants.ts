@@ -51,7 +51,8 @@ export const kinAQPoints: { locationName: string, locationId: number, coordinate
     { locationName: "KINAQ Kimwenza", locationId: 153688, coordinates: [15.273191482850512, -4.469586791919752] },
     { locationName: "KINAQ Masiala", locationId: 154304, coordinates: [15.248748794122553, -4.370019400071179] },
     { locationName: "KINAQ UPN", locationId: 154639, coordinates: [15.25848, -4.39785] },
-    { locationName: "KINAQ Limete", locationId: 155951, coordinates: [15.3437, -4.36597] }
+    { locationName: "KINAQ Limete", locationId: 155951, coordinates: [15.3437, -4.36597] },
+    { locationName: "Kitambo", locationId: 161050, coordinates: [15.254485580805019, -4.332311322644807] }
 ]
 
 export const kinAQfeatureCollection = {

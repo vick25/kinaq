@@ -30,10 +30,10 @@ export default function ResponsiveAside({ children, className }: ResponsiveAside
             {isMobile && !isOpen && (
                 <Button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="fixed md:hidden bottom-10 z-50 right-4 px-3 py-2 bg-black/30 text-black hover:text-white rounded shadow-lg
+                    className="fixed md:hidden bottom-10 z-50 right-4 px-3 py-2 bg-green-600 text-black hover:text-white rounded shadow-lg
                     transition-opacity duration-300 opacity-100"
                 >
-                    Show Details
+                    View details
                 </Button>
             )}
 

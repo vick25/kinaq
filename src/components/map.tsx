@@ -124,6 +124,24 @@ const populateMarkers = async (
             }
         });
 
+        // map.addLayer({
+        //     id: 'location-labels',
+        //     type: 'symbol',
+        //     source: 'locations',
+        //     layout: {
+        //         'text-field': ['get', 'locationName'],
+        //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+        //         'text-size': 12,
+        //         'text-offset': [0, 1.5],
+        //         'text-anchor': 'top'
+        //     },
+        //     paint: {
+        //         'text-color': '#000',
+        //         'text-halo-color': '#FFF',
+        //         'text-halo-width': 1
+        //     }
+        // })
+
         map.on('click', 'location-points', (e) => {
             const coords = (e.features?.[0].geometry as GeoJSON.Point).coordinates;
             const { locationId } = e.features?.[0].properties || {};
