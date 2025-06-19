@@ -68,7 +68,9 @@ const AboutPage = async () => {
                         {t('mission.description')}
                     </p>
                     <p className="text-[#58595b] leading-relaxed">
-                        <span className="font-extrabold text-[#05b15d]">KINAQ</span> {t('mission.goals.awareness')} </p>
+                        <span className="font-extrabold text-[#05b15d]">KINAQ</span>&nbsp;
+                        {t('mission.goals.awareness')}
+                    </p>
                 </div>
 
                 <div className="bg-[#f3f4f6] rounded-lg p-6 mb-8">
