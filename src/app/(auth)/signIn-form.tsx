@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { auth } from '@/lib/auth';
 import { getTranslations } from 'next-intl/server';
+import { revalidatePath } from 'next/cache';
 import { headers } from "next/headers";
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -37,6 +38,9 @@ const SignInForm = async ({ loggedInEmail }: Props) => {
         }
 
         if (response.status === 200) {
+            // Revalidate both the root path (header) and historical path
+            revalidatePath('/', 'layout');
+            revalidatePath('/historical');
             return redirect(`/historical?signup=success`);
         }
 

@@ -15,8 +15,12 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import LocaleSwitcher from "./locale-switcher";
 
-function Header() {
-  const { data: session } = authClient.useSession();
+type props = {
+  user?: any;
+}
+
+function Header({ user }: props) {
+  // const { data: session } = authClient.useSession();
   const router = useRouter()
   const t = useTranslations('Header')
   const pathname = usePathname();
@@ -97,7 +101,7 @@ function Header() {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {session && (
+                {user && (
                   <DropdownMenuItem onSelect={() => router.push('/requests')}>
                     <div className="flex items-center w-full text-sm">
                       <User className="mr-2 h-4 w-4" />
@@ -113,7 +117,7 @@ function Header() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  {!session ? (
+                  {!user ? (
                     <div onClick={() => router.push('/historical?signup=#')} className="flex items-center w-full text-sm">
                       <LogIn className="mr-2 h-4 w-4" />
                       {t('login')}
@@ -166,7 +170,7 @@ function Header() {
                 <span className="text-sm font-medium hover:text-primary transition-colors">User Menu</span>
               </div>
               <div className="pl-10 space-y-2">
-                {session && <Link href="/requests" className="block text-sm">
+                {user && <Link href="/requests" className="block text-sm">
                   {t('myData')}
                 </Link>}
                 {/* <div className="flex items-center justify-between">

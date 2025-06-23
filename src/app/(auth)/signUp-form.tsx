@@ -20,7 +20,7 @@ const SignUpForm = async () => {
             email,
             type: 'sign-in'
         });
-        console.log({ data, error })
+        // console.log({ data, error })
 
         if (error || !data?.success) {
             console.error('OTP sending error:', error)
