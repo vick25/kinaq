@@ -16,10 +16,32 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Kinshasa Air Quality",
-  keywords: ["Next.js", "Kinshasa Air Quality", "KINAQ", "WASARU WASH", "SaaS", "Web App"],
+  keywords: ["Next.js", "Kinshasa Air Quality", "KINAQ", "WASARU WASH", "SaaS", "Web App", 'Air Quality Monitoring', 'DR Congo'],
   authors: [{ name: "Victor Kadiata", url: "https://kinaq.vercel.app" }],
   creator: "Victor Kadiata",
-  description: "Air quality monitoring dashboard for Kinshasa",
+  description: "Air quality monitoring dashboard for Kinshasa. The Kinshasa Air Quality Project (KINAQ) is implemented by WASARU (led by KASEREKA ISEVULAMBIRE), in partnership with Professor Daniel WESTERVELT of Columbia University (USA), with financial support of the Energy Policy Institute at the University of Chicago (EPIC)",
+  openGraph: {
+    title: 'Kinshasa Air Quality | KINAQ',
+    description: 'Download air quality data from KINAQ and learn about our mission to improve air quality in Kinshasa and DR Congo.',
+    url: 'https://kinaq.wasaruwash.org',
+    siteName: 'Kinshasa Air Quality',
+    images: [
+      {
+        url: 'https://kinaq.wasaruwash.org/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'KINAQ air quality dashboard and mission',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'KINAQ',
+    description: 'Learn how KINAQ is helping improve air quality in Kinshasa with data, sensors, and awareness.',
+    images: ['https://kinaq.wasaruwash.org/og-image.jpg'],
+  },
 };
 
 export default async function RootLayout({

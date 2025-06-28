@@ -7,28 +7,6 @@ import Link from "next/link";
 export const metadata = {
     title: 'KINAQ | About Us',
     description: 'Download air quality data from KINAQ and learn about our mission to improve air quality in Kinshasa and DR Congo.',
-    openGraph: {
-        title: 'KINAQ | About Us',
-        description: 'Download air quality data from KINAQ and learn about our mission to improve air quality in Kinshasa and DR Congo.',
-        url: 'https://kinaq.vercel.app/about',
-        siteName: 'KINAQ',
-        images: [
-            {
-                url: 'https://kinaq.vercel.app/og-image.jpg',
-                width: 1200,
-                height: 630,
-                alt: 'KINAQ air quality dashboard and mission',
-            },
-        ],
-        locale: 'en_US',
-        type: 'website',
-    },
-    twitter: {
-        card: 'summary_large_image',
-        title: 'KINAQ | About Us',
-        description: 'Learn how KINAQ is helping improve air quality in Kinshasa with data, sensors, and awareness.',
-        images: ['https://kinaq.vercel.app/og-image.jpg'],
-    },
 };
 
 const socialLinks = [
