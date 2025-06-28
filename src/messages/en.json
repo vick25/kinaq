@@ -43,6 +43,8 @@
         "downloadInstructions": "Download active air quality information older than 7 days:",
         "csv": "comma-separated text files (.csv) or",
         "json": "JSON files (.json)",
+        "raw": "The from .. to interval is limited to 2 days.",
+        "past": "The from .. to interval is limited to 10 days.",
         "warning": {
             "title": "All data are uncorrected values",
             "description": "Air quality parameters are raw values. Apply corrections. See",
@@ -59,7 +61,8 @@
             "dateRange": {
                 "start": "Start date",
                 "end": "End date"
-            }
+            },
+            "lastUpdated": "Last updated:"
         },
         "button": {
             "download": "Download",
@@ -68,7 +71,8 @@
         "errors": {
             "selectLocation": "Please select location and bucket.",
             "selectDates": "Please select a start and end date.",
-            "invalidDates": "End date cannot be earlier than the start date."
+            "invalidDates": "End date cannot be earlier than the start date.",
+            "nodata": "No data returned from the download request. Please check the dates interval."
         }
     },
     "Auth": {
@@ -134,8 +138,6 @@
         "newRequest": "Create New Request",
         "Logout": "Logout",
         "listTitle": "A list of your recent requests.",
-        "nodata": "No download requests found.",
-        "raw": "The from .. to interval is limited to 2 days.",
-        "past": "The from .. to interval is limited to 10 days."
+        "nodata": "No download requests found."
     }
 }

@@ -43,6 +43,8 @@
         "downloadInstructions": "Téléchargez les informations actives sur la qualité de l'air datant de plus de 7 jours :",
         "csv": "fichiers texte séparés par des virgules (.csv) ou",
         "json": "fichiers JSON (.json)",
+        "raw": "L'intervalle de .. à est limité à 2 jours.",
+        "past": "L'intervalle de .. à est limité à 10 jours.",
         "warning": {
             "title": "Toutes les données sont des valeurs non corrigées",
             "description": "Les paramètres de qualité de l’air sont des valeurs brutes. Appliquez des corrections. Voir",
@@ -59,7 +61,8 @@
             "dateRange": {
                 "start": "Date de début",
                 "end": "Date de fin"
-            }
+            },
+            "lastUpdated": "Dernière mise à jour :"
         },
         "button": {
             "download": "Télécharger",
@@ -68,7 +71,8 @@
         "errors": {
             "selectLocation": "Veuillez sélectionner un lieu et un bucket.",
             "selectDates": "Veuillez sélectionner une date de début et une date de fin.",
-            "invalidDates": "La date de fin ne peut pas être antérieure à la date de début."
+            "invalidDates": "La date de fin ne peut pas être antérieure à la date de début.",
+            "nodata": "No data returned from the download request. Please check the dates interval."
         }
     },
     "Auth": {
@@ -134,8 +138,6 @@
         "newRequest": "Créer une nouvelle requête",
         "Logout": "Déconnexion",
         "listTitle": "Liste de vos requêtes récentes.",
-        "nodata": "Aucune demande de téléchargement trouvée.",
-        "raw": "L'intervalle de .. à est limité à 2 jours.",
-        "past": "L'intervalle de .. à est limité à 10 jours."
+        "nodata": "Aucune demande de téléchargement trouvée."
     }
 }
