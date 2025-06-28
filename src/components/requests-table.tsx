@@ -41,6 +41,7 @@ interface IRequest {
 }
 
 const RequestsTable = ({ requests }: { requests: IRequest[] }) => {
+    console.log({ requests })
     const router = useRouter();
     const locale = useLocale();
     const t = useTranslations('Request');
@@ -104,7 +105,9 @@ const RequestsTable = ({ requests }: { requests: IRequest[] }) => {
                                     <TableCell className="font-medium">{request.id}</TableCell>
                                     <TableCell>{request.format}</TableCell>
                                     <TableCell>
-                                        <div>{`${formatDateToLocaleStringWithoutTime(locale, request?.startDate ?? '')} : ${formatDateToLocaleStringWithoutTime(locale, request.endDate ?? '')}`}</div>
+                                        <div>{`${formatDateToLocaleStringWithoutTime(locale, request?.startDate ??
+                                            new Date().toISOString().split('T')[0])} : 
+                                            ${formatDateToLocaleStringWithoutTime(locale, request.endDate ?? new Date().toISOString().split('T')[0])}`}</div>
                                         <div className="text-xs text-gray-500">{request.location?.locationName}</div>
                                         <Link href="#" className="text-blue-600 hover:text-blue-800 hover:underline text-xs font-medium">
                                             View on Map

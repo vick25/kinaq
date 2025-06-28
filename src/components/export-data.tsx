@@ -32,7 +32,7 @@ export default function ExportData({ locationQuery }: Props) {
     const [selectedUsage, setSelectedUsage] = useState<Usages>(Usages.academic_research);
     const [isLoading, setIsLoading] = useState(false);
 
-    const isDownloadDisabled = !selectedLocation || !selectedBucket;
+    const isDownloadDisabled = !selectedLocation || !selectedBucket || !institution || !startDate || !endDate;
 
     // Get the selected location name based on the selectedLocation state
     const selectedLocationName = useMemo(() => {
@@ -176,7 +176,7 @@ export default function ExportData({ locationQuery }: Props) {
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="data-source" className="text-slate-700">
-                            {t('form.source')}
+                            {t('form.source')} <span className="text-red-600">*</span>
                         </Label>
                         <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                             <SelectTrigger id="data-source" className="bg-white border-slate-200 focus:ring-emerald-500">
@@ -195,7 +195,7 @@ export default function ExportData({ locationQuery }: Props) {
 
                     <div className="space-y-2">
                         <Label htmlFor="bucket" className="text-slate-700">
-                            Bucket
+                            Bucket <span className="text-red-600">*</span>
                         </Label>
                         <Select onValueChange={setSelectedBucket}>
                             <SelectTrigger id="bucket" className="bg-white border-slate-200 focus:ring-emerald-500">
@@ -210,25 +210,27 @@ export default function ExportData({ locationQuery }: Props) {
                         </Select>
                     </div>
 
-                    <p className="md:col-[1/2] text-xs text-red-600 ml-4">
+                    <p className="row-[2/3] md:col-[1/2] text-xs text-red-600 ml-4">
                         {t('form.lastUpdated')} {selectedLocationLastDate && new Date(selectedLocationLastDate).toLocaleDateString()}
                     </p>
 
                     {selectedBucket &&
-                        <p className="md:col-[2/-1] text-xs text-red-600 ml-4">
+                        <p className="md:col-[2/-1] text-xs text-red-600  animate-pulse ml-4 transition-all">
                             {selectedBucket === 'raw' ? t('raw') : t('past')}
                         </p>}
                 </div>
 
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="start-date" className="text-slate-700">
-                            {t('form.dateRange.start')}
+                            {t('form.dateRange.start')} <span className="text-red-600">*</span>
                         </Label>
                         <input
                             id="start-date"
                             type="date"
-                            max={endDate}
+                            max={selectedLocationLastDate
+                                ? new Date(selectedLocationLastDate).toISOString().split('T')[0]
+                                : endDate}
                             value={startDate || ''}
                             onChange={(e) => setStartDate(e.target.value)}
                             className="mt-1 border p-2 rounded-md w-full focus:border-blue-500 focus:ring-blue-500"
@@ -237,7 +239,7 @@ export default function ExportData({ locationQuery }: Props) {
 
                     <div className="space-y-2">
                         <Label htmlFor="end-date" className="text-slate-700">
-                            {t('form.dateRange.end')}
+                            {t('form.dateRange.end')} <span className="text-red-600">*</span>
                         </Label>
                         <input id="end-date"
                             type="date"
@@ -257,7 +259,7 @@ export default function ExportData({ locationQuery }: Props) {
 
                     <div className="mt-3">
                         <label htmlFor="institution" className="block text-sm font-medium text-gray-700">
-                            {t('form.institution')}
+                            {t('form.institution')} <span className="text-red-600">*</span>
                         </label>
                         <input
                             type="text"
