@@ -80,7 +80,7 @@ export async function fetchLocationMeasures(downloadUrl: string, from?: string, 
         endPoint += `&to=${end}`;
     }
 
-    console.log(endPoint);
+    // console.log(endPoint);
     try {
         const response = await fetch(endPoint);
         return await response.json();

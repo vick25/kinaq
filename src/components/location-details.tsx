@@ -175,8 +175,8 @@ export default function LocationDetails() {
             <div className="flex flex-col space-y-3 md:flex-row justify-center items-center space-x-2">
               <Link href="https://wasaruwash.org/" target="_blank" rel="noopener noreferrer">
                 <Image
-                  src="/logo-wasaru.jpg"
-                  alt="Partner Logo 1"
+                  src="/logo-wasaru-new.jpeg"
+                  alt="Wasauru Logo"
                   width={100}
                   height={50}
                   className="h-24 w-auto object-cover transition-transform duration-300 ease-in-out hover:scale-105"
@@ -186,7 +186,7 @@ export default function LocationDetails() {
               <Link href="https://epic.uchicago.edu/area-of-focus/clean-air-program/" target="_blank" rel="noopener noreferrer">
                 <Image
                   src="/logo-epic.png"
-                  alt="Partner Logo 2"
+                  alt="EPIC Chicago Logo"
                   width={100}
                   height={50}
                   className="h-16 w-auto object-cover transition-transform duration-300 ease-in-out hover:scale-105"
@@ -198,7 +198,7 @@ export default function LocationDetails() {
               <Link href="https://aerosol.ldeo.columbia.edu/" target="_blank" rel="noopener noreferrer">
                 <Image
                   src="/logo-westerveltgroup.png"
-                  alt="Partner Logo 2"
+                  alt="Westervelt Group Logo"
                   width={100}
                   height={50}
                   className="h-12 w-auto p-1 object-fit md:object-cover transition-transform duration-300 ease-in-out hover:scale-105"
@@ -210,6 +210,6 @@ export default function LocationDetails() {
         </div>
         <div className="mt-3 text-center text-xs text-muted-foreground">© Copyright WASARU {new Date().getFullYear()}</div>
       </footer>
-    </div >
+    </div>
   )
 }
