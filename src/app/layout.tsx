@@ -4,6 +4,7 @@ import LocationsInitializer from "@/components/location-initializer";
 import NextProgress from "@/components/next-progress";
 import { Toast } from "@/components/toast-component";
 import { getRequiredUser } from "@/lib/auth-session";
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from 'next-intl';
@@ -70,6 +71,7 @@ export default async function RootLayout({
           </main>
         </NextIntlClientProvider>
       </body>
+      <GoogleAnalytics gaId="G-RG64WM3R4Z" />
     </html>
   )
 }
