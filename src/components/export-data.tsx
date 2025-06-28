@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchLocationMeasures } from "@/actions/airGradientData";
+import { fetchLocationMeasures, fetchUniqueLocation } from "@/actions/airGradientData";
 import { Label } from "@/components/ui/label";
 import {
     Select, SelectContent, SelectGroup, SelectItem,
@@ -13,6 +13,7 @@ import { Download, FileDown, Info, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-fox-toast";
 import { Button } from "./ui/button";
 
 type Props = {
@@ -33,9 +34,25 @@ export default function ExportData({ locationQuery }: Props) {
 
     const isDownloadDisabled = !selectedLocation || !selectedBucket;
 
+    // Get the selected location name based on the selectedLocation state
     const selectedLocationName = useMemo(() => {
         return locations.find(loc => loc.locationID === selectedLocation)?.locationName ?? selectedLocation;
     }, [locations, selectedLocation]);
+
+    // Store the last date in state and fetch it when location changes
+    const [selectedLocationLastDate, setSelectedLocationLastDate] = useState<string | undefined>();
+
+    useEffect(() => {
+        async function fetchLastDate() {
+            if (selectedLocationName) {
+                const response = await fetchUniqueLocation(selectedLocation as string);
+                setSelectedLocationLastDate(response?.timestamp ?? new Date().toISOString().split('T')[0]);
+            } else {
+                setSelectedLocationLastDate(undefined);
+            }
+        }
+        fetchLastDate();
+    }, [locations, selectedLocation, selectedLocationName]);
 
     useEffect(() => {
         if (!locations.length) return;
@@ -103,7 +120,12 @@ export default function ExportData({ locationQuery }: Props) {
                 startDate ?? '', endDate ?? ''
             );
 
-            if (!data?.length) throw new Error("No data returned from the API.");
+            if (!data?.length) {
+                toast.error(`${t('errors.nodata')}`);
+
+                setIsLoading(false);
+                return;
+            }
 
             if (format === 'csv') {
                 triggerFileDownload(convertToCSV(data), `${filename}.csv`, 'text/csv;charset=utf-8;');
@@ -188,6 +210,10 @@ export default function ExportData({ locationQuery }: Props) {
                         </Select>
                     </div>
 
+                    <p className="md:col-[1/2] text-xs text-red-600 ml-4">
+                        {t('form.lastUpdated')} {selectedLocationLastDate && new Date(selectedLocationLastDate).toLocaleDateString()}
+                    </p>
+
                     {selectedBucket &&
                         <p className="md:col-[2/-1] text-xs text-red-600 ml-4">
                             {selectedBucket === 'raw' ? t('raw') : t('past')}
@@ -216,6 +242,9 @@ export default function ExportData({ locationQuery }: Props) {
                         <input id="end-date"
                             type="date"
                             min={startDate}
+                            max={selectedLocationLastDate
+                                ? new Date(selectedLocationLastDate).toISOString().split('T')[0]
+                                : new Date().toISOString().split('T')[0]} // Prevent future dates
                             value={endDate || ''}
                             onChange={handleEndDateChange}
                             className="mt-1 border p-2 rounded-md w-full focus:border-blue-500 focus:ring-blue-500"
